@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>Cosmos MD — Editor Markdown + LaTeX (A4, PDF, HTML/MD)</title>
+	<link href="./css/copilotEditor.css" rel="stylesheet" type="text/css"/>
+    <!-- Bibliotecas necessárias -->
+    <script src="https://unpkg.com/prosemirror-view@1.27.2/dist/index.js"></script>
+    <script src="https://unpkg.com/prosemirror-state@1.3.4/dist/index.js"></script>
+    <script src="https://unpkg.com/prosemirror-model@1.14.1/dist/index.js"></script>
+    <script src="https://unpkg.com/prosemirror-schema-basic@1.1.2/dist/index.js"></script>
+    <script src="https://unpkg.com/prosemirror-schema-list@1.1.6/dist/index.js"></script>
+    <script src="https://unpkg.com/prosemirror-commands@1.1.11/dist/index.js"></script>
+    <script src="https://unpkg.com/prosemirror-keymap@1.1.4/dist/index.js"></script>
+    <script src="https://unpkg.com/prosemirror-history@1.1.3/dist/index.js"></script>
+    <script src="https://unpkg.com/prosemirror-menu@1.1.4/dist/index.js"></script>
+    <script src="https://unpkg.com/prosemirror-example-setup@1.1.2/dist/index.js"></script>
+    <!-- KaTeX para renderização de LaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.js"></script>
+    <!-- Prism.js para destaque de código -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup.min.js"></script>
+	<!-- MathJax config ANTES da lib -->
+	<script>
+	  window.MathJax = {
+		tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$','$$'], ['\\[','\\]']], processEscapes: true, tags: 'none' },
+		options: { skipHtmlTags: {'[-]': ['code','pre','script','style','textarea']} },
+		chtml: { scale: 1.0, matchFontHeight: false }
+	  };
+	</script>
+	<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+
+<body class="light">
+	<div class="app">
+	  <header>
+		<div class="toolbar">
+		  <span class="seg">
+			<button><img alt="Negrito" src="./assets/icons/format_bold.svg"/></button>
+			<button><img alt="Itálico" src="./assets/icons/format_italic.svg"/></button>
+			<button><img alt="Formatar Código" src="./assets/icons/code.svg"/></button>
+		  </span>
+		  <span class="seg">
+			<button><img alt="Título 1" src="./assets/icons/format_h1.svg"/></button>
+			<button><img alt="Título 2" src="./assets/icons/format_h2.svg"/></button>
+			<button><img alt="Título 3" src="./assets/icons/format_h3.svg"/></button>
+		  </span>
+		  <span class="seg">
+			<button><img alt="Lista não ordenada" src="./assets/icons/format_list_bulleted.svg"/></button>
+			<button><img alt="Lista ordenada" src="./assets/icons/format_list_numbered.svg"/></button>
+			<button><img alt="Checklist" src="./assets/icons/checklist.svg"/></button>
+			<button><img alt="Citação" src="./assets/icons/format_quote.svg"/></button>
+			<button><img alt="Inserir linha horizontal" src="./assets/icons/horizontal_rule.svg"/></button>
+		  </span>
+		  <span class="seg">
+			<button><img alt="Link" src="./assets/icons/link.svg"/></button>
+			<button><img alt="Imagem" src="./assets/icons/photo.svg"/></button>
+			<button><img alt="Inserir quebra de página" src="./assets/icons/insert_page_break.svg"/></button>
+			<button><img alt="Tabela" src="./assets/icons/table.svg"/></button>
+			<button id="exportPDF"><img alt="Exportar PDF" src="./assets/icons/pdf.svg"/></button>
+			<button id="exportHTML"><img alt="Exportar HTML" src="./assets/icons/html.svg"/></button>
+			<button id="downloadMD"><img alt="Exportar MD" src="./assets/icons/markdown.svg"/></button>
+		  </span>
+		  <span class="seg"><button title="Editor de LaTeX" id="latexBtn"><img alt="Fórmula" src="./assets/icons/function.svg"/></button></span>
+		</div>
+		<div class="grow"></div>
+		<div class="brand">Markdown Editor</div>
+		<div class="toggles">
+		  <label><input type="checkbox" id="autoRender" checked> render LaTeX</label>
+		  <span class="seg">
+			<button id="themeBtn" title="Alternar tema"><img alt="Alterar Modo" src="./assets/icons/contrast.svg"/></button>
+		  </span>
+		</div>
+	  </header>
+
+	  <main>
+		<section class="pane left-pane">
+		  <h3>Editor (Markdown) — arraste imagens aqui</h3>
+		  <textarea id="editor" spellcheck="false" placeholder="# Bem-vindo(a) ao Cosmos MD
+
+	Digite **Markdown** aqui. Matemática inline: $E=mc^2$.
+	Matemática em bloco:
+
+	$$
+	\\int_0^1 x^2\\,dx = \\tfrac{1}{3}
+	$$
+
+	- [ ] Checklist desmarcada
+	- [x] Checklist marcada
+	- Use a barra de ferramentas acima
+	- Atalhos: Ctrl+B, Ctrl+I, Ctrl+` (code)
+
+	::: note
+	**Nota**: Este é um bloco *admonition*.
+	:::
+
+	| Alinha à esq | Centro | Direita |
+	|:---|:---:|---:|
+	| A | B | C |
+
+	link
+	"></textarea>
+		  <div class="status">
+			<div id="cursorInfo">Lin 1, Col 1</div>
+			<div id="countInfo">0 caracteres</div>
+		  </div>
+		</section>
+
+		<section class="pane">
+		  <h3>Visualização (A4)</h3>
+		  <div id="preview" class="preview">
+			<div class="a4-surface"><div class="pages" id="pages"></div></div>
+		  </div>
+		  <div class="status">
+			<div>Render em tempo real <span class="kbd">300ms</span></div>
+			<div>LaTeX via MathJax</div>
+		  </div>
+		</section>
+	  </main>
+	</div>
+
+	<!-- Modal LaTeX -->
+	<div class="modal" id="latexModal" aria-hidden="true">
+	  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="latexTitle">
+		<header><div class="brand" id="latexTitle">Editor de LaTeX</div></header>
+		<div class="modal-body">
+		  <div style="flex:1; display:flex; flex-direction:column; gap:.4rem;">
+			<label><small>Expressão LaTeX</small></label>
+			<textarea id="latexInput" placeholder="Ex.: \\int_0^1 x^2\\,dx"></textarea>
+			<div style="display:flex; gap:.5rem; align-items:center;">
+			  <label><input type="radio" name="latexKind" value="inline" checked> inline <span class="kbd">$...$</span></label>
+			  <label><input type="radio" name="latexKind" value="block"> bloco <span class="kbd">$$...$$</span></label>
+			  <label><input type="checkbox" id="latexPreviewToggle" checked> pré-visualizar</label>
+			</div>
+		  </div>
+		  <div class="modal-side">
+			<div><small>Prévia:</small></div>
+			<div id="latexPreview" style="padding-top:.4rem;"></div>
+		  </div>
+		</div>
+		<div class="modal-footer">
+		  <div style="display:flex; gap:.5rem;">
+			<button id="latexInsert">Inserir/Atualizar</button>
+			<button id="latexCancel">Fechar</button>
+		  </div>
+		  <small>Dica: selecione um texto no editor para sobrescrever. O preview usa MathJax.</small>
+		</div>
+	  </div>
+	</div>
+	<script src="./js/copilotEditor.js"></script>
+</body>
+</html>

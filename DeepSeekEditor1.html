@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editor Avançado com LaTeX e Código</title>
+    <!-- Bibliotecas necessárias -->
+    <script src="https://unpkg.com/prosemirror-view@1.27.2/dist/index.js"></script>
+    <script src="https://unpkg.com/prosemirror-state@1.3.4/dist/index.js"></script>
+    <script src="https://unpkg.com/prosemirror-model@1.14.1/dist/index.js"></script>
+    <script src="https://unpkg.com/prosemirror-schema-basic@1.1.2/dist/index.js"></script>
+    <script src="https://unpkg.com/prosemirror-schema-list@1.1.6/dist/index.js"></script>
+    <script src="https://unpkg.com/prosemirror-commands@1.1.11/dist/index.js"></script>
+    <script src="https://unpkg.com/prosemirror-keymap@1.1.4/dist/index.js"></script>
+    <script src="https://unpkg.com/prosemirror-history@1.1.3/dist/index.js"></script>
+    <script src="https://unpkg.com/prosemirror-menu@1.1.4/dist/index.js"></script>
+    <script src="https://unpkg.com/prosemirror-example-setup@1.1.2/dist/index.js"></script>
+    <!-- KaTeX para renderização de LaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.js"></script>
+    <!-- Prism.js para destaque de código -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup.min.js"></script>
+    <link href="./css/deepSeekOne.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Editor Avançado com LaTeX e Código</h1>
+            <p class="subtitle">Crie documentos ricos com fórmulas matemáticas e trechos de código</p>
+        </header>
+        
+        <div class="toolbar">
+            <button onclick="insertLatexBlock()">Inserir Bloco LaTeX</button>
+            <button onclick="insertCodeBlock()">Inserir Bloco de Código</button>
+            <button onclick="insertFloatingBlock()">Inserir Bloco Flutuante</button>
+            <button onclick="togglePreview()">Alternar Visualização</button>
+        </div>
+        
+        <div class="editor-container">
+            <div class="editor-panel">
+                <div class="panel-header">
+                    <span>Editor</span>
+                    <span>Digite seu conteúdo aqui</span>
+                </div>
+                <div class="panel-content">
+                    <div id="editor" contenteditable="true"></div>
+                </div>
+            </div>
+            
+            <div class="editor-panel">
+                <div class="panel-header">
+                    <span>Visualização</span>
+                    <span>Resultado renderizado</span>
+                </div>
+                <div class="panel-content">
+                    <div id="preview"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h2>Como usar o editor:</h2>
+            <ul>
+                <li><strong>Fórmulas LaTeX inline:</strong> Use $...$ para fórmulas inline, como $E = mc^2$</li>
+                <li><strong>Fórmulas LaTeX em bloco:</strong> Use $$...$$ para fórmulas em bloco</li>
+                <li><strong>Código inline:</strong> Use `...` para código inline, como `console.log()`</li>
+                <li><strong>Blocos de código:</strong> Use três crases (```) para criar blocos de código</li>
+                <li><strong>Blocos flutuantes:</strong> Use o botão "Inserir Bloco Flutuante" para adicionar conteúdo destacado</li>
+            </ul>
+            
+            <h3>Exemplo de uso:</h3>
+            <div class="example">
+                <p>Para resolver a equação quadrática, usamos:</p>
+                <p>$$x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$$</p>
+                <p>Em JavaScript, podemos implementar isso como:</p>
+                <pre><code class="language-javascript">function quadratic(a, b, c) {
+    const discriminant = b * b - 4 * a * c;
+    if (discriminant < 0) return null;
+    
+    const sqrtDiscriminant = Math.sqrt(discriminant);
+    return [
+        (-b + sqrtDiscriminant) / (2 * a),
+        (-b - sqrtDiscriminant) / (2 * a)
+    ];
+}</code></pre>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Editor desenvolvido com ProseMirror, KaTeX e Prism.js</p>
+        </footer>
+    </div>
+	<script src="./js/deepSeekOne.js"></script>
+</body>
+</html>

@@ -1,0 +1,3860 @@
+/* VARIÁVEIS DE CORES E ESTILOS */
+:root {
+	--cosmic-dark: #0a0a1f;
+	--thermal-orange: #f97316;
+	--quantum-blue: #2563eb;
+	--plasma-purple: #8b5cf6;
+	--reaction-green: #10b981; /*  verificar duplicidade */
+	--radioactive-green: #10b981;
+	--fusion-orange: #f59e0b;
+	--acid-red: #ef4444;
+	--base-blue: #3b82f6;
+	--lab-white: #f8fafc;
+	--grid-gray: #374151;
+	--danger-red: #ef4444;
+	--magnetic-blue: #3b82f6;
+	--cold-blue: #60a5fa;
+	--hot-red: #ef4444;
+	--heat-red: #dc2626;
+	--plasma-pink: #ec4899;
+	--proton-color: #ef4444;
+	--neutron-color: #3b82f6;
+	--neutron-gray: #9ca3af;
+	--organic-green: #10b981;
+	--carbon-black: #1f2937;
+	--oxygen-red: #dc2626;
+	--hydrogen-gray: #9ca3af;
+	--nitrogen-blue: #1d4ed8;
+	--sulfur-yellow: #eab308;
+	--phosphorus-orange: #f97316;
+	--halogen-purple: #8b5cf6;
+	--work-purple: #8b5cf6;
+	--entropy-green: #10b981;
+}
+
+/* RESET E ESTILOS GLOBAIS */
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0;
+	padding: 20px;
+	font-family: 'Segoe UI', system-ui, -apple-system, Tahoma, Geneva, Verdana, sans-serif;
+	background: linear-gradient(135deg, var(--cosmic-dark) 0%, #1a1a3e 100%);
+	color: var(--lab-white);
+	overflow: hidden;
+	height: 100vh;
+	line-height: 1.5;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	
+}
+
+header {
+	text-align: center;
+	margin-bottom: 20px;
+	background: rgba(15, 23, 42, 0.95);
+	border: 1px solid var(--grid-gray);
+	border-radius: 12px;
+	padding: 16px 20px;
+	backdrop-filter: blur(10px);
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+}
+
+h1 {
+	color: var(--cold-blue);
+	font-size: 2.4em;
+	margin: 0 0 8px 0;
+	letter-spacing: 1px;
+	text-shadow: 0 1px 8px rgba(96, 165, 250, 0.25);
+}
+
+h2, h3 {
+	margin: 16px 0 8px;
+}
+
+h2 {
+	color: var(--cold-blue);
+	text-shadow: 0 1px 8px rgba(96,165,250,0.25);
+}
+
+h3 {
+	color: var(--lab-white);
+}
+
+
+p.subtitle {
+	color: rgba(248, 250, 252, 0.75);
+	font-size: 0.95em;
+	margin: 0;
+}
+
+section {
+	border: 1px solid var(--grid-gray);
+	border-radius: 12px;
+	padding: 16px;
+	background: rgba(15, 23, 42, 0.95);
+	backdrop-filter: blur(10px);
+	box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+}
+
+.tab-container {
+	display: flex;
+	gap: 10px;
+	justify-content: center;
+	margin: 20px 0;
+}
+
+.tab {
+	background: rgba(255, 255, 255, 0.08);
+	padding: 12px 24px;
+	border-radius: 8px;
+	cursor: pointer;
+	border: 1px solid rgba(255, 255, 255, 0.18);
+	color: var(--lab-white);
+	transition: all 0.25s ease;
+	user-select: none;
+}
+
+.tab:hover {
+	background: rgba(37, 99, 235, 0.30);
+	border-color: rgba(37, 99, 235, 0.55);
+}
+
+.tab.active {
+	background: var(--quantum-blue);
+	color: #081225;
+	border-color: var(--quantum-blue);
+	box-shadow: 0 6px 16px rgba(37, 99, 235, 0.40);
+}
+
+.tab-content {
+	display: none;
+}
+
+.tab-content.active {
+	display: flex;
+}
+
+main {
+	display: flex;
+	gap: 20px;
+	max-width: 1400px;
+	margin: 0 auto;
+}
+
+.canvas-container {
+	flex: 0 0 500px;
+	background: rgba(15, 23, 42, 0.95);
+	border-radius: 12px;
+	border: 1px solid var(--grid-gray);
+	padding: 15px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	backdrop-filter: blur(10px);
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+canvas {
+	background: #0d0e20;
+	width: 100%;
+	height: auto;
+	border: 1px solid var(--grid-gray);
+	display: block;
+	border-radius: 8px;
+	box-shadow: inset 0 0 12px rgba(59, 130, 246, 0.18);
+	max-width: 100%;
+}
+
+pre {
+	background: rgba(30,31,53,0.90);
+	padding: 12px;
+	border-radius: 8px;
+	overflow: auto;
+	white-space: pre-wrap;
+	border: 1px solid rgba(255,255,255,0.10);
+	color: rgba(248,250,252,0.90);
+}
+
+.pill {
+	display: inline-block;
+	padding: 2px 8px;
+	border: 1px solid rgba(255,255,255,0.20);
+	border-radius: 999px;
+	font-size: 12px;
+	background: rgba(255,255,255,0.06);
+}
+.spacer {
+	flex: 1 1 auto;
+}
+
+.w200 {
+	max-width: 200px;
+}
+
+/* =========================
+   CARTAS
+   ========================= */
+.cards-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+	gap: 10px;
+}
+.card {
+	border: 1px solid var(--grid-gray);
+	border-radius: 12px;
+	background: rgba(0,0,0,0.85);
+	color: var(--lab-white);
+	padding: 10px;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	gap: 6px;
+	user-select: none;
+	box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+	transition: transform .15s ease, box-shadow .2s ease, border-color .2s ease;
+}
+.card:hover {
+	transform: translateY(-1px);
+	box-shadow: 0 10px 26px rgba(0,0,0,0.4);
+}
+
+.card .name {
+	color: #E6D3A8;
+	font-weight: 600;
+}
+
+.card .sym {
+	font-family: ui-monospace, Menlo, Consolas, monospace;
+}
+
+.card[selected="true"] {
+	outline: 2px solid var(--quantum-blue);
+	box-shadow: 0 0 12px rgba(37,99,235,0.35);
+	border-color: var(--quantum-blue);
+}
+.card.pulse {
+	animation: pulse 450ms ease-out 1;
+}
+
+@keyframes pulse {
+	0% {
+		transform:scale(1);
+	} 50% {
+		transform:scale(1.06);
+	} 100% {
+		transform:scale(1);
+	}
+}
+
+.drop-zone {
+	min-height: 130px;
+	border: 1px dashed rgba(255,255,255,0.25);
+	border-radius: 10px;
+	padding: 10px;
+	background: rgba(10,10,10,0.6);
+	backdrop-filter: blur(6px);
+}
+
+.stats {
+	display: flex;
+	gap: 10px;
+	flex-wrap: wrap;
+}
+
+.badge {
+	border: 1px solid rgba(255,255,255,0.20);
+	border-radius: 999px;
+	padding: 4px 10px;
+	font-size: 12px;
+	background: rgba(255,255,255,0.06);
+}
+.ok {
+	color: var(--radioactive-green);
+}
+
+.warn {
+	color: var(--fusion-orange);
+}
+
+.bad {
+	color: var(--danger-red);
+}
+
+.controls-panel {
+	flex: 0 0 320px;
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+}
+
+.card {
+	background: rgba(15, 23, 42, 0.95);
+	border-radius: 12px;
+	border: 1px solid var(--grid-gray);
+	padding: 20px;
+	backdrop-filter: blur(10px);
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+.card-title {
+	color: var(--cold-blue);
+	font-size: 1.2em;
+	margin: 0 0 15px 0;
+	padding-bottom: 8px;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+	font-weight: 600;
+}
+
+.input-group {
+	display: flex;
+	align-items: center;
+	margin: 8px 0;
+	gap: 10px;
+}
+
+.input-label {
+	color: rgba(248, 250, 252, 0.8);
+	min-width: 80px;
+	font-size: 0.95em;
+}
+
+input[type="number"] {
+	width: 70px;
+	padding: 6px 8px;
+	background: rgba(255, 255, 255, 0.06);
+	color: var(--lab-white);
+	border: 1px solid var(--quantum-blue);
+	border-radius: 6px;
+	text-align: center;
+	font-size: 0.95em;
+	outline: none;
+	transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+input[type="number"]:focus {
+	box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.35);
+	border-color: var(--quantum-blue);
+}
+
+/* LAYOUT PRINCIPAL */
+.lab-container {
+	display: grid;
+	grid-template-areas:
+		"header header header"
+		"sidebar main main"
+		"status status status";
+	grid-template-rows: 60px 1fr 80px;
+	grid-template-columns: 280px minmax(600px, 1fr) 400px;
+	height: 100vh;
+	gap: 0;
+	background: var(--color-background);
+	/* Remover qualquer padding que possa estar causando o problema */
+	padding: 0;
+	margin: 0;
+}
+
+/* Header com padding lateral para alinhar com o conteúdo */
+.header {
+	grid-area: header;
+	background: var(--color-surface);
+	backdrop-filter: blur(10px);
+	border-bottom: 1px solid var(--color-border);
+	padding: 12px 20px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 20px;
+	z-index: 100;
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+	/* Adicionar max-width para limitar a largura do conteúdo */
+	position: relative;
+}
+
+/* Container interno do header para alinhar conteúdo */
+.header::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  z-index: -1;
+}
+
+.logo {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	font-size: 1.5rem;
+	font-weight: bold;
+	color: var(--lab-white);
+}
+
+.logo-icon {
+	font-size: 1.8rem;
+	animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+	0%, 100% {
+		transform: translateY(0px);
+	}
+	
+	50% {
+		transform: translateY(-5px);
+	}
+}
+
+.nav-tabs {
+	display: flex;
+	gap: 8px;
+	flex-wrap:wrap
+}
+
+.nav-tab {
+	display:inline-block;
+	padding: 8px 16px;
+	border: 1px solid rgba(255, 255, 255, 0.2);
+	border-radius: 6px;
+	background: rgba(255, 255, 255, 0.1);
+	color: var(--lab-white);
+	cursor: pointer;
+	transition: all 0.3s ease;
+	text-decoration: none; 
+}
+
+.nav-tab.active {
+	background: var(--quantum-blue);
+	border-color: var(--quantum-blue);
+	box-shadow:0 0 0 2px rgba(59,130,246,.25) inset
+}
+
+.nav-tab:hover {
+	background: rgba(37, 99, 235, 0.3);
+}
+
+.nav-tab:focus-visible {
+	outline: 2px solid var(--quantum-blue);
+	outline-offset: 2px;
+}
+
+.header-actions {
+	display: flex;
+	gap: 15px;
+	align-items: center;
+}
+
+.search-bar {
+	background: rgba(255, 255, 255, 0.1);
+	border: 1px solid rgba(255, 255, 255, 0.2);
+	border-radius: 20px;
+	padding: 8px 15px;
+	color: var(--lab-white);
+	width: 200px;
+}
+
+.icon-btn {
+	background: none;
+	border: none;
+	color: var(--lab-white);
+	font-size: 1.2rem;
+	cursor: pointer;
+	padding: 8px;
+	border-radius: 6px;
+	transition: background 0.3s ease;
+}
+
+.icon-btn:hover {
+	background: rgba(255, 255, 255, 0.1);
+}
+
+/* SIDEBAR */
+.sidebar {
+	grid-area: sidebar;
+	background: rgba(15, 23, 42, 0.8);
+	border-right: 1px solid var(--grid-gray);
+	padding: 20px;
+	overflow-y: auto;
+	display: flex;
+	flex-direction: column;
+	gap: 25px;
+}
+
+.sidebar-section {
+	background: rgba(255,255,255,0.05);
+	border-radius: 10px;
+	padding: 15px;	
+	margin-bottom: 30px;
+}
+
+.main {
+	grid-area: main;
+	background: #0d1020;
+	padding: 14px;
+	overflow: auto;
+}
+
+.status {
+	grid-area: status;
+	background: #0b0f1a;
+	border-top: 1px solid var(--grid-gray);
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	padding:0 14px;
+}
+
+.panel-title {
+	color: #81d4fa;
+	font-size: 1.1em;
+	margin: 12px 0 10px;
+	padding-bottom: 6px;
+	border-bottom: 2px solid #2a2d45;
+	font-weight: 600;
+}
+.info-panel {
+	background: #1a1c2f;
+	border-radius: 12px;
+	padding: 14px;
+	box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+	margin-bottom: 14px;
+}
+.particle-controls {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 10px;
+	margin: 10px 0;
+}
+
+.particle-group {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.particle-title {
+	color: #81d4fa;
+	font-size: 0.9em;
+	text-align: center;
+	margin-bottom: 5px;
+}
+
+.button-group {
+	display: flex;
+	gap: 8px;
+	flex-wrap: wrap;
+	margin-top: 12px;
+}
+
+button {
+	background: #4fc3f7;
+	color: #0b0c1a;
+	border: none;
+	padding: 10px 14px;
+	cursor: pointer;
+	border-radius: 8px;
+	font-weight: 600;
+	font-size: 0.95em;
+	transition: background 0.2s, transform 0.1s, border-color 0.2s;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	white-space: nowrap;
+	backdrop-filter: blur(10px);
+}
+
+button:hover {
+	background:#29b6f6;
+	transform: translateY(-2px);
+	box-shadow:0 4px 12px rgba(41,182,246,0.3);
+}
+
+button:active {
+	transform: translateY(0);
+}
+
+button.warning {
+	background: var(--danger-red);
+	border-color: var(--danger-red);
+	color: #ffffff;
+}
+
+button.warning:hover {
+	background:#ff1744;
+	box-shadow:0 4px 12px rgba(255,23,68,0.3);
+}
+
+button.success {
+	background: var(--radioactive-green);
+	border-color: var(--radioactive-green);
+	color: #081225;
+}
+
+button.success:hover {
+	background:#4caf50;
+	box-shadow:0 4px 12px rgba(76,175,80,0.3);
+}
+
+
+button.secondary {
+	background:#2a2d45;
+	color:#bbdefb;
+}
+
+button.secondary:hover {
+	background:#3a3d55;
+	box-shadow:0 4px 12px rgba(187,222,251,0.2);
+}
+
+textarea, input[type="text"] {
+	width: 100%;
+	box-sizing: border-box;
+	background: rgba(255,255,255,0.06);
+	color: var(--lab-white);
+	border: 1px solid var(--quantum-blue);
+	border-radius: 8px;
+	padding: 10px;
+	font-size: 14px;
+	outline: none;
+	transition: box-shadow .2s, border-color .2s;
+}
+textarea:focus, input[type="text"]:focus {
+	box-shadow: 0 0 0 3px rgba(37,99,235,0.35);
+	border-color: var(--quantum-blue);
+}
+
+/* Range slider no tema */
+input[type="range"] {
+	width: 100%;
+	box-sizing: border-box;
+	background: transparent;
+	accent-color: var(--quantum-blue);
+}
+/* Trilho custom */
+input[type="range"]::-webkit-slider-runnable-track {
+	height: 6px; border-radius: 3px;
+	background: rgba(255,255,255,0.10);
+}
+input[type="range"]::-moz-range-track {
+	height: 6px; border-radius: 3px;
+	background: rgba(255,255,255,0.10);
+}
+/* Thumb */
+input[type="range"]::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	width: 18px; height: 18px; border-radius: 50%;
+	background: var(--quantum-blue);
+	border: 2px solid rgba(255,255,255,0.55);
+	box-shadow: 0 2px 6px rgba(0,0,0,0.45);
+	margin-top: -6px; /* centraliza no trilho */
+	cursor: pointer;
+}
+input[type="range"]::-moz-range-thumb {
+	width: 18px; height: 18px; border-radius: 50%;
+	background: var(--quantum-blue);
+	border: 2px solid rgba(255,255,255,0.55);
+	box-shadow: 0 2px 6px rgba(0,0,0,0.45);
+	cursor: pointer;
+}
+
+.row {
+	display: flex;
+	gap: 8px;
+	flex-wrap: wrap;
+	align-items: center;
+}
+
+.col {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.mono {
+	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+}
+
+.small {
+	font-size: 12px;
+	opacity: 0.8;
+}
+
+.results-panel {
+	flex: 0 0 320px;
+	background: rgba(15, 23, 42, 0.95);
+	border-radius: 12px;
+	border: 1px solid var(--grid-gray);
+	padding: 20px;
+	backdrop-filter: blur(10px);
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+.results-title {
+	color: var(--cold-blue);
+	font-size: 1.2em;
+	margin: 0 0 15px 0;
+	padding-bottom: 8px;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+	font-weight: 600;
+}
+
+#info {
+	min-height: 120px;
+	max-height: 200px;
+	padding: 10px;
+	background: rgba(30, 31, 53, 0.9);
+	border-radius: 8px;
+	margin-top: 10px;
+	white-space: pre-line;
+	font-size: 0.92em;
+	color: rgba(248, 250, 252, 0.85);
+	overflow-y: auto;
+	line-height: 1.5;
+	border: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+.particle-log {
+	background: rgba(30, 31, 53, 0.9);
+	border-radius: 8px;
+	padding: 10px;
+	margin-top: 15px;
+	max-height: 150px;
+	overflow-y: auto;
+	font-size: 0.85em;
+	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+	border: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+.log-entry {
+	margin: 4px 0;
+	padding: 4px;
+	border-left: 3px solid var(--quantum-blue);
+	background: rgba(37, 99, 235, 0.10);
+	border-radius: 4px;
+}
+
+.section-title {
+	font-size: 0.9rem;
+	color: var(--quantum-blue);
+	font-weight: 600;
+	margin-bottom: 15px;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.system-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 8px;
+	margin-bottom: 15px;
+}
+
+.system-btn {
+	padding: 12px 8px;
+	background: rgba(255,255,255,0.1);
+	border: 1px solid rgba(255,255,255,0.2);
+	border-radius: 6px;
+	color: var(--lab-white);
+	cursor: pointer;
+	transition: all 0.3s ease;
+	text-align: center;
+	font-size: 0.8rem;
+}
+
+.system-btn:hover {
+	background: rgba(249, 115, 22, 0.3);
+	transform: translateY(-2px);
+}
+
+.system-btn.active {
+	background: var(--thermal-orange);
+	border-color: var(--thermal-orange);
+}
+
+.process-list {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.process-btn {
+	padding: 10px;
+	background: rgba(255,255,255,0.05);
+	border: 1px solid rgba(255,255,255,0.1);
+	border-radius: 6px;
+	color: var(--lab-white);
+	cursor: pointer;
+	transition: all 0.3s ease;
+	text-align: left;
+	font-size: 0.9rem;
+}
+
+.process-btn:hover {
+	background: rgba(59, 130, 246, 0.3);
+	border-color: var(--cold-blue);
+}
+
+.process-btn.active {
+	background: rgba(59, 130, 246, 0.5);
+	border-color: var(--cold-blue);
+}
+
+.law-buttons {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 8px;
+}
+
+.law-btn {
+	padding: 10px;
+	background: rgba(16, 185, 129, 0.2);
+	border: 1px solid var(--entropy-green);
+	border-radius: 6px;
+	color: var(--lab-white);
+	cursor: pointer;
+	transition: all 0.3s ease;
+	text-align: center;
+	font-size: 0.9rem;
+}
+
+.law-btn:hover {
+	background: rgba(16, 185, 129, 0.4);
+}
+
+.element-grid {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 8px;
+	margin-bottom: 15px;
+}
+
+.element-btn {
+	padding: 10px 5px;
+	background: rgba(255,255,255,0.1);
+	border: 1px solid rgba(255,255,255,0.2);
+	border-radius: 6px;
+	color: var(--lab-white);
+	cursor: pointer;
+	transition: all 0.3s ease;
+	text-align: center;
+	font-size: 0.8rem;
+}
+
+.element-btn:hover {
+	background: rgba(239, 68, 68, 0.3);
+	transform: translateY(-2px);
+}
+
+.element-btn.H {
+	background: linear-gradient(135deg, var(--hydrogen-gray), #6b7280);
+}
+
+.element-btn.O {
+	background: linear-gradient(135deg, var(--oxygen-red), #b91c1c);
+}
+
+.element-btn.C {
+	background: linear-gradient(135deg, var(--carbon-black), #111827);
+}
+
+.element-btn.N {
+	background: linear-gradient(135deg, var(--nitrogen-blue), #1e40af);
+}
+
+.element-btn.Cl, .element-btn.F, .element-btn.Br { 
+	background: linear-gradient(135deg, var(--halogen-purple), #7c3aed); 
+}
+
+.element-btn.S {
+	background: linear-gradient(135deg, var(--sulfur-yellow), #ca8a04);
+}
+
+.element-btn.P {
+	background: linear-gradient(135deg, var(--phosphorus-orange), #ea580c);
+}
+
+.element-btn.Na {
+	background: rgba(249, 115, 22, 0.3);
+}
+
+.functional-group-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 8px;
+}
+
+.group-btn {
+	padding: 10px;
+	background: rgba(16, 185, 129, 0.2);
+	border: 1px solid var(--organic-green);
+	border-radius: 6px;
+	color: var(--lab-white);
+	cursor: pointer;
+	transition: all 0.3s ease;
+	text-align: center;
+	font-size: 0.8rem;
+}
+
+.group-btn:hover {
+	background: rgba(16, 185, 129, 0.4);
+	transform: translateY(-2px);
+}
+
+.tool-list, .element-list, .instrument-list, .project-list {
+	list-style: none;
+}
+
+.tool-item, .element-item, .instrument-item, .project-item {
+	padding: 10px 15px;
+	margin-bottom: 8px;
+	background: rgba(255, 255, 255, 0.05);
+	border-radius: 6px;
+	border-left: 3px solid transparent;
+	cursor: pointer;
+	transition: all 0.3s ease;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.tool-item:hover, .element-item:hover, .instrument-item:hover, .project-item:hover {
+	background: rgba(255, 255, 255, 0.1);
+	border-left-color: var(--quantum-blue);
+}
+
+.tool-item.active, .element-item.active {
+	background: rgba(37, 99, 235, 0.2);
+	border-left-color: var(--quantum-blue);
+}
+
+/* ÁREA PRINCIPAL */
+.main-content {
+	grid-area: main;
+	background: rgba(10, 10, 31, 0.5);
+	position: relative;
+	overflow: hidden;
+	display: grid;
+	grid-template-columns: 1fr 400px;
+	gap: 20px;
+	padding: 20px;
+}
+
+.lab-bench {
+	background: 
+		linear-gradient(45deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%),
+		repeating-linear-gradient(0deg, transparent, transparent 20px, rgba(255,255,255,0.02) 20px, rgba(255,255,255,0.02) 21px);
+	border: 2px solid rgba(255,255,255,0.1);
+	border-radius: 15px;
+	position: relative;
+	overflow: hidden;
+}
+
+.thermo-canvas {
+	background: 
+		linear-gradient(45deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%),
+		repeating-linear-gradient(0deg, transparent, transparent 25px, rgba(249, 115, 22, 0.05) 25px, rgba(249, 115, 22, 0.05) 26px);
+	border: 2px solid rgba(249, 115, 22, 0.3);
+	border-radius: 15px;
+	position: relative;
+	overflow: hidden;
+}
+
+.simulation-area {
+	width: 100%;
+	height: 100%;
+	position: relative;
+}
+
+/* MÁQUINA TÉRMICA */
+.heat-engine {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 300px;
+	height: 200px;
+}
+
+.piston-chamber {
+	position: relative;
+	width: 100%;
+	height: 100%;
+}
+
+.chamber {
+	position: absolute;
+	width: 120px;
+	height: 180px;
+	background: rgba(255,255,255,0.1);
+	border: 2px solid rgba(255,255,255,0.3);
+	border-radius: 10px 10px 0 0;
+	bottom: 0;
+	left: 50%;
+	transform: translateX(-50%);
+	overflow: hidden;
+}
+
+.piston {
+	position: absolute;
+	width: 110px;
+	height: 20px;
+	background: linear-gradient(90deg, #4b5563, #6b7280);
+	border-radius: 5px 5px 0 0;
+	bottom: 40px;
+	left: 50%;
+	transform: translateX(-50%);
+	transition: bottom 0.5s ease;
+}
+
+.gas-particles {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	bottom: 0;
+}
+
+.gas-particle {
+	position: absolute;
+	width: 8px;
+	height: 8px;
+	background: rgba(59, 130, 246, 0.8);
+	border-radius: 50%;
+	animation: gasMove 2s infinite linear;
+}
+
+.heat-source {
+	position: absolute;
+	width: 140px;
+	height: 20px;
+	background: linear-gradient(90deg, var(--heat-red), #ef4444);
+	bottom: -25px;
+	left: 50%;
+	transform: translateX(-50%);
+	border-radius: 5px;
+}
+
+.cold-sink {
+	position: absolute;
+	width: 140px;
+	height: 20px;
+	background: linear-gradient(90deg, var(--cold-blue), #60a5fa);
+	top: -25px;
+	left: 50%;
+	transform: translateX(-50%);
+	border-radius: 5px;
+}
+
+.crank-shaft {
+	position: absolute;
+	width: 200px;
+	height: 4px;
+	background: #d1d5db;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%) rotate(0deg);
+	transform-origin: center;
+	transition: transform 0.5s ease;
+}
+
+/* DIAGRAMA PV */
+.pv-diagram {
+	position: absolute;
+	top: 20px;
+	right: 20px;
+	width: 250px;
+	height: 180px;
+	background: rgba(0,0,0,0.7);
+	border: 1px solid rgba(255,255,255,0.2);
+	border-radius: 8px;
+	padding: 10px;
+}
+
+.graph-axis {
+	position: absolute;
+	background: rgba(255,255,255,0.5);
+}
+
+.axis-x {
+	width: 100%;
+	height: 1px;
+	bottom: 20px;
+	left: 0;
+}
+
+.axis-y {
+	width: 1px;
+	height: 100%;
+	bottom: 20px;
+	left: 20px;
+}
+
+.thermodynamic-cycle {
+	position: absolute;
+	width: calc(100% - 40px);
+	height: calc(100% - 40px);
+	bottom: 20px;
+	left: 20px;
+}
+
+.cycle-path {
+	fill: none;
+	stroke: var(--work-purple);
+	stroke-width: 2;
+	stroke-dasharray: 5, 5;
+}
+
+/* PARTÍCULAS DE CALOR */
+.heat-particle {
+	position: absolute;
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: var(--heat-red);
+	animation: heatRise 3s infinite linear;
+}
+
+.cold-particle {
+	position: absolute;
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: var(--cold-blue);
+	animation: coldFall 3s infinite linear;
+}
+
+.organic-canvas {
+	background: 
+		linear-gradient(45deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%),
+		repeating-linear-gradient(0deg, transparent, transparent 25px, rgba(16, 185, 129, 0.05) 25px, rgba(16, 185, 129, 0.05) 26px);
+	border: 2px solid rgba(16, 185, 129, 0.3);
+	border-radius: 15px;
+	position: relative;
+	overflow: hidden;
+}
+
+.molecule-presets {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.molecule-canvas {
+	width: 100%;
+	height: 100%;
+	position: relative;
+}
+
+.molecule-display {
+	width: 100%;
+	height: 100%;
+	position: relative;
+}
+
+.carbon-chain {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+
+.nuclear-canvas {
+	background: rgba(15,23,42,0.6);
+	border-radius:15px;
+	border:1px solid var(--grid-gray);
+	position:relative;
+	overflow:hidden;
+}
+/* Canvas WebGL ocupa todo o container */
+.nuclear-canvas canvas {
+	position:absolute;
+	inset:0;
+	display:block;
+}
+
+.control-panel {
+	background: rgba(15,23,42,0.8);
+	border:1px solid var(--grid-gray);
+	border-radius:15px;
+	padding:20px; backdrop-filter: blur(10px);
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+}
+
+.reaction-controls {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 10px;
+}
+
+.panel-section {
+	margin-bottom:25px;
+}
+
+.parameter-controls {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 15px;
+}
+
+.control-group {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.slider-container {
+	margin: 15px 0;
+}
+
+.slider-label {
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: 5px;
+	font-size: 0.9rem;
+}
+
+.slider {
+	width: 100%;
+	height: 6px;
+	background: rgba(255,255,255,0.1);
+	border-radius: 3px;
+	outline: none;
+	-webkit-appearance: none;
+}
+
+.slider::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	width: 18px;
+	height: 18px;
+	border-radius: 50%;
+	background: var(--quantum-blue);
+	background: var(--thermal-orange);
+	cursor: pointer;
+	border: 2px solid rgba(255, 255, 255, 0.55);
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
+}
+
+.value-display {
+	background: rgba(0,0,0,0.3);
+	padding: 10px;
+	border-radius: 8px;
+	text-align: center;
+	font-family: 'Courier New', monospace;
+}
+
+.value-large {
+	font-size: 1.8rem;
+	font-weight: bold;
+	margin: 5px 0;
+}
+
+.energy-flow {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 10px;
+	margin: 15px 0;
+}
+
+.flow-item {
+	background: rgba(255,255,255,0.05);
+	padding: 10px;
+	border-radius: 8px;
+	text-align: center;
+}
+
+.flow-value {
+	font-size: 1.2rem;
+	font-weight: bold;
+	margin-top: 5px;
+}
+
+.reaction-buttons {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 10px;
+	margin: 20px 0;
+}
+
+.reaction-btn {
+	padding: 12px;
+	border: none;
+	border-radius: 8px;
+	background: rgba(255,255,255,0.1);
+	color: var(--lab-white);
+	cursor: pointer;
+	transition: 0.3s;
+	font-weight: 600;
+}
+
+.reaction-btn.fusion {
+	background: linear-gradient(135deg, var(--fusion-orange), var(--danger-red));
+}
+
+.reaction-btn.fission {
+	background: linear-gradient(135deg, var(--radioactive-green), #059669);
+}
+
+.reaction-btn:hover {
+	transform: translateY(-2px);
+	box-shadow:0 5px 15px rgba(0,0,0,0.3);
+}
+
+.atom {
+	position: absolute;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: white;
+	font-weight: bold;
+	font-size: 0.8rem;
+	cursor: grab;
+	user-select: none;
+	transition: all 0.3s ease;
+	box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.atom:active {
+	cursor: grabbing;
+}
+
+.atom.H { 
+	background: radial-gradient(circle at 30% 30%, var(--hydrogen-gray), #6b7280);
+	width: 40px;
+	height: 40px;
+	font-size: 0.7rem;
+}
+.atom.O { 
+	background: radial-gradient(circle at 30% 30%, var(--oxygen-red), #b91c1c);
+	width: 60px;
+	height: 60px;
+}
+.atom.C { 
+	background: radial-gradient(circle at 30% 30%, var(--carbon-black), #111827);
+	width: 70px;
+	height: 70px;
+	border: 2px solid rgba(255,255,255,0.3);
+}
+.atom.N { 
+	background: radial-gradient(circle at 30% 30%, var(--nitrogen-blue), #1e40af);
+	width: 65px;
+	height: 65px;
+}
+.atom.Cl, .atom.F, .atom.Br { 
+	background: radial-gradient(circle, #22c55e, #15803d); 
+	width: 75px;
+	height: 75px;
+}
+.atom.Na { 
+	background: radial-gradient(circle, #f97316, #c2410c); 
+	width: 65px;
+	height: 65px;
+}
+
+.atom.S { 
+	background: radial-gradient(circle at 30% 30%, var(--sulfur-yellow), #ca8a04); 
+	width: 70px; height: 70px; 
+}
+.atom.P { 
+	background: radial-gradient(circle at 30% 30%, var(--phosphorus-orange), #ea580c); 
+	width: 75px; height: 75px; 
+}
+
+.atom-canvas {
+	background:
+		radial-gradient(circle at 30% 30%, rgba(37, 99, 235, 0.1) 0%, transparent 50%),
+		radial-gradient(circle at 70% 70%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
+	border-radius: 15px;
+	position: relative;
+	transition: all 0.5s ease;
+}
+
+.atom-canvas.cold {
+	background:
+		radial-gradient(circle at 30% 30%, rgba(96, 165, 250, 0.2) 0%, transparent 50%),
+		radial-gradient(circle at 70% 70%, rgba(59, 130, 246, 0.2) 0%, transparent 50%);
+}
+
+.atom-canvas.hot {
+	background:
+		radial-gradient(circle at 30% 30%, rgba(239, 68, 68, 0.3) 0%, transparent 50%),
+		radial-gradient(circle at 70% 70%, rgba(245, 158, 11, 0.3) 0%, transparent 50%);
+}
+
+.atom-canvas.plasma {
+	background:
+		radial-gradient(circle at 30% 30%, rgba(236, 72, 153, 0.4) 0%, transparent 50%),
+		radial-gradient(circle at 70% 70%, rgba(139, 92, 246, 0.4) 0%, transparent 50%);
+	animation: plasma-pulse 2s ease-in-out infinite;
+}
+
+.atom-display {
+	width: 500px;
+	height: 500px;
+	position: relative;
+}
+
+.bond {
+	position: absolute;
+	background: rgba(255,255,255,0.6);
+	transform-origin: 0 0;
+	pointer-events: none;
+	z-index: -1;
+}
+
+.bond.double {
+	background: linear-gradient(to bottom, 
+		rgba(255,255,255,0.8) 0%,
+		rgba(255,255,255,0.8) 40%,
+		transparent 40%,
+		transparent 60%,
+		rgba(255,255,255,0.8) 60%,
+		rgba(255,255,255,0.8) 100%);
+}
+
+.bond.triple {
+	background: linear-gradient(to bottom, 
+		rgba(255,255,255,0.8) 0%,
+		rgba(255,255,255,0.8) 30%,
+		transparent 30%,
+		transparent 40%,
+		rgba(255,255,255,0.8) 40%,
+		rgba(255,255,255,0.8) 60%,
+		transparent 60%,
+		transparent 70%,
+		rgba(255,255,255,0.8) 70%,
+		rgba(255,255,255,0.8) 100%);
+}
+
+.reaction-area {
+	position: absolute;
+	bottom: 20px;
+	left: 50%;
+	transform: translateX(-50%);
+	background: rgba(0,0,0,0.7);
+	padding: 15px 25px;
+	inset: 0;                       /* garante preenchimento total */
+	pointer-events: none;           /* já previsto onde necessário */
+	border-radius: 10px;
+	border: 2px solid var(--reaction-green);
+	z-index: 1;              /* abaixo do display, acima do fundo */
+}
+
+.reaction-equation {
+	font-family: 'Courier New', monospace;
+	font-size: 1.2rem;
+	color: var(--lab-white);
+}
+
+.accelerator-tube {
+	position: relative;
+	width: 100%;
+	height: 80px;
+	background: linear-gradient(90deg, #11183f, #1c2a5e, #11183f);
+	border: 2px solid var(--magnetic-blue);
+	border-radius: 40px;
+	margin: 20px 0;
+	overflow: hidden;
+	box-shadow: inset 0 0 20px rgba(59, 130, 246, 0.25);
+}
+
+.beam-line {
+	position: absolute;
+	top: 50%;
+	left: 0;
+	width: 100%;
+	height: 4px;
+	background: linear-gradient(90deg, transparent, #ffeb3b, transparent);
+	transform: translateY(-50%);
+	filter: drop-shadow(0 0 8px rgba(255, 235, 59, 0.6));
+}
+
+.detector {
+	position: absolute;
+	top: 50%;
+	right: 50px;
+	width: 60px;
+	height: 60px;
+	background: radial-gradient(circle, var(--plasma-pink), #a31355);
+	border-radius: 50%;
+	transform: translateY(-50%);
+	border: 3px solid #ff80ab;
+	box-shadow: 0 0 15px rgba(236, 72, 153, 0.5);
+}
+
+.grid {
+	display: grid;
+	gap: 24px;
+	grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+	align-items: start;
+}
+
+@keyframes plasma-pulse {
+	0%, 100% {
+		opacity: 1;
+	}
+	
+	50% {
+		opacity: 0.8;
+	}
+}
+
+.nucleus {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	border-radius: 50%;
+	background: radial-gradient(circle, var(--fusion-orange), var(--danger-red));
+	box-shadow: 0 0 30px var(--fusion-orange);
+	transition: all 0.5s ease;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	overflow: hidden;
+}
+
+.nucleus-inner {
+	position: relative;
+	width: 100%;
+	height: 100%;
+	border-radius: 50%;
+}
+
+.nucleus-particle {
+	position: absolute;
+	border-radius: 50%;
+	background: var(--proton-color);
+	box-shadow: 0 0 5px currentColor;
+}
+
+.nucleus-particle.neutron {
+	background: var(--neutron-color);
+}
+
+.nucleus.cold {
+	background: radial-gradient(circle, var(--cold-blue), #1d4ed8);
+	box-shadow: 0 0 20px var(--cold-blue);
+}
+
+.nucleus.hot {
+	background: radial-gradient(circle, var(--hot-red), #dc2626);
+	box-shadow: 0 0 40px var(--hot-red);
+}
+
+.nucleus.plasma {
+	background: radial-gradient(circle, var(--plasma-pink), #db2777);
+	box-shadow: 0 0 50px var(--plasma-pink);
+	animation: nucleus-pulse 1s ease-in-out infinite;
+}
+
+@keyframes nucleus-pulse {
+	0%, 100% { transform: translate(-50%, -50%) scale(1); }
+	50% { transform: translate(-50%, -50%) scale(1.1); }
+}
+
+.electron {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	border-radius: 50%;
+	background: var(--quantum-blue);
+	box-shadow: 0 0 15px var(--quantum-blue);
+	transition: all 0.5s ease;
+}
+
+.electron.excited {
+	background: var(--radioactive-green);
+	box-shadow: 0 0 20px var(--radioactive-green);
+}
+
+.electron.spin-up {
+	background: var(--magnetic-blue);
+	box-shadow: 0 0 20px var(--magnetic-blue);
+}
+
+.electron.spin-down {
+	background: #ec4899;
+	box-shadow: 0 0 20px #ec4899;
+}
+
+.electron.hot {
+	background: var(--hot-red);
+	box-shadow: 0 0 25px var(--hot-red);
+}
+
+.electron.plasma {
+	background: var(--plasma-pink);
+	box-shadow: 0 0 30px var(--plasma-pink);
+	animation: electron-flicker 0.5s ease-in-out infinite;
+}
+
+@keyframes electron-flicker {
+	0%, 100% { opacity: 1; }
+	50% { opacity: 0.7; }
+}
+
+.orbit {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	border-radius: 50%;
+	transition: all 0.5s ease;
+}
+
+.orbit.zeeman-split {
+	border-color: rgba(59, 130, 246, 0.3);
+	box-shadow: 0 0 10px rgba(59, 130, 246, 0.2);
+}
+
+.orbit.hot {
+	border-color: rgba(239, 68, 68, 0.4);
+	box-shadow: 0 0 15px rgba(239, 68, 68, 0.3);
+}
+
+.magnetic-field-lines {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	inset: 0;                       /* garante preenchimento total */
+	pointer-events: none;
+	opacity: 0;
+	transition: opacity 0.5s ease;
+	z-index: 1;              /* abaixo do display, acima do fundo */
+}
+
+.field-line {
+	position: absolute;
+	background: linear-gradient(to bottom, transparent, var(--magnetic-blue), transparent);
+	width: 2px;
+	height: 100%;
+	left: 50%;
+	transform: translateX(-50%);
+}
+
+.field-line:nth-child(2) {
+	transform: translateX(-50%) rotate(45deg);
+}
+
+.field-line:nth-child(3) {
+	transform: translateX(-50%) rotate(90deg);
+}
+
+.field-line:nth-child(4) {
+	transform: translateX(-50%) rotate(135deg);
+}
+
+/* Overlays continuam cobrindo toda a área do contêiner do canvas */
+.thermal-particles {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	inset: 0;                       /* garante preenchimento total */
+	pointer-events: none;           /* já previsto onde necessário */
+	z-index: 1;              /* abaixo do display, acima do fundo */
+}
+
+.thermal-particle {
+	position: absolute;
+	border-radius: 50%;
+	pointer-events: none;
+	opacity: 0;
+}
+
+.reaction-panel {
+	position: absolute;
+	bottom: 20px;
+	left: 20px;
+	background: rgba(15, 23, 42, 0.9);
+	border: 1px solid var(--grid-gray);
+	border-radius: 10px;
+	padding: 15px;
+	width: 300px;
+	backdrop-filter: blur(10px);
+}
+
+.reaction-formula {
+	font-family: 'Courier New', monospace;
+	font-size: 1.1rem;
+	margin-bottom: 10px;
+	color: var(--radioactive-green);
+}
+
+.reaction-status {
+	font-size: 0.9rem;
+	color: var(--lab-white);
+	opacity: 0.8;
+}
+
+/* PAINEL DE ENERGIA */
+.energy-panel {
+	position: absolute;
+	top: 20px;
+	left: 20px;
+	background: rgba(15, 23, 42, 0.95);
+	border: 1px solid var(--grid-gray);
+	border-radius: 10px;
+	padding: 20px;
+	width: 300px;
+	backdrop-filter: blur(10px);
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.energy-controls {
+	margin: 15px 0;
+}
+
+.energy-slider {
+	width: 100%;
+	margin: 10px 0;
+	background: rgba(255, 255, 255, 0.1);
+	border-radius: 10px;
+	height: 6px;
+	outline: none;
+}
+
+.energy-value {
+	text-align: center;
+	font-size: 1.2rem;
+	font-weight: bold;
+	color: var(--radioactive-green);
+	margin: 10px 0;
+}
+
+.energy-buttons {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 10px;
+	margin-top: 15px;
+}
+
+.photon {
+	position: absolute;
+	width: 4px;
+	height: 4px;
+	background: var(--radioactive-green);
+	border-radius: 50%;
+	pointer-events: none;
+	opacity: 0;
+}
+
+@keyframes photon-emission {
+	0% {
+		transform: scale(1);
+		opacity: 1;
+	}
+	100% {
+		transform: scale(3);
+		opacity: 0;
+	}
+}
+
+/* PAINEL MAGNÉTICO */
+.magnetic-panel {
+	position: absolute;
+	top: 20px;
+	left: 20px;
+	background: rgba(15, 23, 42, 0.95);
+	border: 1px solid var(--grid-gray);
+	border-radius: 10px;
+	padding: 20px;
+	width: 300px;
+	backdrop-filter: blur(10px);
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+/* PAINEL DE TEMPERATURA */
+.temperature-panel {
+	position: absolute;
+	top: 20px;
+	left: 20px;
+	background: rgba(15, 23, 42, 0.95);
+	border: 1px solid var(--grid-gray);
+	border-radius: 10px;
+	padding: 20px;
+	width: 300px;
+	backdrop-filter: blur(10px);
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.temperature-controls {
+	margin: 15px 0;
+}
+
+.temperature-slider {
+	width: 100%;
+	margin: 10px 0;
+	background: linear-gradient(to right, var(--cold-blue), var(--lab-white), var(--hot-red));
+	border-radius: 10px;
+	height: 8px;
+	outline: none;
+}
+
+.temperature-value {
+	text-align: center;
+	font-size: 1.4rem;
+	font-weight: bold;
+	margin: 15px 0;
+	padding: 10px;
+	border-radius: 8px;
+	background: rgba(255, 255, 255, 0.1);
+}
+
+.temperature-value.cold {
+	color: var(--cold-blue);
+}
+
+.temperature-value.normal {
+	color: var(--lab-white);
+}
+
+.temperature-value.hot {
+	color: var(--hot-red);
+}
+
+.temperature-value.plasma {
+	color: var(--plasma-pink);
+}
+
+.state-indicator {
+	display: flex;
+	justify-content: space-between;
+	margin: 10px 0;
+	font-size: 0.8rem;
+	opacity: 0.7;
+}
+
+.state-markers {
+	display: flex;
+	justify-content: space-between;
+	margin: 5px 0;
+	font-size: 0.7rem;
+	opacity: 0.6;
+}
+
+.temperature-buttons {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 10px;
+	margin-top: 15px;
+}
+
+.reaction-presets {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.preset-temperatures {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 8px;
+	margin: 15px 0;
+}
+
+.preset-btn {
+	padding: 8px;
+	background: rgba(255, 255, 255, 0.05);
+	border: 1px solid var(--grid-gray);
+	border-radius: 6px;
+	color: var(--lab-white);
+	cursor: pointer;
+	transition: all 0.3s ease;
+	text-align: left;
+	font-size: 0.8rem;
+}
+
+.preset-btn:hover {
+	background: rgba(255, 255, 255, 0.1);
+	border-color: var(--base-blue)
+}
+
+.preset-btn.cold {
+	border-color: var(--cold-blue);
+	color: var(--cold-blue);
+}
+
+.preset-btn.normal {
+	border-color: var(--lab-white);
+}
+
+.preset-btn.hot {
+	border-color: var(--hot-red);
+	color: var(--hot-red);
+}
+
+.preset-btn.plasma {
+	border-color: var(--plasma-pink);
+	color: var(--plasma-pink);
+}
+
+.control-btn.temperature {
+	background: linear-gradient(45deg, var(--cold-blue), var(--hot-red));
+	border: none;
+	color: white;
+	font-weight: bold;
+}
+
+.energy-display {
+	background: rgba(0,0,0,0.3);
+	padding:15px;
+	border-radius:10px;
+	text-align:center;
+	margin:15px 0;
+}
+
+.energy-controls, .magnetic-controls, .temperature-controls {
+	margin: 15px 0;
+}
+
+.energy-slider, .magnetic-slider, .temperature-slider {
+	width: 100%;
+	margin: 10px 0;
+	border-radius: 10px;
+	height: 6px;
+	outline: none;
+}
+
+.energy-value, .magnetic-value, .temperature-value {
+	text-align: center;
+	font-size: 1.2rem;
+	font-weight: bold;
+	margin: 10px 0;
+	color:var(--radioactive-green);
+	text-shadow:0 0 10px currentColor;
+}
+
+.energy-buttons, .magnetic-buttons, .temperature-buttons {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 10px;
+	margin-top: 15px;
+}
+
+.field-direction {
+	display: flex;
+	gap: 10px;
+	margin: 15px 0;
+}
+
+.direction-btn {
+	flex: 1;
+	padding: 8px;
+	background: rgba(255, 255, 255, 0.05);
+	border: 1px solid var(--grid-gray);
+	border-radius: 6px;
+	color: var(--lab-white);
+	cursor: pointer;
+	transition: all 0.3s ease;
+}
+
+.direction-btn.active {
+	background: var(--magnetic-blue);
+	border-color: var(--magnetic-blue);
+}
+
+.photon {
+	position: absolute;
+	width: 4px;
+	height: 4px;
+	background: var(--radioactive-green);
+	border-radius: 50%;
+	pointer-events: none;
+	opacity: 0;
+}
+
+.particle-counter {
+	display:grid;
+	grid-template-columns:1fr 1fr;
+	gap:10px;
+	margin-top:15px;
+}
+
+.counter {
+	background: rgba(255,255,255,0.05);
+	padding:10px;
+	border-radius:8px;
+	text-align:center;
+}
+
+.counter-value {
+	font-size:1.5rem;
+	font-weight:bold;
+	color:var(--plasma-purple);
+}
+
+@keyframes nuclearFlash {
+	0% {
+		background-color:transparent;
+	}
+	
+	50% {
+		background-color:rgba(245,158,11,0.3);
+	}
+	
+	100% {
+		background-color:transparent;
+	}
+}
+
+.nuclear-flash {
+	animation: nuclearFlash .5s ease-out;
+}
+
+
+@keyframes photon-emission {
+	0% {
+		transform: scale(1);
+		opacity: 1;
+	}
+	
+	100% {
+		transform: scale(3);
+		opacity: 0;
+	}
+}
+
+
+/* MODAL DA TABELA PERIÓDICA */
+.modal-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, 0.8);
+	display: none;
+	justify-content: center;
+	align-items: center;
+	z-index: 1000;
+}
+
+.modal-content {
+	background: rgba(15, 23, 42, 0.95);
+	border: 1px solid var(--grid-gray);
+	border-radius: 15px;
+	padding: 20px;
+	max-width: 90%;
+	max-height: 90%;
+	overflow: auto;
+	backdrop-filter: blur(10px);
+}
+
+.element-stats {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 10px;
+	margin-bottom: 10px;
+}
+
+.stat {
+	background: rgba(255,255,255,0.05);
+	padding: 8px;
+	border-radius: 6px;
+	text-align: center;
+}
+
+.stat-value {
+	font-size: 1.1em;
+	font-weight: bold;
+	color: #bbdefb;
+}
+
+.stat-label {
+	font-size: 0.8em;
+	color: #81d4fa;
+	margin-top: 4px;
+}
+
+.stability-indicator {
+	padding: 10px;
+	border-radius: 6px;
+	text-align: center;
+	font-weight: bold;
+	margin: 10px 0;
+}
+
+.stable {
+	background: rgba(76,175,80,0.2);
+	color: #66bb6a;
+	border: 1px solid #66bb6a;
+}
+
+.unstable {
+	background: rgba(255,152,0,0.2);
+	color: #ff9800;
+	border: 1px solid #ff9800;
+}
+
+.radioactive {
+	background: rgba(244,67,54,0.2);
+	color: #ff5252;
+	border: 1px solid #ff5252;
+	animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+	0%, 100% {
+		opacity: 1
+	}
+	
+	50% {
+		opacity: 0.7
+	} 
+}
+
+/* Área 3D (mantida) */
+
+.creation-area {
+	background: #1a1c2f;
+	border-radius: 12px;
+	padding: 12px;
+	box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+	position: relative;
+	height: 600px;
+}
+
+#atom3d {
+	width: 100%;
+	height: 100%;
+	border-radius: 8px;
+	background: #0d0e20;
+}
+
+.view-toggle {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 100;
+    display: flex;
+    gap: 8px;
+    background: rgba(15, 23, 42, 0.8);
+    padding: 6px;
+    border-radius: 8px;
+    backdrop-filter: blur(10px);
+}
+
+.toggle-btn {
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    color: var(--lab-white);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.toggle-btn:hover {
+    background: rgba(37, 99, 235, 0.3);
+}
+
+.toggle-btn.active {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: var(--color-btn-primary-text);
+}
+
+.controls-3d {
+    position: absolute;
+    top: 70px;
+    left: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 100;
+}
+
+.control-3d-btn {
+    background: rgba(26, 28, 47, 0.8);
+    color: var(--color-primary);
+    border: 1px solid var(--color-primary);
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+    font-size: 0.85rem;
+}
+
+.control-3d-btn:hover {
+    background: var(--color-primary);
+    color: var(--color-btn-primary-text);
+}
+
+.periodic-table-section {
+	background: #1a1c2f;
+	border-radius: 12px;
+	padding: 12px;
+	margin-top: 14px;
+	box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+
+.table-controls {
+	display: flex;
+	gap: 10px;
+	margin-bottom: 12px;
+	flex-wrap: wrap;
+}
+
+
+.periodic-table {
+	display: grid;
+	grid-template-columns: repeat(18, 1fr);
+	gap: 2px;
+	margin: 20px 0;
+	background: #0d0e20;
+	padding: 10px;
+	border-radius: 8px;
+	border: 1px solid #2a2d45;
+}
+
+.element {
+	aspect-ratio: 1;
+	border-radius: 4px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	transition: all 0.3s ease;
+	padding: 2px;
+	font-size: 0.6rem;
+	text-align: center;
+	position: relative;
+}
+
+.element:hover {
+	transform: scale(1.1);
+	z-index: 10;
+	box-shadow: 0 0 10px currentColor;
+}
+
+.atomic-number {
+	font-size: 0.5rem;
+	opacity: 0.8;
+	position: absolute;
+	top: 2px;
+	left: 4px;
+}
+
+.symbol {
+	font-size: 0.8rem;
+	font-weight: bold;
+}
+
+.name {
+	font-size: 0.5rem;
+	opacity: 0.9;
+}
+
+/* Cores dos grupos - ATUALIZADO */
+.alkali-metal {
+    background: #ff6b6b;
+    color: black;
+}
+
+.alkaline-earth-metal {  /* Mudou de .alkaline-earth */
+    background: #ffa726;
+    color: black;
+}
+
+.transition-metal {
+    background: #42a5f5;
+    color: white;
+}
+
+.post-transition-metal {  /* Mudou de .basic-metal */
+    background: #66bb6a;
+    color: black;
+}
+
+.metalloid {
+    background: #ab47bc;
+    color: white;
+}
+
+.nonmetal {
+    background: #26c6da;
+    color: black;
+}
+
+.halogen {
+    background: #ffee58;
+    color: black;
+}
+
+.noble-gas {
+    background: #ec407a;
+    color: white;
+}
+
+.lanthanide {
+    background: #7e57c2;
+    color: white;
+}
+
+.actinide {
+    background: #8d6e63;
+    color: white;
+}
+.user-created{
+	background:linear-gradient(45deg,#4fc3f7,#29b6f6)!important;
+	color:#000!important;
+	font-weight:bold;
+	animation: glow 2s infinite alternate;
+}
+@keyframes glow {
+	from {
+		box-shadow:0 0 5px #4fc3f7
+	} to  {
+		box-shadow:0 0 20px #4fc3f7
+	}
+}
+
+/* Responsividade */
+@media (max-width: 1024px){
+	.periodic-table{
+		grid-template-columns: repeat(9, 1fr);
+	}
+	
+	.creation-area{
+		height:500px;
+	}
+}
+@media (max-width: 768px){
+	.periodic-table{
+		grid-template-columns: repeat(6, 1fr);
+	}
+	
+	.particle-controls{
+		grid-template-columns: 1fr;
+	}
+}
+
+
+/* PAINEL DE INFORMAÇÕES DO ELEMENTO */
+
+.element-cell {
+	aspect-ratio: 1;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	border-radius: 4px;
+	cursor: pointer;
+	transition: all 0.3s ease;
+	padding: 2px;
+	font-size: 0.7em;
+	text-align: center;
+	position: relative;
+}
+
+.element-cell:hover {
+	transform: scale(1.1);
+	z-index: 10;
+	box-shadow: 0 0 15px currentColor;
+}
+
+.element-header {
+	display: flex;
+	align-items: center;
+	gap: 15px;
+	margin-bottom: 15px;
+}
+
+.element-symbol {
+	font-size: 2.5rem;
+	font-weight: bold;
+	padding: 10px;
+	border-radius: 8px;
+	min-width: 60px;
+	text-align: center;
+}
+
+.element-number {
+	font-size: 0.6em;
+	opacity: 0.8;
+}
+
+
+.element-info {
+	background:#1e1f35;
+	border-radius:8px;
+	padding:12px;
+	margin-bottom:12px;
+}
+
+
+.element-name {
+	font-size: 1.5rem;
+	font-weight: bold;
+	color: #4fc3f7;
+	margin-bottom: 8px;
+	text-align: center;
+}
+
+.properties-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 10px;
+	margin-top: 10px;
+}
+
+.property-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 10px;
+	margin-top: 15px;
+}
+
+.property {
+	background: rgba(255, 255, 255, 0.05);
+	padding: 8px;
+	border-radius: 6px;
+	font-size: 0.9rem;
+}
+
+.property-label {
+	font-size: 0.8rem;
+	opacity: 0.7;
+	margin-bottom: 4px;
+}
+
+.property-value {
+	font-size: 0.9rem;
+	font-weight: 600;
+}
+
+.isomer-view {
+	background: rgba(16, 185, 129, 0.1);
+	padding: 15px;
+	border-radius: 10px;
+	border: 1px solid var(--organic-green);
+	margin-top: 15px;
+}
+
+.isomer-buttons {
+	display: flex;
+	gap: 8px;
+	margin-top: 10px;
+}
+
+.isomer-btn {
+	flex: 1;
+	padding: 8px;
+	background: rgba(255,255,255,0.1);
+	border: none;
+	border-radius: 6px;
+	color: var(--lab-white);
+	cursor: pointer;
+	font-size: 0.8rem;
+}
+
+.isomer-btn.active {
+	background: var(--organic-green);
+}
+
+/* Status bar com padding lateral */
+.status-bar {
+	grid-area: status;
+	background: var(--color-surface);
+	border-top: 1px solid var(--color-border);
+	padding: 12px 20px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	font-size: 0.9rem;
+	gap: 20px;
+}
+
+.status-indicators {
+	display: flex;
+	gap: 30px;
+	align-items: center;
+}
+
+.status-item {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.status-dot {
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: var(--radioactive-green);
+}
+
+.status-dot.offline {
+	background: var(--danger-red);
+}
+
+.simulation-controls {
+	display: flex;
+	gap: 15px;
+	align-items: center;
+}
+
+.control-buttons {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 10px;
+	margin-top: 15px;
+}
+
+.control-btn {
+	padding: 6px 12px;
+	border: 1px solid rgba(255, 255, 255, 0.2);
+	border-radius: 6px;
+	background: rgba(255, 255, 255, 0.1);
+	color: var(--lab-white);
+	cursor: pointer;
+	transition: all 0.3s ease;
+	font-weight: 600;
+}
+
+.control-btn:hover {
+	background: rgba(255, 255, 255, 0.2);
+	transform: translateY(-2px);
+	box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.control-btn.primary {
+	background: var(--thermal-orange);
+	background: var(--acid-red);
+	background: var(--quantum-blue);
+	border-color: var(--quantum-blue);
+	background: var(--organic-green);
+}
+
+.control-btn.warning {
+	background: var(--phosphorus-orange);
+	background: var(--heat-red);
+}
+
+.control-btn.success {
+	background: var(--reaction-green);
+	background: var(--entropy-green);
+}
+
+.control-btn.energy {
+	background: var(--radioactive-green);
+	border-color: var(--radioactive-green);
+	color: black;
+	font-weight: bold;
+}
+
+.control-btn.magnetic {
+	background: var(--magnetic-blue);
+	border-color: var(--magnetic-blue);
+	color: white;
+	font-weight: bold;
+}
+
+.control-btn.temperature {
+	background: linear-gradient(45deg, var(--cold-blue), var(--hot-red));
+	border: none;
+	color: white;
+	font-weight: bold;
+}
+
+.ph-indicator {
+	background: linear-gradient(90deg, 
+		var(--base-blue) 0%, 
+		#22c55e 20%, 
+		#f59e0b 50%, 
+		var(--acid-red) 100%);
+	height: 30px;
+	border-radius: 15px;
+	position: relative;
+	margin: 15px 0;
+}
+
+.ph-slider {
+	width: 100%;
+	margin: 20px 0;
+}
+
+.ph-value {
+	text-align: center;
+	font-size: 1.5rem;
+	font-weight: bold;
+	margin: 10px 0;
+}
+
+.molecule-info {
+	background: rgba(0,0,0,0.3);
+	padding: 15px;
+	border-radius: 10px;
+	margin-top: 10px;
+}
+
+/* ANIMAÇÕES */
+@keyframes reactionFlash {
+	0% {
+		background-color: transparent;
+	}
+	
+	50% {
+		background-color: rgba(16, 185, 129, 0.3);
+	}
+	
+	100% {
+		background-color: transparent;
+	}
+}
+
+@keyframes bubble {
+	0% {
+		transform: translateY(0) scale(1);
+		opacity: 1;
+	}
+	
+	100% {
+		transform: translateY(-100px) scale(0.5);
+		opacity: 0;
+	}
+}
+
+@keyframes rotate3D {
+	0% {
+		transform: translate(-50%, -50%) rotateX(0deg) rotateY(0deg);
+	}
+	
+	100% {
+		transform: translate(-50%, -50%) rotateX(360deg) rotateY(360deg);
+	}
+}
+
+@keyframes gasMove {
+	0%, 100% {
+		transform: translate(0, 0);
+	}
+	
+	25% {
+		transform: translate(10px, -10px);
+	}
+	
+	50% {
+		transform: translate(-5px, -20px);
+	}
+	
+	75% {
+		transform: translate(-10px, -5px);
+	}
+}
+
+@keyframes heatRise {
+	0% {
+		transform: translateY(0) scale(1);
+		opacity: 1;
+	}
+	
+	100% {
+		transform: translateY(-100px) scale(0.5);
+		opacity: 0;
+	}
+}
+
+@keyframes coldFall {
+	0% {
+		transform: translateY(0) scale(1);
+		opacity: 1;
+	}
+	
+	100% {
+		transform: translateY(100px) scale(0.5);
+		opacity: 0;
+	}
+}
+
+@keyframes pistonMove {
+	0%, 100% {
+		bottom: 40px;
+	}
+	
+	50% {
+		bottom: 120px;
+	}
+}
+
+@keyframes crankRotate {
+	0% {
+		transform: translate(-50%, -50%) rotate(0deg);
+	}
+	
+	100% {
+		transform: translate(-50%, -50%) rotate(360deg);
+	}
+}
+
+.piston-moving {
+	animation: pistonMove 2s infinite ease-in-out;
+}
+
+.crank-rotating {
+	animation: crankRotate 2s infinite linear;
+}
+
+.reaction-flash {
+	animation: reactionFlash 0.5s ease-out;
+}
+
+.rotate-3d {
+	animation: rotate3D 20s infinite linear;
+}
+
+.bubble {
+	position: absolute;
+	border-radius: 50%;
+	background: rgba(59, 130, 246, 0.6);
+	animation: bubble 1s ease-out forwards;
+}
+
+/* *** RESPONSIVIDADE *** */
+
+@media (max-width: 768px) {
+	.lab-container {
+		grid-template-areas:
+			"header"
+			"main"
+			"status";
+		grid-template-columns: 1fr;
+		grid-template-rows: 60px 1fr 80px;
+	}
+
+	.sidebar {
+		display: none;
+	}
+
+	.nav-tabs {
+		display: none;
+	}
+}
+
+@media (max-width: 1200px) {
+	main {
+		flex-direction: column;
+		align-items: center;
+	}
+
+	.canvas-container, .controls-panel, .results-panel {
+		width: 100%;
+		max-width: 600px;
+	}
+}
+
+/* *** RESPONSIVIDADE MARKDOWN EDITOR *** */
+
+@media (max-width: 1100px) {
+	.sheet {
+		transform: scale(0.85);
+	}
+}
+
+@media (max-width: 900px) {
+	.sheet {
+		transform: scale(0.75);
+	}
+}
+
+@media (max-width: 700px) {
+	.sheet {
+		transform: scale(0.65);
+	}
+}
+
+
+/*------------------------------------------------------------*/
+
+/* ===== Visualização: esquerda = controles, centro = canvas, direita = info ===== */
+.visualization-area {
+  display: grid !important;
+  grid-template-columns: 320px minmax(680px, 1fr) 420px; /* left | stage | right */
+  grid-template-rows: auto auto 1fr;
+  grid-template-areas:
+    "left stage info"
+    "left stage reaction"
+    "left stage .";
+  gap: 16px;
+  align-items: start;
+  position: relative;
+  grid-auto-flow: row dense;
+}
+
+/* Centraliza o conteúdo da cena dentro da célula do canvas */
+#atom-canvas,
+.atom-canvas {
+  grid-area: stage !important;
+  position: relative !important;  /* já existe, mantemos */
+  display: grid;                  /* vira grid container */
+  place-items: center;            /* centra horizontal e vertical */
+  min-height: 560px;
+  z-index: 0;
+  overflow: hidden;        /* corta partículas que extrapolem */
+  border-radius: 15px;
+}
+
+/* O display (500x500) fica exatamente no centro do contêiner */
+#atom-display,
+.atom-display {
+  position: relative !important;  /* nada de left/top aqui */
+  margin: 0;                      /* remove qualquer margem acidental */
+  width: 500px;                   /* mantém centro em 250px, se sua lógica usa isso */
+  height: 500px;
+  z-index: 2;                     /* conteúdo da cena acima do fundo do canvas */
+}
+
+/* Direita topo: informações do átomo, sempre visível */
+#element-info {
+  grid-area: info !important;
+  position: sticky !important;
+  top: 16px;               /* ajuste conforme a altura do header */
+  margin: 0;
+  z-index: 2;
+}
+
+/* Direita logo abaixo: “Átomo Selecionado” */
+.reaction-panel {
+  grid-area: reaction !important;
+  position: static !important;
+  margin: 0;
+  z-index: 1;
+}
+
+/* Esquerda: controles */
+.energy-panel,
+.magnetic-panel,
+.temperature-panel {
+  grid-area: left !important;
+  position: static !important;
+  width: auto;
+  max-width: 320px;
+  margin: 0 0 12px 0;
+}
+
+/* Responsivo: empilha em telas menores */
+@media (max-width: 1024px) {
+  .visualization-area {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto 1fr;
+    grid-template-areas:
+      "info"
+      "reaction"
+      "left"
+      "stage";
+  }
+}
+
+/* Coluna direita fixa com os dois cards empilhados */
+.right-col {
+  /* ocupa a 3ª coluna (direita) e as 3 linhas do grid atual */
+  grid-column: 3 / 4;
+  grid-row: 1 / 4;
+  position: sticky;
+  top: 16px;                 /* ajuste conforme altura do header */
+  max-height: calc(100vh - 16px - 16px);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow: auto;            /* rola só dentro da coluna quando necessário */
+}
+
+/* Dentro da coluna: info no topo e reação preenchendo o restante */
+#element-info { position: static; flex: 0 0 auto; }
+.reaction-panel { position: static; flex: 1 1 auto; overflow: auto; }
+
+:root {
+  --right-top: 16px;     /* deslocamento do topo */
+  --right-gap: 16px;     /* gap vertical entre os cards */
+  --info-h: 240px;       /* será atualizado por JS */
+}
+
+/* #element-info sempre visível no topo direito */
+#element-info {
+  position: sticky !important;
+  top: var(--right-top);
+  z-index: 3;
+}
+
+/* Reação fica colada logo abaixo e usa o restante da altura */
+.reaction-panel {
+  position: sticky !important;
+  top: calc(var(--right-top) + var(--info-h) + var(--right-gap));
+  max-height: calc(100vh - (var(--right-top) + var(--info-h) + 2*var(--right-gap)));
+  overflow: auto;
+  z-index: 2;
+}
+
+---------------------------------------------------------------------------------------
+
+/* Alteração do DeepSeek*/
+
+/* ===== RESPONSIVIDADE ===== */
+
+/* Tablets */
+@media (max-width: 1024px) {
+    .lab-container {
+        grid-template-areas:
+            "header"
+            "main"
+            "status";
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr auto;
+    }
+    
+    .sidebar {
+        display: none;
+    }
+    
+    .visualization-area {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            "info"
+            "reaction"
+            "left"
+            "stage";
+    }
+    
+    .right-col {
+        grid-column: 1;
+        grid-row: auto;
+        position: static;
+    }
+    
+    #atom-display,
+    .atom-display {
+        width: min(400px, 100%);
+        height: min(400px, 100%);
+    }
+    
+    .periodic-table {
+        grid-template-columns: repeat(9, 1fr);
+    }
+}
+
+/* Tablets Pequenos e Mobile */
+@media (max-width: 768px) {
+    body {
+        padding: 12px;
+    }
+    
+    .header {
+        flex-direction: column;
+        text-align: center;
+        gap: 12px;
+    }
+    
+    .nav-tabs {
+        order: 3;
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .header-actions {
+        justify-content: center;
+        width: 100%;
+    }
+    
+    .main-content {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    
+    .cards-grid {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    }
+    
+    .status-bar {
+        flex-direction: column;
+        gap: 12px;
+        text-align: center;
+    }
+    
+    .status-indicators {
+        justify-content: center;
+    }
+    
+    .periodic-table {
+        grid-template-columns: repeat(6, 1fr);
+    }
+    
+    .particle-controls {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Mobile Pequeno */
+@media (max-width: 480px) {
+    body {
+        padding: 8px;
+    }
+    
+    .header,
+    .main,
+    .status-bar {
+        padding: 12px;
+    }
+    
+    .card {
+        padding: 16px;
+    }
+    
+    .cards-grid {
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    }
+    
+    .system-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    .button-group {
+        flex-direction: column;
+    }
+    
+    button {
+        width: 100%;
+    }
+    
+    #atom-display,
+    .atom-display {
+        width: min(300px, 100%);
+        height: min(300px, 100%);
+    }
+    
+    .periodic-table {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* Mobile Muito Pequeno */
+@media (max-width: 360px) {
+    .periodic-table {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .element {
+        font-size: 0.5rem;
+    }
+}
+
+/* Telas Grandes */
+@media (min-width: 1600px) {
+    body {
+        padding: 30px;
+    }
+    
+    .lab-container {
+        max-width: 1600px;
+        margin: 0 auto;
+    }
+}
+
+/* Modo Paisagem Mobile */
+@media (max-height: 500px) and (orientation: landscape) {
+    #atom-display,
+    .atom-display {
+        width: min(250px, 100%);
+        height: min(250px, 100%);
+    }
+    
+    .visualization-area {
+        grid-template-columns: 250px 1fr 300px;
+    }
+}
+
+/* ---------------------------------------------------------------------------- */
+
+/* NOVOS INSTRUMENTOS - DETECTOR DE RADIAÇÃO, MEDIDOR DE pH E TERMÔMETRO */
+.instrument-panel {
+	position: absolute;
+	background: rgba(15, 23, 42, 0.95);
+	border: 1px solid var(--grid-gray);
+	border-radius: 10px;
+	padding: 20px;
+	backdrop-filter: blur(10px);
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+	width: 300px;
+}
+
+.radiation-detector-panel {
+	top: 20px;
+	right: 340px;
+}
+
+.ph-meter-panel {
+	bottom: 20px;
+	right: 340px;
+}
+
+.thermometer-panel {
+	bottom: 20px;
+	left: 340px;
+}
+
+.instrument-title {
+	font-size: 1.1rem;
+	font-weight: bold;
+	margin-bottom: 15px;
+	color: var(--lab-white);
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+/* Detector de Radiação */
+.radiation-meter {
+	background: #1a1b2e;
+	height: 25px;
+	border-radius: 12px;
+	overflow: hidden;
+	position: relative;
+	border: 2px solid var(--grid-gray);
+	margin: 10px 0;
+}
+
+.radiation-level {
+	height: 100%;
+	width: 0%;
+	background: linear-gradient(90deg, #4caf50, #ff9800, #f44336);
+	transition: width 0.5s ease;
+	border-radius: 10px;
+}
+
+.radiation-value {
+	position: absolute;
+	right: 10px;
+	top: 50%;
+	transform: translateY(-50%);
+	color: white;
+	font-weight: bold;
+	font-size: 12px;
+	text-shadow: 0 0 5px rgba(0, 0, 0, 0.8);
+}
+
+.radiation-alert {
+	color: var(--danger-red);
+	font-size: 12px;
+	display: none;
+	animation: blink 1s infinite;
+	font-weight: bold;
+	margin-top: 5px;
+}
+
+@keyframes blink {
+	0%, 50% { opacity: 1; }
+	51%, 100% { opacity: 0.3; }
+}
+
+/* Medidor de pH */
+.ph-scale {
+	background: linear-gradient(90deg, #2196f3, #4caf50, #f44336);
+	height: 25px;
+	border-radius: 12px;
+	position: relative;
+	margin: 15px 0;
+	border: 2px solid var(--grid-gray);
+}
+
+.ph-indicator {
+	position: absolute;
+	width: 6px;
+	height: 35px;
+	background: white;
+	top: -5px;
+	transform: translateX(-50%);
+	border-radius: 3px;
+	box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+	transition: left 0.5s ease;
+}
+
+.ph-value {
+	text-align: center;
+	font-weight: bold;
+	font-size: 16px;
+	margin-top: 10px;
+	padding: 8px;
+	background: rgba(255, 255, 255, 0.1);
+	border-radius: 8px;
+}
+
+/* Termômetro */
+.thermometer {
+	background: #1a1b2e;
+	height: 150px;
+	width: 40px;
+	border-radius: 20px;
+	position: relative;
+	margin: 15px auto;
+	border: 2px solid var(--grid-gray);
+	overflow: hidden;
+}
+
+.thermometer-mercury {
+	position: absolute;
+	bottom: 0;
+	width: 100%;
+	height: 0%;
+	background: linear-gradient(to top, #4fc3f7, #03dac6);
+	border-radius: 18px;
+	transition: height 0.8s ease;
+}
+
+.temp-value {
+	text-align: center;
+	font-weight: bold;
+	font-size: 18px;
+	margin-top: 10px;
+	padding: 8px;
+	background: rgba(255, 255, 255, 0.1);
+	border-radius: 8px;
+}
+
+.temp-controls {
+	display: flex;
+	gap: 8px;
+	margin-top: 10px;
+}
+
+.temp-btn {
+	flex: 1;
+	padding: 8px;
+	background: rgba(255, 255, 255, 0.05);
+	border: 1px solid var(--grid-gray);
+	border-radius: 6px;
+	color: var(--lab-white);
+	cursor: pointer;
+	transition: all 0.3s ease;
+	font-size: 12px;
+}
+
+.temp-btn:hover {
+	background: rgba(255, 255, 255, 0.1);
+}
+
+/* ESPECTRÔMETRO */
+.spectrometer-panel {
+	position: absolute;
+	bottom: 20px;
+	right: 20px;
+	background: rgba(15, 23, 42, 0.95);
+	border: 1px solid var(--grid-gray);
+	border-radius: 10px;
+	padding: 20px;
+	width: 350px;
+	backdrop-filter: blur(10px);
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.spectrum-display {
+	height: 120px;
+	background: linear-gradient(90deg, 
+		#9400D3, #4B0082, #0000FF, #00FF00, #FFFF00, #FF7F00, #FF0000);
+	border-radius: 8px;
+	margin: 15px 0;
+	position: relative;
+	overflow: hidden;
+}
+
+.spectrum-line {
+	position: absolute;
+	height: 100%;
+	width: 2px;
+	background: white;
+	top: 0;
+	opacity: 0.8;
+	transform-origin: bottom;
+}
+
+.wavelength-scale {
+	display: flex;
+	justify-content: space-between;
+	margin-top: 5px;
+	font-size: 0.7rem;
+	opacity: 0.7;
+}
+
+.spectrum-info {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 10px;
+	margin-top: 15px;
+	font-size: 0.8rem;
+}
+
+.spectrum-peak {
+	background: rgba(255, 255, 255, 0.1);
+	padding: 8px;
+	border-radius: 6px;
+	text-align: center;
+}
+
+
+/* -----------------Corrigir depois-----------------------*/
+
+/* Esquerda: TODOS os painéis de controle e instrumentos */
+.energy-panel,
+.magnetic-panel,
+.temperature-panel,
+.spectrometer-panel,
+.radiation-detector-panel,
+.ph-meter-panel,
+.thermometer-panel {
+  grid-area: left !important;
+  position: static !important;
+  width: 100%;
+  max-width: 360px;
+  margin: 0 0 16px 0;
+  padding: 20px;
+  background: rgba(15, 23, 42, 0.9);
+  border-radius: 12px;
+  border: 1px solid rgba(100, 116, 139, 0.3);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  display: none; /* Começa oculto */
+}
+
+/* ========== RESPONSIVIDADE ========== */
+
+/* Desktop Grande (> 1400px) - Layout padrão já está definido */
+
+/* Desktop Médio (1200px - 1400px) */
+@media (max-width: 1400px) {
+  .visualization-area {
+    grid-template-columns: 320px minmax(400px, 1fr) 380px;
+    gap: 12px;
+  }
+  
+  .energy-panel,
+  .magnetic-panel,
+  .temperature-panel,
+  .spectrometer-panel,
+  .radiation-detector-panel,
+  .ph-meter-panel,
+  .thermometer-panel {
+    max-width: 320px;
+    padding: 16px;
+  }
+  
+  #element-info {
+    max-width: 380px;
+  }
+  
+  #atom-canvas,
+  #atom3d {
+    min-height: 500px;
+  }
+  
+  #atom-display {
+    width: 400px;
+    height: 400px;
+  }
+}
+
+/* Desktop Pequeno / Tablet Horizontal (1024px - 1200px) */
+@media (max-width: 1200px) {
+  .lab-container {
+    grid-template-columns: 260px 1fr;
+    grid-template-rows: 60px 1fr 70px;
+  }
+  
+  .visualization-area {
+    grid-template-columns: 280px 1fr 340px;
+    gap: 10px;
+    padding: 12px;
+  }
+  
+  .header-actions {
+    gap: 8px;
+  }
+  
+  .search-bar {
+    width: 150px;
+  }
+  
+  .nav-tabs {
+    gap: 8px;
+  }
+  
+  .nav-tab {
+    padding: 8px 12px;
+    font-size: 0.85rem;
+  }
+  
+  #atom-canvas,
+  #atom3d {
+    min-height: 450px;
+  }
+  
+  #atom-display {
+    width: 350px;
+    height: 350px;
+  }
+}
+
+/* Tablet Vertical (768px - 1024px) */
+@media (max-width: 1024px) {
+  .lab-container {
+    grid-template-columns: 1fr;
+    grid-template-rows: 60px auto 1fr 70px;
+    grid-template-areas:
+      "header"
+      "sidebar"
+      "main"
+      "status";
+  }
+  
+  .sidebar {
+    width: 100%;
+    height: auto;
+    max-height: 200px;
+    overflow-y: auto;
+    border-right: none;
+    border-bottom: 1px solid var(--color-border);
+  }
+  
+  .sidebar-section {
+    padding: 12px;
+  }
+  
+  .tool-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  
+  .tool-item,
+  .instrument-item {
+    flex: 0 0 calc(25% - 6px);
+    padding: 10px;
+    text-align: center;
+  }
+  
+  .visualization-area {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto 1fr;
+    grid-template-areas:
+      "info"
+      "reaction"
+      "left"
+      "stage";
+    padding: 12px;
+  }
+  
+  .energy-panel,
+  .magnetic-panel,
+  .temperature-panel,
+  .spectrometer-panel,
+  .radiation-detector-panel,
+  .ph-meter-panel,
+  .thermometer-panel,
+  #element-info {
+    max-width: 100%;
+    position: static !important;
+  }
+  
+  #atom-canvas,
+  #atom3d {
+    width: 100%;
+    min-height: 400px;
+  }
+  
+  #atom-display {
+    width: 350px;
+    height: 350px;
+  }
+  
+  .header-actions {
+    flex-wrap: wrap;
+  }
+  
+  .nav-tabs {
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+}
+
+/* Mobile Grande (576px - 768px) */
+@media (max-width: 768px) {
+  .header {
+    padding: 10px;
+    flex-wrap: wrap;
+  }
+  
+  .logo {
+    font-size: 1.2rem;
+  }
+  
+  .nav-tabs {
+    order: 3;
+    width: 100%;
+    margin-top: 8px;
+    gap: 4px;
+  }
+  
+  .nav-tab {
+    padding: 6px 10px;
+    font-size: 0.75rem;
+  }
+  
+  .header-actions {
+    gap: 6px;
+  }
+  
+  .search-bar {
+    width: 120px;
+    font-size: 0.85rem;
+  }
+  
+  .icon-btn {
+    width: 35px;
+    height: 35px;
+    font-size: 1.2rem;
+  }
+  
+  .sidebar {
+    max-height: 150px;
+  }
+  
+  .tool-item,
+  .instrument-item {
+    flex: 0 0 calc(33.333% - 6px);
+    padding: 8px;
+    font-size: 0.85rem;
+  }
+  
+  .tool-item span:first-child,
+  .instrument-item span:first-child {
+    font-size: 1.2rem;
+  }
+  
+  .visualization-area {
+    padding: 8px;
+    gap: 10px;
+  }
+  
+  #atom-display {
+    width: 300px;
+    height: 300px;
+  }
+  
+  #atom-canvas,
+  #atom3d {
+    min-height: 350px;
+  }
+  
+  .element-info-panel,
+  .reaction-panel {
+    padding: 12px;
+  }
+  
+  .element-symbol {
+    font-size: 2.5rem;
+  }
+  
+  .element-name {
+    font-size: 1.1rem;
+  }
+  
+  .property-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  
+  .status-bar {
+    padding: 8px 10px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  
+  .status-indicators,
+  .simulation-controls {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  
+  .status-item {
+    font-size: 0.75rem;
+  }
+  
+  .control-btn {
+    padding: 6px 10px;
+    font-size: 0.75rem;
+  }
+  
+  .view-toggle {
+    top: 10px;
+    left: 10px;
+  }
+  
+  .toggle-btn {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+  }
+  
+  .controls-3d {
+    top: 60px;
+    left: 10px;
+  }
+  
+  .control-3d-btn {
+    padding: 6px 10px;
+    font-size: 0.75rem;
+  }
+}
+
+/* Mobile Médio (480px - 576px) */
+@media (max-width: 576px) {
+  .header {
+    padding: 8px;
+  }
+  
+  .logo {
+    font-size: 1rem;
+  }
+  
+  .logo-icon {
+    font-size: 1.2rem;
+  }
+  
+  .nav-tab {
+    padding: 5px 8px;
+    font-size: 0.7rem;
+  }
+  
+  .tool-item,
+  .instrument-item {
+    flex: 0 0 calc(50% - 4px);
+  }
+  
+  #atom-display {
+    width: 250px;
+    height: 250px;
+  }
+  
+  #atom-canvas,
+  #atom3d {
+    min-height: 300px;
+  }
+  
+  .energy-panel,
+  .magnetic-panel,
+  .temperature-panel,
+  .spectrometer-panel,
+  .radiation-detector-panel,
+  .ph-meter-panel,
+  .thermometer-panel {
+    padding: 12px;
+  }
+  
+  .element-symbol {
+    font-size: 2rem;
+  }
+  
+  .spectrum-display {
+    height: 80px;
+  }
+  
+  .thermometer {
+    width: 40px;
+    height: 150px;
+  }
+}
+
+/* Mobile Pequeno (< 480px) */
+@media (max-width: 480px) {
+  .lab-container {
+    grid-template-rows: auto auto 1fr 60px;
+  }
+  
+  .header {
+    padding: 6px;
+  }
+  
+  .logo {
+    font-size: 0.9rem;
+  }
+  
+  .nav-tabs {
+    gap: 3px;
+  }
+  
+  .nav-tab {
+    padding: 4px 6px;
+    font-size: 0.65rem;
+  }
+  
+  .search-bar {
+    width: 100px;
+    font-size: 0.75rem;
+    padding: 6px 10px;
+  }
+  
+  .icon-btn {
+    width: 30px;
+    height: 30px;
+    font-size: 1rem;
+  }
+  
+  .sidebar {
+    max-height: 120px;
+  }
+  
+  .section-title {
+    font-size: 0.75rem;
+    padding: 6px 8px;
+  }
+  
+  .tool-item,
+  .instrument-item {
+    padding: 6px;
+    font-size: 0.75rem;
+  }
+  
+  .tool-item span:first-child,
+  .instrument-item span:first-child {
+    font-size: 1rem;
+  }
+  
+  .visualization-area {
+    padding: 6px;
+    gap: 8px;
+  }
+  
+  #atom-display {
+    width: 220px;
+    height: 220px;
+  }
+  
+  #atom-canvas,
+  #atom3d {
+    min-height: 280px;
+  }
+  
+  .element-info-panel,
+  .reaction-panel,
+  .energy-panel,
+  .magnetic-panel,
+  .temperature-panel {
+    padding: 10px;
+  }
+  
+  .element-symbol {
+    font-size: 1.8rem;
+  }
+  
+  .element-name {
+    font-size: 0.95rem;
+  }
+  
+  .property-label {
+    font-size: 0.7rem;
+  }
+  
+  .property-value {
+    font-size: 0.85rem;
+  }
+  
+  .control-btn {
+    padding: 5px 8px;
+    font-size: 0.7rem;
+  }
+  
+  .status-bar {
+    padding: 6px 8px;
+  }
+  
+  .status-item {
+    font-size: 0.65rem;
+  }
+  
+  .status-dot {
+    width: 6px;
+    height: 6px;
+  }
+  
+  .view-toggle {
+    top: 8px;
+    left: 8px;
+    padding: 4px;
+  }
+  
+  .toggle-btn {
+    padding: 5px 10px;
+    font-size: 0.75rem;
+  }
+  
+  .controls-3d {
+    top: 50px;
+    left: 8px;
+    gap: 6px;
+  }
+  
+  .control-3d-btn {
+    padding: 5px 8px;
+    font-size: 0.7rem;
+  }
+}
+
+/* Landscape Mobile (altura < 500px) */
+@media (max-height: 500px) and (orientation: landscape) {
+  .lab-container {
+    grid-template-rows: 50px 1fr 50px;
+    grid-template-areas:
+      "header header"
+      "sidebar main"
+      "status status";
+    grid-template-columns: 200px 1fr;
+  }
+  
+  .sidebar {
+    max-height: none;
+    height: 100%;
+    border-bottom: none;
+    border-right: 1px solid var(--color-border);
+  }
+  
+  .tool-list {
+    flex-direction: column;
+  }
+  
+  .tool-item,
+  .instrument-item {
+    flex: none;
+  }
+  
+  .visualization-area {
+    grid-template-columns: 250px 1fr 280px;
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+      "left stage info"
+      "left stage reaction";
+  }
+  
+  #atom-canvas,
+  #atom3d {
+    min-height: 300px;
+  }
+}

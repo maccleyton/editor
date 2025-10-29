@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editor Markdown Profissional</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+	<link href="./css/deepSeekTwo.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Editor Markdown</h1>
+            <p class="subtitle">Escreva e visualize seu conteúdo em tempo real</p>
+        </header>
+
+        <div class="toolbar">
+            <button class="toolbar-btn" onclick="insertText('**', '**')">
+                <i class="fas fa-bold"></i> Negrito
+            </button>
+            <button class="toolbar-btn" onclick="insertText('*', '*')">
+                <i class="fas fa-italic"></i> Itálico
+            </button>
+            <button class="toolbar-btn" onclick="insertText('# ', '')">
+                <i class="fas fa-heading"></i> Título
+            </button>
+            <button class="toolbar-btn" onclick="insertText('- ', '')">
+                <i class="fas fa-list"></i> Lista
+            </button>
+            <button class="toolbar-btn" onclick="insertText('```javascript\n', '\n```')">
+                <i class="fas fa-code"></i> Código
+            </button>
+            <button class="toolbar-btn" onclick="insertText('> ', '')">
+                <i class="fas fa-quote-left"></i> Citação
+            </button>
+            <button class="toolbar-btn" onclick="insertText('[', '](url)')">
+                <i class="fas fa-link"></i> Link
+            </button>
+            <button class="toolbar-btn" onclick="insertText('![', '](imagem.jpg)')">
+                <i class="fas fa-image"></i> Imagem
+            </button>
+            <button class="toolbar-btn" onclick="insertText('| ', ' |')">
+                <i class="fas fa-table"></i> Tabela
+            </button>
+        </div>
+
+        <div class="editor-container">
+            <div class="panel">
+                <div class="panel-header">
+                    <span><i class="fas fa-edit"></i> Editor</span>
+                </div>
+                <div class="panel-content">
+                    <textarea id="markdown-input" placeholder="Comece a escrever seu Markdown aqui..."># Bem-vindo ao Editor Markdown
+
+Este é um editor **Markdown** com preview em tempo real!
+
+## Recursos Suportados
+
+- **Formatação básica**: negrito, itálico
+- **Código**: inline e em bloco
+- **Listas** ordenadas e não ordenadas
+- **Links** e imagens
+- **Tabelas**
+- **Citações em bloco**
+- **Fórmulas matemáticas LaTeX**
+
+### Exemplo de Código
+
+\`\`\`javascript
+function saudacao(nome) {
+    return \`Olá, \${nome}! Bem-vindo ao editor.\`;
+}
+
+console.log(saudacao("Mundo"));
+\`\`\`
+
+### Exemplo de Fórmula
+
+Fórmula inline: $E = mc^2$
+
+Fórmula em bloco:
+$$
+\\nabla \\times \\vec{E} = -\\frac{\\partial \\vec{B}}{\\partial t}
+$$
+
+> Esta é uma citação em bloco. Perfeita para destacar conteúdo importante.
+
+### Tabela Exemplo
+
+| Recurso | Suporte | Status |
+|---------|---------|--------|
+| Tabelas | Sim | ✅ |
+| Código | Sim | ✅ |
+| LaTeX | Sim | ✅ |
+| Imagens | Sim | ✅ |
+</textarea>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-header">
+                    <span><i class="fas fa-eye"></i> Visualização</span>
+                </div>
+                <div class="panel-content">
+                    <div id="preview"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="instructions">
+            <h2>Guia Rápido de Markdown</h2>
+            <div class="instructions-grid">
+                <div class="instruction-item">
+                    <h3>Texto</h3>
+                    <p><code>**Negrito**</code> → <strong>Negrito</strong></p>
+                    <p><code>*Itálico*</code> → <em>Itálico</em></p>
+                </div>
+                <div class="instruction-item">
+                    <h3>Cabeçalhos</h3>
+                    <p><code># H1</code></p>
+                    <p><code>## H2</code></p>
+                    <p><code>### H3</code></p>
+                </div>
+                <div class="instruction-item">
+                    <h3>Listas</h3>
+                    <p><code>- Item</code> (não ordenada)</p>
+                    <p><code>1. Item</code> (ordenada)</p>
+                </div>
+                <div class="instruction-item">
+                    <h3>Código</h3>
+                    <p><code>`inline`</code> (inline)</p>
+                    <p><code>```bloco```</code> (bloco)</p>
+                </div>
+                <div class="instruction-item">
+                    <h3>LaTeX</h3>
+                    <p><code>$fórmula$</code> (inline)</p>
+                    <p><code>$$fórmula$$</code> (bloco)</p>
+                </div>
+                <div class="instruction-item">
+                    <h3>Outros</h3>
+                    <p><code>> Citação</code></p>
+                    <p><code>[Link](url)</code></p>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Editor Markdown com suporte a LaTeX e syntax highlighting</p>
+        </footer>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup.min.js"></script>
+	<script src="./js/deepSeekTwo.js"></script>
+</body>
+</html>

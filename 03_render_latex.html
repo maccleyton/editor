@@ -1,0 +1,80 @@
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Editor ProseMirror com LaTeX</title>
+  <style>
+    body {
+      display: flex;
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+    #sidebar {
+      width: 250px;
+      padding: 20px;
+      background: #f0f0f0;
+      border-right: 1px solid #ccc;
+    }
+    #editor {
+      flex: 1;
+      padding: 40px;
+      min-height: 100vh;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    .latex-block {
+      background: #eef;
+      padding: 10px;
+      margin: 10px 0;
+      border-left: 4px solid #99f;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <script src="https://prosemirror.net/examples/prosemirror.js"></script>
+</head>
+<body>
+  <div id="sidebar">
+    <h3>Configurações</h3>
+    <label>Fonte:<br><input type="text" id="fontFamily" value="Arial"></label><br><br>
+    <label>Tamanho:<br><input type="number" id="fontSize" value="16"></label><br><br>
+    <label>Margem:<br><input type="number" id="margin" value="40"></label><br><br>
+    <label>Espaçamento:<br><input type="number" id="lineHeight" value="1.6" step="0.1"></label><br><br>
+    <label>Orientação:<br>
+      <select id="orientation">
+        <option value="vertical">Vertical</option>
+        <option value="horizontal">Horizontal</option>
+      </select>
+    </label><br><br>
+    <button onclick="insertLatex()">Inserir Fórmula LaTeX</button>
+  </div>
+  <div id="editor" contenteditable="true"></div>
+
+  <script>
+    function insertLatex() {
+      const latex = prompt("Digite o código LaTeX:");
+      if (latex) {
+        const span = document.createElement("span");
+        span.className = "latex-block";
+        span.textContent = `$$${latex}$$`;
+        document.getElementById("editor").appendChild(span);
+        MathJax.typeset();
+      }
+    }
+
+    // Aplicar configurações da barra lateral
+    const applySettings = () => {
+      const editor = document.getElementById("editor");
+      editor.style.fontFamily = document.getElementById("fontFamily").value;
+      editor.style.fontSize = document.getElementById("fontSize").value + "px";
+      editor.style.padding = document.getElementById("margin").value + "px";
+      editor.style.lineHeight = document.getElementById("lineHeight").value;
+      document.body.style.flexDirection = document.getElementById("orientation").value === "horizontal" ? "row" : "column";
+    };
+
+    document.querySelectorAll('#sidebar input, #sidebar select').forEach(el => {
+      el.addEventListener('input', applySettings);
+    });
+  </script>
+</body>
+</html>

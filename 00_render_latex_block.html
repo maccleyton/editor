@@ -1,0 +1,91 @@
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>ProseMirror com LaTeX</title>
+  <style>
+    body {
+      display: flex;
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+    #sidebar {
+      width: 250px;
+      background: #f4f4f4;
+      padding: 20px;
+      border-right: 1px solid #ccc;
+    }
+    #output {
+      flex: 1;
+      padding: 40px;
+      font-size: 18px;
+    }
+    .latex-block {
+      margin: 20px 0;
+      padding: 10px;
+      background: #eef;
+      border-left: 4px solid #99f;
+    }
+  </style>
+  <!-- MathJax -->
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+  <div id="sidebar">
+    <h3>Configurações</h3>
+    <label>Margem:</label><br>
+    <input type="range" id="margin" min="0" max="100" value="40"><br><br>
+
+    <label>Fonte:</label><br>
+    <select id="font">
+      <option value="Arial">Arial</option>
+      <option value="Georgia">Georgia</option>
+      <option value="Courier New">Courier New</option>
+    </select><br><br>
+
+    <label>Espaçamento:</label><br>
+    <input type="range" id="spacing" min="1" max="3" step="0.1" value="1.5"><br><br>
+
+    <label>Orientação:</label><br>
+    <select id="orientation">
+      <option value="vertical">Vertical</option>
+      <option value="horizontal">Horizontal</option>
+    </select><br><br>
+
+    <button onclick="insertLatex()">Inserir Fórmula LaTeX</button>
+  </div>
+
+  <div id="output">
+    <h2>Renderização de Fórmulas</h2>
+    <div id="latex-container"></div>
+  </div>
+
+  <script>
+    function insertLatex() {
+      const code = prompt("Digite o código LaTeX:");
+      if (code) {
+        const block = document.createElement("div");
+        block.className = "latex-block";
+        block.innerHTML = `$$${code}$$`;
+        document.getElementById("latex-container").appendChild(block);
+        MathJax.typeset();
+      }
+    }
+
+    // Aplicar configurações visuais
+    document.getElementById("margin").addEventListener("input", e => {
+      document.getElementById("output").style.padding = e.target.value + "px";
+    });
+    document.getElementById("font").addEventListener("change", e => {
+      document.getElementById("output").style.fontFamily = e.target.value;
+    });
+    document.getElementById("spacing").addEventListener("input", e => {
+      document.getElementById("output").style.lineHeight = e.target.value;
+    });
+    document.getElementById("orientation").addEventListener("change", e => {
+      document.body.style.flexDirection = e.target.value === "horizontal" ? "row" : "column";
+    });
+  </script>
+</body>
+</html>

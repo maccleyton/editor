@@ -1,0 +1,113 @@
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Editor ProseMirror com LaTeX e Código</title>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.css">
+  <style>
+    body {
+      display: flex;
+      font-family: Arial, sans-serif;
+      margin: 0;
+    }
+    #sidebar {
+      width: 250px;
+      padding: 10px;
+      background: #f0f0f0;
+      border-right: 1px solid #ccc;
+    }
+    #editor {
+      flex: 1;
+      padding: 20px;
+      min-height: 100vh;
+    }
+    .toolbar button {
+      margin: 5px;
+    }
+    .latex-block, .code-block {
+      background: #f9f9f9;
+      border: 1px dashed #aaa;
+      padding: 10px;
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body>
+  <div id="sidebar">
+    <h3>Configurações</h3>
+    <label>Fonte: <input type="text" id="fontFamily" value="Arial"></label><br><br>
+    <label>Tamanho: <input type="number" id="fontSize" value="14"></label><br><br>
+    <label>Margem: <input type="number" id="margin" value="20"></label><br><br>
+    <label>Espaçamento: <input type="number" id="lineHeight" value="1.5" step="0.1"></label><br><br>
+    <label>Orientação:
+      <select id="orientation">
+        <option value="vertical">Vertical</option>
+        <option value="horizontal">Horizontal</option>
+      </select>
+    </label>
+    <br><br>
+    <button onclick="applyStyles()">Aplicar Estilos</button>
+  </div>
+
+  <div id="editor">
+    <div class="toolbar">
+      <button onclick="insertLatex()">Inserir LaTeX</button>
+      <button onclick="renderLatex()">Renderizar LaTeX</button>
+      <button onclick="insertCode()">Inserir Código</button>
+      <button onclick="renderCode()">Renderizar Código</button>
+    </div>
+    <div id="content" contenteditable="true" style="white-space: pre-wrap;"></div>
+  </div>
+
+  <script>
+    function insertLatex() {
+      const latex = prompt("Digite o código LaTeX:");
+      if (latex) {
+        const span = document.createElement("div");
+        span.className = "latex-block";
+        span.textContent = `$$${latex}$$`;
+        document.getElementById("content").appendChild(span);
+      }
+    }
+
+    function renderLatex() {
+      MathJax.typeset();
+    }
+
+    function insertCode() {
+      const code = prompt("Digite o código:");
+      if (code) {
+        const pre = document.createElement("pre");
+        pre.className = "code-block";
+        pre.textContent = code;
+        document.getElementById("content").appendChild(pre);
+      }
+    }
+
+    function renderCode() {
+      document.querySelectorAll('.code-block').forEach(block => {
+        CodeMirror(function(elt) {
+          block.parentNode.replaceChild(elt, block);
+        }, {
+          value: block.textContent,
+          mode: "javascript",
+          lineNumbers: true,
+          readOnly: true
+        });
+      });
+    }
+
+    function applyStyles() {
+      const editor = document.getElementById("content");
+      editor.style.fontFamily = document.getElementById("fontFamily").value;
+      editor.style.fontSize = document.getElementById("fontSize").value + "px";
+      editor.style.margin = document.getElementById("margin").value + "px";
+      editor.style.lineHeight = document.getElementById("lineHeight").value;
+      editor.style.flexDirection = document.getElementById("orientation").value === "horizontal" ? "row" : "column";
+    }
+  </script>
+</body>
+</html>

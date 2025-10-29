@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editor Acadêmico - Novo Protótipo</title>
+    
+    <!-- CKEditor 5 -->
+    <script src="https://cdn.ckeditor.com/ckeditor5/43.3.0/ckeditor5.umd.js"></script>
+    <link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/43.3.0/ckeditor5.css">
+    
+    <!-- MathJax -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+            background: #667eea;
+            color: white;
+        }
+
+        .btn:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        /* Main Layout */
+        .main-layout {
+            display: grid;
+            grid-template-columns: 250px 1fr 250px;
+            gap: 20px;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            max-height: calc(100vh - 200px);
+            overflow-y: auto;
+        }
+
+        .sidebar h3 {
+            color: #667eea;
+            font-size: 16px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+        }
+
+        .control-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .control-group input,
+        .control-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        .margin-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        /* Editor Area */
+        .editor-container {
+            background: white;
+            border-radius: 10px;
+            padding: 40px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            min-height: calc(100vh - 200px);
+        }
+
+        .page-wrapper {
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .page {
+            width: 21cm;
+            min-height: 29.7cm;
+            max-height: 29.7cm;
+            margin: 0 auto;
+            background: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-content {
+            width: 100%;
+            height: 100%;
+            padding: 3cm 3cm 2cm 3cm;
+            font-family: 'Times New Roman', serif;
+            font-size: 12pt;
+            line-height: 1.5;
+        }
+
+        .page-number {
+            position: absolute;
+            bottom: 1cm;
+            right: 3cm;
+            font-size: 11pt;
+            color: #666;
+        }
+
+        /* CKEditor Customization */
+        .ck-editor__editable {
+            min-height: 23.7cm !important;
+            max-height: 23.7cm !important;
+            border: none !important;
+            padding: 0 !important;
+        }
+
+        .ck-editor__editable:focus {
+            box-shadow: none !important;
+        }
+
+        /* TOC Sidebar */
+        .toc-sidebar h3 {
+            color: #667eea;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+
+        .toc-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .toc-item {
+            padding: 8px 12px;
+            margin-bottom: 5px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+
+        .toc-item:hover {
+            background: #f0f0f0;
+        }
+
+        .toc-item.active {
+            background: #667eea;
+            color: white;
+        }
+
+        /* Math styling */
+        .math-tex {
+            display: inline-block;
+            padding: 2px 4px;
+            background: #f9f9f9;
+            border-radius: 3px;
+            font-family: 'Times New Roman', serif;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .modal-content h3 {
+            margin-bottom: 20px;
+            color: #667eea;
+        }
+
+        .modal-content textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 13px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: flex-end;
+        }
+
+        /* Templates */
+        .template-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .template-btn {
+            padding: 10px;
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s;
+        }
+
+        .template-btn:hover {
+            background: #e9ecef;
+            border-color: #667eea;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                max-height: none;
+            }
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .header,
+            .sidebar,
+            .toc-sidebar,
+            .btn {
+                display: none !important;
+            }
+            
+            .main-layout {
+                grid-template-columns: 1fr;
+            }
+            
+            .page-wrapper {
+                page-break-after: always;
+                box-shadow: none;
+                margin: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>📚 Editor Acadêmico Profissional</h1>
+            <div class="toolbar">
+                <button class="btn" onclick="editorApp.addNewPage()">➕ Nova Página</button>
+                <button class="btn" onclick="editorApp.insertTOC()">📋 Inserir Sumário</button>
+                <button class="btn" onclick="editorApp.showFormulaModal()">∑ Inserir Fórmula</button>
+                <button class="btn" onclick="editorApp.renderAllMath()">🔄 Renderizar LaTeX</button>
+                <button class="btn btn-secondary" onclick="editorApp.saveDocument()">💾 Salvar</button>
+                <button class="btn btn-secondary" onclick="window.print()">🖨️ Imprimir</button>
+            </div>
+        </div>
+
+        <!-- Main Layout -->
+        <div class="main-layout">
+            <!-- Left Sidebar - Controls -->
+            <div class="sidebar">
+                <h3>⚙️ Configurações</h3>
+                
+                <div class="control-group">
+                    <label>📏 Margens (cm)</label>
+                    <div class="margin-inputs">
+                        <div>
+                            <label style="font-size: 11px;">Superior</label>
+                            <input type="number" id="marginTop" value="3" step="0.5" min="1" max="5">
+                        </div>
+                        <div>
+                            <label style="font-size: 11px;">Inferior</label>
+                            <input type="number" id="marginBottom" value="2" step="0.5" min="1" max="5">
+                        </div>
+                        <div>
+                            <label style="font-size: 11px;">Esquerda</label>
+                            <input type="number" id="marginLeft" value="3" step="0.5" min="1" max="5">
+                        </div>
+                        <div>
+                            <label style="font-size: 11px;">Direita</label>
+                            <input type="number" id="marginRight" value="3" step="0.5" min="1" max="5">
+                        </div>
+                    </div>
+                    <button class="btn" style="width: 100%; margin-top: 10px;" onclick="editorApp.applyMargins()">Aplicar</button>
+                </div>
+
+                <div class="control-group">
+                    <label>🔤 Fonte</label>
+                    <select id="fontFamily" onchange="editorApp.applyFont()">
+                        <option value="Times New Roman">Times New Roman</option>
+                        <option value="Arial">Arial</option>
+                        <option value="Calibri">Calibri</option>
+                        <option value="Georgia">Georgia</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label>📐 Tamanho (pt)</label>
+                    <input type="number" id="fontSize" value="12" min="8" max="18" onchange="editorApp.applyFont()">
+                </div>
+
+                <div class="control-group">
+                    <label>📊 Espaçamento</label>
+                    <select id="lineHeight" onchange="editorApp.applyFont()">
+                        <option value="1">Simples</option>
+                        <option value="1.5" selected>1,5</option>
+                        <option value="2">Duplo</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <h3 style="margin-top: 20px;">📄 Templates</h3>
+                    <div class="template-list">
+                        <button class="template-btn" onclick="editorApp.insertTemplate('capa')">📘 Capa</button>
+                        <button class="template-btn" onclick="editorApp.insertTemplate('resumo')">📝 Resumo</button>
+                        <button class="template-btn" onclick="editorApp.insertTemplate('abstract')">🌐 Abstract</button>
+                        <button class="template-btn" onclick="editorApp.insertTemplate('referencias')">📚 Referências</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Center - Editor -->
+            <div class="editor-container" id="editorContainer">
+                <!-- As páginas serão inseridas aqui -->
+            </div>
+
+            <!-- Right Sidebar - TOC -->
+            <div class="sidebar toc-sidebar">
+                <h3>📑 Sumário</h3>
+                <ul class="toc-list" id="tocList">
+                    <li class="toc-item">Nenhum título encontrado</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formula Modal -->
+    <div class="modal" id="formulaModal">
+        <div class="modal-content">
+            <h3>Inserir Fórmula LaTeX</h3>
+            <textarea id="latexInput" placeholder="Digite a fórmula LaTeX aqui...&#10;Exemplo: E = mc^2"></textarea>
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" onclick="editorApp.closeFormulaModal()">Cancelar</button>
+                <button class="btn" onclick="editorApp.insertFormula()">Inserir</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { DecoupledEditor, Bold, Essentials, Italic, Paragraph, Heading, List, Table, Link, Alignment, FontSize, FontFamily, FontColor, FontBackgroundColor, Underline, Strikethrough, Code, Subscript, Superscript, BlockQuote, Image, ImageUpload, ImageToolbar, ImageCaption, ImageStyle, ImageResize, Indent, IndentBlock } = CKEDITOR;
+
+        // Configuração do MathJax
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+
+        class EditorApp {
+            constructor() {
+                this.pages = [];
+                this.editors = [];
+                this.currentPageIndex = 0;
+                this.init();
+            }
+
+            async init() {
+                await this.createPage();
+                this.setupEventListeners();
+                this.updateTOC();
+            }
+
+            async createPage() {
+                const pageWrapper = document.createElement('div');
+                pageWrapper.className = 'page-wrapper';
+                pageWrapper.dataset.pageIndex = this.pages.length;
+
+                const page = document.createElement('div');
+                page.className = 'page';
+
+                const pageContent = document.createElement('div');
+                pageContent.className = 'page-content';
+                pageContent.innerHTML = '<p>Comece a escrever aqui...</p>';
+
+                const pageNumber = document.createElement('div');
+                pageNumber.className = 'page-number';
+                pageNumber.textContent = this.pages.length + 1;
+
+                page.appendChild(pageContent);
+                page.appendChild(pageNumber);
+                pageWrapper.appendChild(page);
+
+                document.getElementById('editorContainer').appendChild(pageWrapper);
+
+                // Inicializar CKEditor
+                try {
+                    const editor = await DecoupledEditor.create(pageContent, {
+                        plugins: [
+                            Essentials, Bold, Italic, Underline, Strikethrough,
+                            Paragraph, Heading, List, Table, Link, Alignment,
+                            FontSize, FontFamily, FontColor, FontBackgroundColor,
+                            Code, Subscript, Superscript, BlockQuote,
+                            Indent, IndentBlock
+                        ],
+                        toolbar: {
+                            items: [
+                                'heading', '|',
+                                'bold', 'italic', 'underline', '|',
+                                'fontSize', 'fontFamily', 'fontColor', '|',
+                                'alignment', '|',
+                                'numberedList', 'bulletedList', '|',
+                                'link', 'blockQuote', '|',
+                                'undo', 'redo'
+                            ]
+                        },
+                        heading: {
+                            options: [
+                                { model: 'paragraph', title: 'Parágrafo', class: 'ck-heading_paragraph' },
+                                { model: 'heading1', view: 'h1', title: 'Título 1', class: 'ck-heading_heading1' },
+                                { model: 'heading2', view: 'h2', title: 'Título 2', class: 'ck-heading_heading2' },
+                                { model: 'heading3', view: 'h3', title: 'Título 3', class: 'ck-heading_heading3' }
+                            ]
+                        }
+                    });
+
+                    // Adicionar toolbar acima do conteúdo
+                    const toolbarContainer = document.createElement('div');
+                    toolbarContainer.style.cssText = 'position: sticky; top: 0; background: white; z-index: 100; border-bottom: 1px solid #ddd; margin-bottom: 20px;';
+                    toolbarContainer.appendChild(editor.ui.view.toolbar.element);
+                    pageWrapper.insertBefore(toolbarContainer, page);
+
+                    this.editors.push(editor);
+                    this.pages.push({ wrapper: pageWrapper, editor: editor, content: pageContent });
+
+                    // Eventos do editor
+                    editor.model.document.on('change:data', () => {
+                        this.updateTOC();
+                        this.checkPageOverflow(this.pages.length - 1);
+                    });
+
+                    this.applyMargins();
+                    
+                } catch (error) {
+                    console.error('Erro ao criar editor:', error);
+                }
+            }
+
+            async addNewPage() {
+                await this.createPage();
+                this.updatePageNumbers();
+            }
+
+            updatePageNumbers() {
+                this.pages.forEach((page, index) => {
+                    const pageNumber = page.wrapper.querySelector('.page-number');
+                    if (pageNumber) {
+                        pageNumber.textContent = index + 1;
+                    }
+                });
+            }
+
+            applyMargins() {
+                const top = document.getElementById('marginTop').value + 'cm';
+                const bottom = document.getElementById('marginBottom').value + 'cm';
+                const left = document.getElementById('marginLeft').value + 'cm';
+                const right = document.getElementById('marginRight').value + 'cm';
+
+                this.pages.forEach(page => {
+                    page.content.style.padding = `${top} ${right} ${bottom} ${left}`;
+                });
+            }
+
+            applyFont() {
+                const fontFamily = document.getElementById('fontFamily').value;
+                const fontSize = document.getElementById('fontSize').value + 'pt';
+                const lineHeight = document.getElementById('lineHeight').value;
+
+                this.pages.forEach(page => {
+                    page.content.style.fontFamily = fontFamily;
+                    page.content.style.fontSize = fontSize;
+                    page.content.style.lineHeight = lineHeight;
+                });
+            }
+
+            checkPageOverflow(pageIndex) {
+                const page = this.pages[pageIndex];
+                if (!page) return;
+
+                const content = page.content;
+                const maxHeight = 29.7; // cm
+                const currentHeight = content.scrollHeight / 37.8; // conversão px para cm
+
+                if (currentHeight > maxHeight * 0.95) {
+                    console.log('Página cheia, considere adicionar nova página');
+                }
+            }
+
+            updateTOC() {
+                const tocList = document.getElementById('tocList');
+                tocList.innerHTML = '';
+
+                let foundHeadings = false;
+
+                this.pages.forEach((page, pageIndex) => {
+                    const headings = page.content.querySelectorAll('h1, h2, h3');
+                    
+                    headings.forEach(heading => {
+                        foundHeadings = true;
+                        const li = document.createElement('li');
+                        li.className = 'toc-item';
+                        
+                        const level = parseInt(heading.tagName[1]);
+                        li.style.paddingLeft = (level * 10) + 'px';
+                        li.textContent = heading.textContent;
+                        
+                        li.onclick = () => {
+                            heading.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        };
+                        
+                        tocList.appendChild(li);
+                    });
+                });
+
+                if (!foundHeadings) {
+                    tocList.innerHTML = '<li class="toc-item">Nenhum título encontrado</li>';
+                }
+            }
+
+            insertTOC() {
+                if (this.editors.length === 0) return;
+
+                let tocHTML = '<h2>Sumário</h2><ul style="list-style: none; padding-left: 0;">';
+                let foundHeadings = false;
+
+                this.pages.forEach((page, pageIndex) => {
+                    const headings = page.content.querySelectorAll('h1, h2, h3');
+                    
+                    headings.forEach(heading => {
+                        foundHeadings = true;
+                        const level = parseInt(heading.tagName[1]);
+                        const indent = '&nbsp;'.repeat((level - 1) * 4);
+                        tocHTML += `<li>${indent}${heading.textContent}</li>`;
+                    });
+                });
+
+                tocHTML += '</ul>';
+
+                if (foundHeadings) {
+                    const editor = this.editors[this.currentPageIndex];
+                    const viewFragment = editor.data.processor.toView(tocHTML);
+                    const modelFragment = editor.data.toModel(viewFragment);
+                    editor.model.insertContent(modelFragment);
+                }
+            }
+
+            showFormulaModal() {
+                document.getElementById('formulaModal').classList.add('active');
+                document.getElementById('latexInput').focus();
+            }
+
+            closeFormulaModal() {
+                document.getElementById('formulaModal').classList.remove('active');
+                document.getElementById('latexInput').value = '';
+            }
+
+            insertFormula() {
+                const latex = document.getElementById('latexInput').value.trim();
+                if (!latex) return;
+
+                const editor = this.editors[this.currentPageIndex];
+                const formulaHTML = `<span class="math-tex">\\(${latex}\\)</span>`;
+                
+                const viewFragment = editor.data.processor.toView(formulaHTML);
+                const modelFragment = editor.data.toModel(viewFragment);
+                editor.model.insertContent(modelFragment);
+
+                this.closeFormulaModal();
+                
+                setTimeout(() => {
+                    this.renderAllMath();
+                }, 100);
+            }
+
+            renderAllMath() {
+                if (typeof MathJax !== 'undefined' && MathJax.typesetPromise) {
+                    MathJax.typesetPromise().catch((err) => console.log('Erro no MathJax:', err));
+                }
+            }
+
+            insertTemplate(type) {
+                const editor = this.editors[this.currentPageIndex];
+                let templateHTML = '';
+
+                switch(type) {
+                    case 'capa':
+                        templateHTML = `
+                            <div style="text-align: center; margin-top: 5cm;">
+                                <h1>UNIVERSIDADE FEDERAL</h1>
+                                <h2 style="margin-top: 2cm;">TÍTULO DO TRABALHO</h2>
+                                <p style="margin-top: 5cm;">Nome do Autor</p>
+                                <p style="margin-top: 5cm;">Cidade<br>Ano</p>
+                            </div>
+                        `;
+                        break;
+                    case 'resumo':
+                        templateHTML = `
+                            <h2 style="text-align: center;">RESUMO</h2>
+                            <p>Digite aqui o resumo do trabalho...</p>
+                            <p><strong>Palavras-chave:</strong> Palavra1. Palavra2. Palavra3.</p>
+                        `;
+                        break;
+                    case 'abstract':
+                        templateHTML = `
+                            <h2 style="text-align: center;">ABSTRACT</h2>
+                            <p>Type here the abstract...</p>
+                            <p><strong>Keywords:</strong> Keyword1. Keyword2. Keyword3.</p>
+                        `;
+                        break;
+                    case 'referencias':
+                        templateHTML = `
+                            <h2>REFERÊNCIAS</h2>
+                            <p>AUTOR, A. A. <strong>Título da obra</strong>. Cidade: Editora, ano.</p>
+                        `;
+                        break;
+                }
+
+                const viewFragment = editor.data.processor.toView(templateHTML);
+                const modelFragment = editor.data.toModel(viewFragment);
+                editor.model.insertContent(modelFragment);
+            }
+
+            saveDocument() {
+                const documentData = this.pages.map((page, index) => ({
+                    page: index + 1,
+                    content: page.editor.getData()
+                }));
+
+                const dataStr = JSON.stringify(documentData, null, 2);
+                const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(dataBlob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = 'documento_academico.json';
+                link.click();
+                URL.revokeObjectURL(url);
+            }
+
+            setupEventListeners() {
+                // Fechar modal ao clicar fora
+                document.getElementById('formulaModal').addEventListener('click', (e) => {
+                    if (e.target.id === 'formulaModal') {
+                        this.closeFormulaModal();
+                    }
+                });
+
+                // Enter no input de fórmula
+                document.getElementById('latexInput').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        this.insertFormula();
+                    }
+                });
+            }
+        }
+
+        // Inicializar aplicação
+        let editorApp;
+        document.addEventListener('DOMContentLoaded', () => {
+            editorApp = new EditorApp();
+        });
+    </script>
+</body>
+</html>

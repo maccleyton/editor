@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editor Acadêmico - Quill + KaTeX</title>
+    
+    <!-- Quill CSS -->
+    <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+    
+    <!-- KaTeX CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+            background: #667eea;
+            color: white;
+        }
+
+        .btn:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: 250px 1fr 250px;
+            gap: 20px;
+        }
+
+        .sidebar {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            max-height: calc(100vh - 200px);
+            overflow-y: auto;
+        }
+
+        .sidebar h3 {
+            color: #667eea;
+            font-size: 16px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+        }
+
+        .control-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .control-group input,
+        .control-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        .margin-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .editor-container {
+            background: white;
+            border-radius: 10px;
+            padding: 40px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            min-height: calc(100vh - 200px);
+        }
+
+        .page-wrapper {
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .page {
+            width: 21cm;
+            min-height: 29.7cm;
+            margin: 0 auto;
+            background: white;
+            position: relative;
+            padding: 3cm 3cm 2cm 3cm;
+        }
+
+        .page-number {
+            position: absolute;
+            bottom: 1cm;
+            right: 3cm;
+            font-size: 11pt;
+            color: #666;
+        }
+
+        /* Quill Editor */
+        .ql-container {
+            font-family: 'Times New Roman', serif;
+            font-size: 12pt;
+            line-height: 1.5;
+            min-height: 23.7cm;
+            border: none !important;
+        }
+
+        .ql-editor {
+            min-height: 23.7cm;
+            padding: 0 !important;
+        }
+
+        .ql-toolbar {
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 100;
+            border: none !important;
+            border-bottom: 1px solid #ddd !important;
+            padding: 10px !important;
+        }
+
+        .template-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .template-btn {
+            padding: 10px;
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s;
+        }
+
+        .template-btn:hover {
+            background: #e9ecef;
+            border-color: #667eea;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .modal-content h3 {
+            margin-bottom: 20px;
+            color: #667eea;
+        }
+
+        .modal-content input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: flex-end;
+        }
+
+        .formula-preview {
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @media (max-width: 1200px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .header,
+            .sidebar,
+            .btn,
+            .ql-toolbar {
+                display: none !important;
+            }
+            
+            .main-layout {
+                grid-template-columns: 1fr;
+            }
+            
+            .page-wrapper {
+                page-break-after: always;
+                box-shadow: none;
+                margin: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 Editor Acadêmico Profissional</h1>
+            <div class="toolbar">
+                <button class="btn" onclick="editorApp.showFormulaModal()">∑ Inserir Fórmula</button>
+                <button class="btn" onclick="editorApp.addNewPage()">➕ Nova Página</button>
+                <button class="btn btn-secondary" onclick="editorApp.saveDocument()">💾 Salvar HTML</button>
+                <button class="btn btn-secondary" onclick="window.print()">🖨️ Imprimir</button>
+            </div>
+        </div>
+
+        <div class="main-layout">
+            <div class="sidebar">
+                <h3>⚙️ Configurações</h3>
+                
+                <div class="control-group">
+                    <label>📏 Margens (cm)</label>
+                    <div class="margin-inputs">
+                        <div>
+                            <label style="font-size: 11px;">Superior</label>
+                            <input type="number" id="marginTop" value="3" step="0.5" min="1" max="5">
+                        </div>
+                        <div>
+                            <label style="font-size: 11px;">Inferior</label>
+                            <input type="number" id="marginBottom" value="2" step="0.5" min="1" max="5">
+                        </div>
+                        <div>
+                            <label style="font-size: 11px;">Esquerda</label>
+                            <input type="number" id="marginLeft" value="3" step="0.5" min="1" max="5">
+                        </div>
+                        <div>
+                            <label style="font-size: 11px;">Direita</label>
+                            <input type="number" id="marginRight" value="3" step="0.5" min="1" max="5">
+                        </div>
+                    </div>
+                    <button class="btn" style="width: 100%; margin-top: 10px;" onclick="editorApp.applyMargins()">Aplicar</button>
+                </div>
+
+                <div class="control-group">
+                    <label>🔤 Fonte</label>
+                    <select id="fontFamily" onchange="editorApp.applyFont()">
+                        <option value="Times New Roman">Times New Roman</option>
+                        <option value="Arial">Arial</option>
+                        <option value="Calibri">Calibri</option>
+                        <option value="Georgia">Georgia</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label>📐 Tamanho (pt)</label>
+                    <input type="number" id="fontSize" value="12" min="8" max="18" onchange="editorApp.applyFont()">
+                </div>
+
+                <div class="control-group">
+                    <label>📊 Espaçamento</label>
+                    <select id="lineHeight" onchange="editorApp.applyFont()">
+                        <option value="1">Simples</option>
+                        <option value="1.5" selected>1,5</option>
+                        <option value="2">Duplo</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <h3 style="margin-top: 20px;">📄 Templates</h3>
+                    <div class="template-list">
+                        <button class="template-btn" onclick="editorApp.insertTemplate('capa')">📘 Capa</button>
+                        <button class="template-btn" onclick="editorApp.insertTemplate('resumo')">📝 Resumo</button>
+                        <button class="template-btn" onclick="editorApp.insertTemplate('abstract')">🌐 Abstract</button>
+                        <button class="template-btn" onclick="editorApp.insertTemplate('referencias')">📚 Referências</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="editor-container" id="editorContainer">
+                <!-- As páginas serão inseridas aqui -->
+            </div>
+
+            <div class="sidebar">
+                <h3>📑 Informações</h3>
+                <div style="font-size: 13px; color: #666;">
+                    <p style="margin-bottom: 10px;"><strong>Quill.js + KaTeX</strong></p>
+                    <p style="margin-bottom: 10px;">✓ Editor rico</p>
+                    <p style="margin-bottom: 10px;">✓ Fórmulas matemáticas</p>
+                    <p style="margin-bottom: 10px;">✓ Formatação completa</p>
+                    <p style="margin-bottom: 10px;">✓ Paginação A4</p>
+                </div>
+                
+                <h3 style="margin-top: 20px;">💡 Dicas LaTeX</h3>
+                <div style="font-size: 12px; color: #666; line-height: 1.6;">
+                    <p style="margin-bottom: 5px;"><strong>Fração:</strong> \frac{a}{b}</p>
+                    <p style="margin-bottom: 5px;"><strong>Raiz:</strong> \sqrt{x}</p>
+                    <p style="margin-bottom: 5px;"><strong>Integral:</strong> \int_a^b</p>
+                    <p style="margin-bottom: 5px;"><strong>Somatório:</strong> \sum_{i=1}^n</p>
+                    <p style="margin-bottom: 5px;"><strong>Expoente:</strong> x^2</p>
+                    <p><strong>Subscrito:</strong> x_i</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formula Modal -->
+    <div class="modal" id="formulaModal">
+        <div class="modal-content">
+            <h3>Inserir Fórmula LaTeX</h3>
+            <input type="text" id="latexInput" placeholder="Digite a fórmula... Ex: E = mc^2">
+            <div class="formula-preview" id="formulaPreview">Preview aparecerá aqui</div>
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" onclick="editorApp.closeFormulaModal()">Cancelar</button>
+                <button class="btn" onclick="editorApp.insertFormula()">Inserir</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- KaTeX -->
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    
+    <!-- Quill -->
+    <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+    
+    <!-- Quill Formula Module -->
+    <script>
+        // Configurar KaTeX no Quill
+        window.katex = katex;
+    </script>
+
+    <script>
+        class EditorApp {
+            constructor() {
+                this.pages = [];
+                this.editors = [];
+                this.currentPageIndex = 0;
+                this.init();
+            }
+
+            init() {
+                this.createPage();
+                this.setupFormulaPreview();
+            }
+
+            createPage() {
+                const pageWrapper = document.createElement('div');
+                pageWrapper.className = 'page-wrapper';
+
+                const page = document.createElement('div');
+                page.className = 'page';
+
+                const editorDiv = document.createElement('div');
+                editorDiv.id = `editor-${this.pages.length}`;
+
+                const pageNumber = document.createElement('div');
+                pageNumber.className = 'page-number';
+                pageNumber.textContent = this.pages.length + 1;
+
+                page.appendChild(editorDiv);
+                page.appendChild(pageNumber);
+                pageWrapper.appendChild(page);
+                document.getElementById('editorContainer').appendChild(pageWrapper);
+
+                // Inicializar Quill
+                const quill = new Quill(`#editor-${this.pages.length}`, {
+                    theme: 'snow',
+                    modules: {
+                        toolbar: [
+                            [{ 'header': [1, 2, 3, false] }],
+                            ['bold', 'italic', 'underline', 'strike'],
+                            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                            [{ 'align': [] }],
+                            ['link'],
+                            [{ 'color': [] }, { 'background': [] }],
+                            ['clean']
+                        ]
+                    }
+                });
+
+                // Texto inicial
+                quill.setText('Comece a escrever seu documento acadêmico aqui...\n\n');
+
+                this.pages.push({ wrapper: pageWrapper, element: page });
+                this.editors.push(quill);
+                this.applyMargins();
+            }
+
+            addNewPage() {
+                this.createPage();
+                this.updatePageNumbers();
+            }
+
+            updatePageNumbers() {
+                this.pages.forEach((page, index) => {
+                    const pageNumber = page.wrapper.querySelector('.page-number');
+                    if (pageNumber) {
+                        pageNumber.textContent = index + 1;
+                    }
+                });
+            }
+
+            applyMargins() {
+                const top = document.getElementById('marginTop').value + 'cm';
+                const bottom = document.getElementById('marginBottom').value + 'cm';
+                const left = document.getElementById('marginLeft').value + 'cm';
+                const right = document.getElementById('marginRight').value + 'cm';
+
+                this.pages.forEach(page => {
+                    page.element.style.padding = `${top} ${right} ${bottom} ${left}`;
+                });
+            }
+
+            applyFont() {
+                const fontFamily = document.getElementById('fontFamily').value;
+                const fontSize = document.getElementById('fontSize').value + 'pt';
+                const lineHeight = document.getElementById('lineHeight').value;
+
+                document.querySelectorAll('.ql-editor').forEach(editor => {
+                    editor.style.fontFamily = fontFamily;
+                    editor.style.fontSize = fontSize;
+                    editor.style.lineHeight = lineHeight;
+                });
+            }
+
+            showFormulaModal() {
+                document.getElementById('formulaModal').classList.add('active');
+                document.getElementById('latexInput').focus();
+            }
+
+            closeFormulaModal() {
+                document.getElementById('formulaModal').classList.remove('active');
+                document.getElementById('latexInput').value = '';
+                document.getElementById('formulaPreview').innerHTML = 'Preview aparecerá aqui';
+            }
+
+            setupFormulaPreview() {
+                const input = document.getElementById('latexInput');
+                const preview = document.getElementById('formulaPreview');
+                
+                input.addEventListener('input', () => {
+                    const latex = input.value.trim();
+                    if (latex) {
+                        try {
+                            katex.render(latex, preview, {
+                                throwOnError: false,
+                                displayMode: true
+                            });
+                        } catch (e) {
+                            preview.innerHTML = '<span style="color: #dc3545;">Erro na fórmula</span>';
+                        }
+                    } else {
+                        preview.innerHTML = 'Preview aparecerá aqui';
+                    }
+                });
+            }
+
+            insertFormula() {
+                const latex = document.getElementById('latexInput').value.trim();
+                if (!latex) return;
+
+                const editor = this.editors[this.currentPageIndex];
+                const range = editor.getSelection(true);
+                
+                // Renderizar fórmula em HTML
+                try {
+                    const html = katex.renderToString(latex, {
+                        throwOnError: false,
+                        displayMode: false
+                    });
+                    
+                    // Inserir como HTML
+                    editor.clipboard.dangerouslyPasteHTML(range.index, html + ' ');
+                    editor.setSelection(range.index + 1);
+                    
+                } catch (e) {
+                    alert('Erro ao inserir fórmula: ' + e.message);
+                }
+
+                this.closeFormulaModal();
+            }
+
+            insertTemplate(type) {
+                const editor = this.editors[this.currentPageIndex];
+                let content = '';
+
+                switch(type) {
+                    case 'capa':
+                        content = '\n\nUNIVERSIDADE FEDERAL\n\n\nTÍTULO DO TRABALHO\n\n\n\n\nNome do Autor\n\n\n\n\nCidade\nAno\n\n';
+                        editor.setText(content);
+                        editor.formatLine(0, 1, { 'align': 'center', 'header': 1 });
+                        break;
+                    case 'resumo':
+                        content = 'RESUMO\n\nDigite aqui o resumo do trabalho...\n\nPalavras-chave: Palavra1. Palavra2. Palavra3.\n\n';
+                        editor.insertText(editor.getLength(), content);
+                        break;
+                    case 'abstract':
+                        content = 'ABSTRACT\n\nType here the abstract...\n\nKeywords: Keyword1. Keyword2. Keyword3.\n\n';
+                        editor.insertText(editor.getLength(), content);
+                        break;
+                    case 'referencias':
+                        content = 'REFERÊNCIAS\n\nAUTOR, A. A. Título da obra. Cidade: Editora, ano.\n\n';
+                        editor.insertText(editor.getLength(), content);
+                        break;
+                }
+            }
+
+            saveDocument() {
+                const content = this.editors.map((editor, index) => ({
+                    page: index + 1,
+                    html: editor.root.innerHTML,
+                    text: editor.getText()
+                }));
+
+                const dataStr = JSON.stringify(content, null, 2);
+                const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(dataBlob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = 'documento_academico.json';
+                link.click();
+                URL.revokeObjectURL(url);
+            }
+        }
+
+        // Inicializar aplicação
+        let editorApp;
+        window.addEventListener('DOMContentLoaded', () => {
+            editorApp = new EditorApp();
+        });
+    </script>
+</body>
+</html>

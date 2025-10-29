@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR">
+<head>
+	<meta charset="utf-8"/>
+	<meta content="width=device-width,initial-scale=1" name="viewport"/>
+	<title>QuantumLab Editor</title>
+	<link href="./css/main.css" rel="stylesheet" type="text/css"/>
+	<!-- Material Icons -->
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+	<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+	<!-- MathJax para LaTeX -->
+	<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+	<script async="" id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+	<!-- jsPDF -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+	<!-- html2canvas para captura de tela -->
+	<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+</head>
+<body>
+	<!-- header -->
+	<div class="header">
+		<div class="logo">
+		<!--<img src="./assets/logo/cosmos.png" width="50" height="50" alt="Logo Cosmos" />-->
+				QuantumLab - Markdown Editor (PROTÓTIPO EM CONSTRUÇÃO)</div>
+		<div class="title"></div>
+		<!--
+			<div class="actions">
+			  <button class="top-btn" id="saveBtn"><img src="./assets/icons/icone.svg" alt="Reservado" />&nbsp;"RESERVADO"</button>
+			</div>
+			-->
+		</div>
+		<!-- toolbar superior -->
+		<div class="toolbar">
+		<!-- formatting group -->
+			<div class="group">
+				<div class="icon-btn" data-cmd="configBtn" title="Configurações"><img alt="Configurações" src="./assets/icons/settings.svg"/></div>
+				<div class="icon-btn" data-cmd="marginBtn" title="Margens e Orientação"><img alt="Margens" src="./assets/icons/margin.svg"/></div>
+				<div class="icon-btn" data-cmd="printBtn" title="Imprimir"><img alt="Imprimir" src="./assets/icons/print.svg"/></div>
+				<div class="icon-btn" data-cmd="publishBtn" title="Publicar"><img alt="Publicar" src="./assets/icons/publish.svg"/></div>
+				<div class="icon-btn" data-cmd="modeBtn" title="Alterar Modo"><img alt="Alterar modo" src="./assets/icons/contrast.svg"/></div>
+				<div class="icon-btn" data-cmd="helpBtn" title="Ajuda"><img alt="Ajuda" src="./assets/icons/help_center.svg"/></div>
+			</div>
+			<div class="sep"></div>
+			<div class="group">
+				<div class="icon-btn" data-cmd="selectTitle" title="Título"><img alt="Título" src="./assets/icons/title.svg"/></div>
+				<div class="icon-btn" data-cmd="selectFont" title="Selecionar Fonte"><img alt="Selecionar fonte" src="./assets/icons/font_download.svg"/></div>
+				<div class="icon-btn" data-cmd="selectSize" title="Tamanho da Fonte"><img alt="Tamanho da fonte" src="./assets/icons/format_size.svg"/></div>
+				<div class="icon-btn" data-cmd="capitulateLetter" title="Capitular"><img alt="Capitular" src="./assets/icons/serif.svg"/></div>
+			</div>
+			<div class="sep"></div>
+			<div class="group">
+				<div class="icon-btn" data-cmd="insertQuote" title="Citação"><img alt="Citação" src="./assets/icons/format_quote.svg"/></div>
+				<div class="icon-btn" data-cmd="linkBtn" title="Inserir Link"><img alt="Link" src="./assets/icons/link.svg"/></div>
+				<div class="icon-btn" data-cmd="insertHorizontalRule" title="Inserir Linha Horizontal"><img alt="Inserir linha horizontal" src="./assets/icons/horizontal_rule.svg"/></div>
+				<div class="icon-btn" data-cmd="insertPageBreak" title="Inserir Quebra de Página"><img alt="Inserir quebra de página" src="./assets/icons/insert_page_break.svg"/></div>
+			</div>
+			<div class="sep"></div>
+			<div class="group">
+				<div class="icon-btn" data-cmd="selectColor" title="Cor da Fonte"><img alt="Cor da fonte" src="./assets/icons/format_color_text.svg"/></div>
+				<div class="icon-btn" data-cmd="formatPaint" title="Cor do Fundo"><img alt="Cor do fundo" src="./assets/icons/format_paint.svg"/></div>
+				<div class="icon-btn" data-cmd="selectCase" title="Maiúscula e Minúscula"><img alt="Maiúscula e Minúscula" src="./assets/icons/match_case.svg"/></div>
+				<div class="icon-btn" data-cmd="rotateText" title="Rotacionar"><img alt="Rotacionar" src="./assets/icons/rotate_auto.svg"/></div>
+				<div class="icon-btn" data-cmd="sortText" title="Classificar"><img alt="Classificar" src="./assets/icons/sort_by_alpha.svg"/></div>
+				<div class="icon-btn" data-cmd="clearFormat" title="Limpar Formatação"><img alt="Limpar formatação" src="./assets/icons/format_clear.svg"/></div>
+			</div>
+			<div class="sep"></div>
+			<div class="group">
+				<div class="icon-btn" data-cmd="formatLineSpacing" title="Espaçamento Vertical"><img alt="Espaçamento vertical" src="./assets/icons/format_line_spacing.svg"/></div>
+				<div class="icon-btn" data-cmd="formatLetterSpacing" title="Espaçamento Horizontal"><img alt="Espaçamento horizontal" src="./assets/icons/format_letter_spacing.svg"/></div>
+				<div class="icon-btn" data-cmd="indentIncrease" title="Aumentar Recuo"><img alt="Aumentar recuo" src="./assets/icons/format_indent_increase.svg"/></div>
+				<div class="icon-btn" data-cmd="indentDecrease" title="Diminuir Recuo"><img alt="Diminuir recuo" src="./assets/icons/format_indent_decrease.svg"/></div>
+			</div>
+			<div class="sep"></div>
+			<div class="group">
+				<div class="icon-btn" data-cmd="insertLatexBtn" title="Inserir Fórmula"><img alt="Fórmula" src="./assets/icons/function.svg"/></div>
+				<div class="icon-btn" data-cmd="insertCodeBtn" title="Inserir Bloco de Código"><img alt="Bloco de Código" src="./assets/icons/code_blocks.svg"/></div>
+				<div class="icon-btn" data-cmd="formatLatexBtn" title="Formatar LaTeX"><img alt="Formatar LaTeX" src="./assets/icons/functions.svg"/></div>
+				<div class="icon-btn" data-cmd="formatCodeBtn" title="Formatar Código"><img alt="Formatar Código" src="./assets/icons/code.svg"/></div>
+			</div>
+			<div class="sep"></div>
+			<div class="group">
+				<div class="icon-btn" data-cmd="insertTable" title="Inserir Tabela"><img alt="Tabela" src="./assets/icons/table.svg"/></div>
+				<div class="icon-btn" data-cmd="addColumnLeft" title="Adicionar Coluna à Esquerda"><img alt="Adicionar coluna à esquerda" src="./assets/icons/add_column_left.svg"/></div>
+				<div class="icon-btn" data-cmd="addColumnRight" title="Adicionar Coluna à Direita"><img alt="Adicionar coluna à direita" src="./assets/icons/add_column_right.svg"/></div>
+				<div class="icon-btn" data-cmd="addRowAbove" title="Adicionar Linha Acima"><img alt="Adicionar linha acima" src="./assets/icons/add_row_above.svg"/></div>
+				<div class="icon-btn" data-cmd="addRowBelow" title="Adicionar Linha Abaixo"><img alt="Adicionar linha abaixo" src="./assets/icons/add_row_below.svg"/></div>
+				<div class="icon-btn" data-cmd="mergerCell" title="Mesclar Células"><img alt="Mesclar células" src="./assets/icons/cell_merge.svg"/></div>
+				<div class="icon-btn" data-cmd="combineColumns" title="Combinar Colunas"><img alt="Combinar colunas" src="./assets/icons/combine_columns.svg"/></div>
+				<div class="icon-btn" data-cmd="borderColor" title="Cor da Borda"><img alt="Cor da borda" src="./assets/icons/border_color.svg"/></div>
+				<div class="icon-btn" data-cmd="formatColor" title="Cor do Fundo"><img alt="Cor do fundo" src="./assets/icons/format_color_fill.svg"/></div>
+				<div class="icon-btn" data-cmd="deleteTable" title="Deletar Tabela"><img alt="Deletar tabela" src="./assets/icons/delete.svg"/></div>
+			</div>
+		</div>
+		<!-- toolbar inferior -->
+		<div class="toolbar">
+		<!-- formatting group -->
+			<div class="group">
+				<div class="icon-btn" data-cmd="newBtn" title="Novo"><img alt="Novo" src="./assets/icons/draft.svg"/></div>
+				<div class="icon-btn" data-cmd="openBtn" title="Abrir"><img alt="Abrir" src="./assets/icons/file_open.svg"/></div>
+				<div class="icon-btn" data-cmd="saveBtn" title="Salvar"><img alt="Salvar" src="./assets/icons/save.svg"/></div>
+				<div class="icon-btn" data-cmd="saveAsBtn" title="Salvar Como"><img alt="Salvar Como" src="./assets/icons/save_as.svg"/></div>				
+				<div class="icon-btn" data-cmd="webMode" title="Modo Web"><img alt="Modo Web" src="./assets/icons/globe.svg"/></div>
+				<div class="icon-btn" data-cmd="bookMode" title="Modo Livro"><img alt="Modo Livro" src="./assets/icons/menu_book.svg"/></div>
+			</div>		
+			<div class="sep"></div>
+			<div class="group">
+				<div class="icon-btn" data-cmd="contentCopy" title="Copiar"><img alt="Copiar" src="./assets/icons/content_copy.svg"/></div>
+				<div class="icon-btn" data-cmd="contentCut" title="Recortar"><img alt="Recortar" src="./assets/icons/content_cut.svg"/></div>
+				<div class="icon-btn" data-cmd="contentPaste" title="Colar"><img alt="Colar" src="./assets/icons/content_paste.svg"/></div>
+				<div class="icon-btn" data-cmd="selectAll" title="Selecionar Tudo"><img alt="Selecionar Tudo" src="./assets/icons/select_all.svg"/></div>
+			</div>
+			<div class="sep"></div>
+			<div class="group">
+				<div class="icon-btn" data-cmd="justifyLeft" title="Esquerda"><img alt="Esquerda" src="./assets/icons/format_align_left.svg"/></div>
+				<div class="icon-btn" data-cmd="justifyCenter" title="Centralizar"><img alt="Centralizado" src="./assets/icons/format_align_center.svg"/></div>
+				<div class="icon-btn" data-cmd="justifyRight" title="Direita"><img alt="Direita" src="./assets/icons/format_align_right.svg"/></div>
+				<div class="icon-btn" data-cmd="justifyFull" title="Justificar"><img alt="Justificado" src="./assets/icons/format_align_justify.svg"/></div>
+			</div>
+			<div class="sep"></div>
+			<div class="group">
+				<div class="icon-btn" data-cmd="bold" title="Negrito (Ctrl+B)"><img alt="Negrito" src="./assets/icons/format_bold.svg"/></div>
+				<div class="icon-btn" data-cmd="italic" title="Itálico (Ctrl+I)"><img alt="Itálico" src="./assets/icons/format_italic.svg"/></div>
+				<div class="icon-btn" data-cmd="underline" title="Sublinhado (Ctrl+U)"><img alt="Sublinhado" src="./assets/icons/format_underlined.svg"/></div>
+				<div class="icon-btn" data-cmd="strikeThrough" title="Tachado"><img alt="Tachado" src="./assets/icons/format_strikethrough.svg"/></div>
+				<div class="icon-btn" data-cmd="subscriptText" title="Subscrito"><img alt="Subscrito" src="./assets/icons/subscript.svg"/></div>
+				<div class="icon-btn" data-cmd="superscriptText" title="Sobrescrito"><img alt="Sobrescrito" src="./assets/icons/superscript.svg"/></div>
+			</div>
+			<div class="sep"></div>
+			<div class="group">
+				<div class="icon-btn" data-cmd="insertUnorderedList" title="Lista Não Ordenada"><img alt="Lista não ordenada" src="./assets/icons/format_list_bulleted.svg"/></div>
+				<div class="icon-btn" data-cmd="insertOrderedList" title="Lista Ordenada"><img alt="Lista ordenada" src="./assets/icons/format_list_numbered.svg"/></div>
+				<div class="icon-btn" data-cmd="insertDefinitionList" title="Lista de Definição"><img alt="Lista de definição" src="./assets/icons/list.svg"/></div>
+				<div class="icon-btn" data-cmd="insertCheckList" title="Checklist"><img alt="Checklist" src="./assets/icons/checklist.svg"/></div>
+			</div>
+			<div class="sep"></div>
+			<div class="group">
+				<div class="icon-btn" data-cmd="localImageBtn" title="Inserir Imagem"><img alt="Imagem" src="./assets/icons/photo.svg"/></div>
+				<div class="icon-btn" data-cmd="imageLeft" title="Alinha à Esquerda"><img alt="Alinha à esquerda" src="./assets/icons/format_image_left.svg"/></div>
+				<div class="icon-btn" data-cmd="imageRight" title="Alinha à Direita"><img alt="Alinha à direita" src="./assets/icons/format_image_right.svg"/></div>
+				<div class="icon-btn" data-cmd="imagePosition" title="Posição"><img alt="Posição" src="./assets/icons/image_inset.svg"/></div>
+			</div>
+			<div class="sep"></div>
+			<div class="group">
+				<div class="icon-btn" data-cmd="insertBorderAll" title="Inserir Borda"><img alt="Inserir borda" src="./assets/icons/border_all.svg"/></div>
+				<div class="icon-btn" data-cmd="insertBorderOutr" title="Inserir Borda Externa"><img alt="Borda externa" src="./assets/icons/border_outer.svg"/></div>
+				<div class="icon-btn" data-cmd="insertBorderInner" title="Inserir Borda Interna"><img alt="Borda interna" src="./assets/icons/border_inner.svg"/></div>
+				<div class="icon-btn" data-cmd="insertBorderVertical" title="Inserir Borda Vertical"><img alt="Borda vertical" src="./assets/icons/border_vertical.svg"/></div>
+				<div class="icon-btn" data-cmd="insertBorderHorizontal" title="Inserir Borda Horizontal"><img alt="Borda horizontal" src="./assets/icons/border_horizontal.svg"/></div>
+				<div class="icon-btn" data-cmd="insertBorderTop" title="Inserir Borda Superior"><img alt="Inserir borda superior" src="./assets/icons/border_top.svg"/></div>
+				<div class="icon-btn" data-cmd="insertBorderBottom" title="Inserir Borda Inferior"><img alt="Inserir borda inferior" src="./assets/icons/border_bottom.svg"/></div>
+				<div class="icon-btn" data-cmd="insertBorderLeft" title="Inserir Borda Esquerda"><img alt="Inserir borda esquerda" src="./assets/icons/border_left.svg"/></div>
+				<div class="icon-btn" data-cmd="insertBorderRight" title="Inserir Borda Direita"><img alt="Inserir borda direita" src="./assets/icons/border_right.svg"/></div>
+				<div class="icon-btn" data-cmd="cleartBorder" title="Limpar Borda"><img alt="Limpar borda" src="./assets/icons/border_clear.svg"/></div>
+			</div>
+		</div>
+	</div>
+
+	<!-- main area -->
+	<div class="container">
+		<!-- sidebar (expandable) -->
+		<aside class="sidebar" id="sidebar">
+			<button class="btn-small toggle-btn" id="toggleSidebar"><span class="material-icon">chevron_left</span> <span class="text">Recolher</span></button>
+			<div class="item">
+				<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+					<strong style="color:#fff">Navegação</strong>
+					<small style="color:var(--muted)">Estrutura</small>
+				</div>
+				<div style="display:flex;flex-direction:column;gap:8px">
+					<button class="btn-small"><img alt="Títulos" src="./assets/icons/title.svg"/> <span class="text">Títulos</span></button>
+					<button class="btn-small"><img alt="Fontes" src="./assets/icons/slab_serif.svg"/> <span class="text">Fontes</span></button>
+					<button class="btn-small"><img alt="Margens" src="./assets/icons/margin.svg"/> <span class="text">Margens</span></button>
+					<button class="btn-small"><img alt="Páginas" src="./assets/icons/description.svg"/> <span class="text">Páginas</span></button>
+					<button class="btn-small"><img alt="Resultados" src="./assets/icons/search.svg"/> <span class="text">Resultados</span></button>
+				</div>
+			</div>
+			<hr style="border:none;border-top:1px solid rgba(255,255,255,0.03);margin:12px 0"/>
+			<div class="item">
+				<strong style="color:#fff">Bibliotecas</strong>
+				<div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
+					<button class="btn-small"><img alt="Resultados" src="./assets/icons/functions.svg"/> <span class="text">Fórmulas</span></button>
+					<button class="btn-small"><img alt="Resultados" src="./assets/icons/image.svg"/> <span class="text">Imagens</span></button>
+					<button class="btn-small"><img alt="Resultados" src="./assets/icons/palette.svg"/> <span class="text">Estilos</span></button>
+					<button class="btn-small"><img alt="Resultados" src="./assets/icons/font_download.svg"/> <span class="text">Fontes</span></button>
+				</div>
+			</div>
+		</aside>
+	<!-- editor area with centered A4 sheet -->
+	<main class="editor-area" id="editorArea">
+		<div class="page-viewport">
+			<article class="sheet" id="sheet">
+				<div class="page-wrap" contenteditable="true" id="page" spellcheck="true">
+					<h2>Digite aqui seu conteúdo...</h2>
+					<p>Esta é a folha A4 com tamanho real. Use a barra de edição para formatar. A sidebar é expansível — clique em "Recolher" para minimizar.</p>
+				</div>
+			</article>
+		</div>
+	</main>
+	</div>
+	<!-- status bar -->
+	<div class="statusbar">
+		<div class="left"><span id="pageInfo">Página 1</span> • <span id="wordCount">0 palavras</span>
+		</div>
+		<div class="zoom">
+			<label style="color:var(--muted)">Zoom</label>
+			<input id="zoomRange" max="200" min="20" type="range" value="100"/>
+			<span id="zoomLabel">100%</span>
+		</div>
+	</div>
+	<script src="./js/editor!.js"></script>
+	<script src="./js/modeSwitcher.js"></script>
+	<script src="./js/main.js"></script>
+	<script src="./js/new1.js"></script>
+	<script src="./js/toolbarSup.js"></script>
+	<script src="./js/toolbarInf.js"></script>
+	<script src="./js/imageLib.js"></script>
+	<script src="./js/exportLib.js"></script>
+	<script src="./js/formulaLib.js"></script>
+	<script src="./js/articleLib.js"></script>
+	<!-- Biblioteca de visualização de Markdown -->
+	<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+	</div>
+</body>
+</html>

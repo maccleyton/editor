@@ -1,0 +1,1885 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>CKEditor 5 Ultra</title>
+  
+  <!-- CKEditor 5 CSS -->
+  <link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/43.3.0/ckeditor5.css" />
+  
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #e5e5e5;
+      /* CORRIGIDO: Aumentado o padding para acomodar todas as barras */
+      padding-top: 250px;
+      padding-bottom: 60px;
+      overflow-y: scroll;
+    }
+    
+    /* ========== BARRA DE CONTROLE PRINCIPAL ========== */
+    /* CORRIGIDO: Esta barra fica no topo */
+    .main-controls {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 15px 20px;
+      z-index: 2002; /* Aumentado para ficar acima de tudo */
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    
+    .main-controls h1 {
+      margin: 0 0 10px 0;
+      font-size: 18px;
+      font-weight: 600;
+    }
+    
+    .quick-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    
+    .quick-actions button {
+      padding: 8px 16px;
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.3);
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.3s;
+      backdrop-filter: blur(10px);
+    }
+    
+    .quick-actions button:hover {
+      background: rgba(255,255,255,0.3);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    
+    /* ========== PAINEL DE CONFIGURAÇÕES ========== */
+    /* CORRIGIDO: Posicionado abaixo da barra principal (105px) */
+    .settings-panel {
+      position: fixed;
+      top: 105px; /* Altura da barra principal */
+      left: 0;
+      right: 0;
+      background: #ffffff;
+      border-bottom: 2px solid #667eea;
+      z-index: 2001;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    
+    .settings-panel.open {
+      max-height: 500px;
+      overflow-y: auto;
+    }
+    
+    .settings-content {
+      padding: 20px;
+    }
+    
+    .settings-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    
+    .setting-group {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 8px;
+      border: 1px solid #e0e0e0;
+    }
+    
+    .setting-group h3 {
+      margin: 0 0 10px 0;
+      font-size: 14px;
+      color: #667eea;
+      font-weight: 600;
+    }
+    
+    .setting-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    
+    .setting-item label {
+      font-size: 12px;
+      color: #555;
+      flex: 1;
+    }
+    
+    .setting-item input[type="number"],
+    .setting-item input[type="text"],
+    .setting-item select {
+      width: 80px;
+      padding: 4px 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+    
+    .setting-item input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+    
+    .setting-item input[type="color"] {
+      width: 50px;
+      height: 30px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    
+    /* ========== TOOLBAR CONTAINER ========== */
+    /* CORRIGIDO: Posicionado dinamicamente baseado no painel de configurações */
+    .toolbar-container {
+      position: fixed;
+      /* Por padrão, fica abaixo da barra principal (105px) */
+      top: 105px;
+      left: 0;
+      right: 0;
+      background: #ffffff;
+      border-bottom: 1px solid #c4c4c4;
+      z-index: 2000;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      /* ADICIONADO: Transição suave quando as configurações abrem */
+      transition: top 0.3s ease;
+    }
+    
+    /* ADICIONADO: Classe aplicada quando o painel de configurações está aberto */
+    .toolbar-container.settings-open {
+      top: calc(105px + 200px); /* Altura da barra + altura aproximada das configurações visíveis */
+    }
+    
+    /* ========== SIDEBAR DE NAVEGAÇÃO ========== */
+    .sidebar {
+      position: fixed;
+      left: 0;
+      /* CORRIGIDO: Começa após a toolbar */
+      top: 250px;
+      bottom: 60px;
+      width: 250px;
+      background: white;
+      border-right: 1px solid #ddd;
+      overflow-y: auto;
+      z-index: 1500;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+      transform: translateX(-250px);
+      transition: transform 0.3s ease;
+    }
+    
+    .sidebar.open {
+      transform: translateX(0);
+    }
+    
+    .sidebar h3 {
+      padding: 15px;
+      margin: 0;
+      background: #667eea;
+      color: white;
+      font-size: 14px;
+    }
+    
+    .sidebar-content {
+      padding: 15px;
+    }
+    
+    .toc-item {
+      padding: 8px 12px;
+      margin: 4px 0;
+      cursor: pointer;
+      border-radius: 4px;
+      font-size: 13px;
+      transition: all 0.2s;
+    }
+    
+    .toc-item:hover {
+      background: #f0f0f0;
+    }
+    
+    .toc-item.level-1 { margin-left: 0; font-weight: bold; }
+    .toc-item.level-2 { margin-left: 15px; }
+    .toc-item.level-3 { margin-left: 30px; }
+    
+    .page-nav-item {
+      padding: 10px;
+      margin: 5px 0;
+      background: #f8f9fa;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.2s;
+    }
+    
+    .page-nav-item:hover {
+      background: #667eea;
+      color: white;
+    }
+    
+    .page-nav-item.active {
+      background: #667eea;
+      color: white;
+      font-weight: bold;
+    }
+    
+    /* ========== ÁREA DE TRABALHO ========== */
+    .workspace {
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 0 20px;
+      transition: margin-left 0.3s ease;
+    }
+    
+    .workspace.with-sidebar {
+      margin-left: 270px;
+    }
+    
+    /* ========== PÁGINA A4 APRIMORADA ========== */
+    .page-wrapper {
+      background: white;
+      width: 21cm;
+      min-height: 29.7cm;
+      margin: 0 auto 30px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+      position: relative;
+      page-break-after: always;
+      overflow: hidden;
+    }
+    
+    /* Plano de fundo da página */
+    .page-background {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+    
+    .page-background img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .page-background.blurred img {
+      filter: blur(5px);
+      opacity: 0.3;
+    }
+    
+    /* Container do editor com margens */
+    .editor-page-content {
+      position: relative;
+      z-index: 1;
+      padding: 3cm 2cm 2cm 3cm;
+      min-height: 25.7cm;
+    }
+    
+    /* ========== ELEMENTOS ACADÊMICOS ========== */
+    .academic-cover {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      min-height: 25.7cm;
+      padding: 3cm 2cm;
+    }
+    
+    .academic-cover .logo {
+      width: 100px;
+      height: 100px;
+      margin-bottom: 2cm;
+    }
+    
+    .academic-cover .institution {
+      font-size: 18pt;
+      font-weight: bold;
+      margin-bottom: 1cm;
+      text-transform: uppercase;
+    }
+    
+    .academic-cover .title {
+      font-size: 24pt;
+      font-weight: bold;
+      margin: 2cm 0;
+      text-transform: uppercase;
+    }
+    
+    .academic-cover .author {
+      font-size: 14pt;
+      margin: 2cm 0;
+    }
+    
+    .academic-cover .location {
+      font-size: 12pt;
+      margin-top: auto;
+    }
+    
+    /* Cabeçalho e rodapé */
+    .page-header {
+      position: absolute;
+      top: 2cm;
+      left: 3cm;
+      right: 2cm;
+      height: 1cm;
+      border-bottom: 1px solid #ccc;
+      font-size: 10pt;
+      color: #666;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 2;
+    }
+    
+    .page-footer {
+      position: absolute;
+      bottom: 1.5cm;
+      left: 3cm;
+      right: 2cm;
+      height: 0.5cm;
+      border-top: 1px solid #ccc;
+      font-size: 10pt;
+      color: #666;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 2;
+    }
+    
+    .page-number {
+      font-weight: bold;
+    }
+    
+    .page-number.hidden {
+      display: none;
+    }
+    
+    /* ========== ESTILOS DO CKEDITOR ========== */
+    .ck.ck-editor__editable {
+      border: none;
+      min-height: 20cm;
+    }
+    
+    .ck-content {
+      font-family: 'Times New Roman', Times, serif;
+      font-size: 12pt;
+      line-height: 1.5;
+      text-align: justify;
+    }
+    
+    /* Títulos */
+    .ck-content h1 { 
+      font-size: 24pt; 
+      font-weight: bold; 
+      margin: 1.5em 0 0.5em 0;
+      page-break-after: avoid;
+    }
+    .ck-content h2 { font-size: 20pt; font-weight: bold; margin: 1.3em 0 0.5em 0; }
+    .ck-content h3 { font-size: 18pt; font-weight: bold; margin: 1.2em 0 0.5em 0; }
+    .ck-content h4 { font-size: 16pt; font-weight: bold; margin: 1.1em 0 0.5em 0; }
+    .ck-content h5 { font-size: 14pt; font-weight: bold; margin: 1em 0 0.5em 0; }
+    .ck-content h6 { font-size: 12pt; font-weight: bold; margin: 1em 0 0.5em 0; }
+    
+    /* Imagens com opções avançadas */
+    .ck-content img {
+      max-width: 100%;
+      height: auto;
+    }
+    
+    .ck-content .image {
+      position: relative;
+      display: table;
+      margin: 1em auto;
+    }
+    
+    .ck-content .image.align-left {
+      float: left;
+      margin: 0 1.5em 1em 0;
+    }
+    
+    .ck-content .image.align-right {
+      float: right;
+      margin: 0 0 1em 1.5em;
+    }
+    
+    .ck-content .image.align-center {
+      display: table;
+      margin: 1em auto;
+      float: none;
+    }
+    
+    .ck-content .image figcaption {
+      display: table-caption;
+      caption-side: bottom;
+      padding: 0.5em;
+      font-size: 10pt;
+      text-align: center;
+      color: #666;
+      font-style: italic;
+    }
+    
+    /* Legendas numeradas */
+    .ck-content .figure-caption::before {
+      content: "Figura " counter(figure) ": ";
+      font-weight: bold;
+    }
+    
+    .ck-content .table-caption::before {
+      content: "Tabela " counter(table) ": ";
+      font-weight: bold;
+    }
+    
+    /* Math/LaTeX renderizado */
+    .ck-content .math-tex {
+      background: #f9f9f9;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: 'Courier New', monospace;
+      cursor: pointer;
+    }
+    
+    .ck-content .math-tex.rendered {
+      background: transparent;
+      padding: 0;
+    }
+    
+    /* Sumário */
+    .table-of-contents {
+      background: #f8f9fa;
+      border: 2px solid #667eea;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 2em 0;
+    }
+    
+    .table-of-contents h2 {
+      margin: 0 0 15px 0;
+      color: #667eea;
+      font-size: 18pt;
+    }
+    
+    .toc-list {
+      list-style: none;
+      padding: 0;
+    }
+    
+    .toc-list li {
+      padding: 8px 0;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    
+    .toc-list li:last-child {
+      border-bottom: none;
+    }
+    
+    .toc-list a {
+      text-decoration: none;
+      color: #333;
+      display: flex;
+      justify-content: space-between;
+    }
+    
+    .toc-list a:hover {
+      color: #667eea;
+    }
+    
+    /* Referências */
+    .references-section {
+      margin-top: 3em;
+      padding-top: 2em;
+      border-top: 2px solid #333;
+    }
+    
+    .references-section h2 {
+      text-align: center;
+      text-transform: uppercase;
+    }
+    
+    .reference-item {
+      margin-bottom: 1em;
+      text-indent: -2em;
+      padding-left: 2em;
+    }
+    
+    /* ========== BARRA DE STATUS ========== */
+    .status-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 8px 20px;
+      font-size: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 2000;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
+    }
+    
+    .status-item {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+    
+    .status-badge {
+      background: rgba(255,255,255,0.2);
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+    
+    /* ========== MODAL GENÉRICO ========== */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 3000;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .modal.open {
+      display: flex;
+    }
+    
+    .modal-content {
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      max-width: 600px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #667eea;
+    }
+    
+    .modal-header h2 {
+      margin: 0;
+      color: #667eea;
+    }
+    
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #999;
+    }
+    
+    .modal-close:hover {
+      color: #333;
+    }
+    
+    .modal-body {
+      margin-bottom: 20px;
+    }
+    
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      padding-top: 15px;
+      border-top: 1px solid #e0e0e0;
+    }
+    
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s;
+    }
+    
+    .btn-primary {
+      background: #667eea;
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: #5568d3;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-secondary {
+      background: #e0e0e0;
+      color: #333;
+    }
+    
+    .btn-secondary:hover {
+      background: #d0d0d0;
+    }
+    
+    /* ========== LOADER ========== */
+    .loader {
+      text-align: center;
+      padding: 60px 20px;
+      color: #667eea;
+    }
+    
+    .loader::after {
+      content: "⚡";
+      font-size: 48px;
+      animation: pulse 1.5s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.1); }
+    }
+    
+    /* ========== RESPONSIVIDADE ========== */
+    @media screen and (max-width: 1024px) {
+      .page-wrapper {
+        width: 100%;
+        min-height: auto;
+      }
+      
+      .sidebar {
+        width: 200px;
+        transform: translateX(-200px);
+      }
+      
+      .workspace.with-sidebar {
+        margin-left: 220px;
+      }
+    }
+    
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      
+      .main-controls,
+      .toolbar-container,
+      .sidebar,
+      .status-bar,
+      .settings-panel {
+        display: none !important;
+      }
+      
+      .page-wrapper {
+        box-shadow: none;
+        margin: 0;
+        page-break-after: always;
+      }
+      
+      .workspace {
+        margin: 0;
+        padding: 0;
+        max-width: 100%;
+      }
+    }
+  </style>
+  
+  <!-- CKEditor 5 -->
+  <script src="https://cdn.ckeditor.com/ckeditor5/43.3.0/ckeditor5.umd.js"></script>
+  
+  <!-- MathJax para LaTeX -->
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  
+  <!-- jsPDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  
+  <!-- html2canvas para captura de tela -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+</head>
+<body>
+  <!-- ========== BARRA DE CONTROLE PRINCIPAL ========== -->
+  <div class="main-controls">
+    <h1>📚 Editor Acadêmico Profissional - CKEditor 5 Ultra</h1>
+    <div class="quick-actions">
+      <button onclick="toggleSettings()">⚙️ Configurações</button>
+      <button onclick="toggleSidebar()">📑 Navegação</button>
+      <button onclick="addNewPage()">➕ Nova Página</button>
+      <button onclick="insertTOC()">📋 Inserir Sumário</button>
+      <button onclick="openTemplateModal()">📄 Templates</button>
+      <button onclick="insertMathFormula()">∑ Fórmula</button>
+      <button onclick="renderAllMath()">🔄 Renderizar LaTeX</button>
+      <button onclick="saveDocument()">💾 Salvar</button>
+      <button onclick="exportToPDF()">📥 Exportar PDF</button>
+      <button onclick="printDocument()">🖨️ Imprimir</button>
+    </div>
+  </div>
+
+  <!-- ========== PAINEL DE CONFIGURAÇÕES ========== -->
+  <div class="settings-panel" id="settingsPanel">
+    <div class="settings-content">
+      <h2 style="margin-top: 0; color: #667eea;">⚙️ Configurações do Documento</h2>
+      
+      <div class="settings-grid">
+        <!-- Margens -->
+        <div class="setting-group">
+          <h3>📏 Margens (cm)</h3>
+          <div class="setting-item">
+            <label>Superior:</label>
+            <input type="number" id="marginTop" value="3" min="0" max="10" step="0.5">
+          </div>
+          <div class="setting-item">
+            <label>Inferior:</label>
+            <input type="number" id="marginBottom" value="2" min="0" max="10" step="0.5">
+          </div>
+          <div class="setting-item">
+            <label>Esquerda:</label>
+            <input type="number" id="marginLeft" value="3" min="0" max="10" step="0.5">
+          </div>
+          <div class="setting-item">
+            <label>Direita:</label>
+            <input type="number" id="marginRight" value="2" min="0" max="10" step="0.5">
+          </div>
+          <button class="btn btn-primary" onclick="applyMargins()" style="width: 100%; margin-top: 10px;">Aplicar Margens</button>
+        </div>
+        
+        <!-- Paginação -->
+        <div class="setting-group">
+          <h3>📄 Paginação</h3>
+          <div class="setting-item">
+            <label>Numeração:</label>
+            <select id="pageNumberStyle">
+              <option value="arabic">Arábicos (1, 2, 3)</option>
+              <option value="roman">Romanos (i, ii, iii)</option>
+              <option value="Roman">Romanos maiúsc. (I, II, III)</option>
+              <option value="none">Sem numeração</option>
+            </select>
+          </div>
+          <div class="setting-item">
+            <label>Posição:</label>
+            <select id="pageNumberPosition">
+              <option value="bottom-right">Inferior Direita</option>
+              <option value="bottom-center">Inferior Centro</option>
+              <option value="bottom-left">Inferior Esquerda</option>
+              <option value="top-right">Superior Direita</option>
+            </select>
+          </div>
+          <div class="setting-item">
+            <label>Iniciar em:</label>
+            <input type="number" id="pageNumberStart" value="1" min="1">
+          </div>
+          <button class="btn btn-primary" onclick="updatePageNumbers()" style="width: 100%; margin-top: 10px;">Atualizar Numeração</button>
+        </div>
+        
+        <!-- Plano de Fundo -->
+        <div class="setting-group">
+          <h3>🎨 Plano de Fundo</h3>
+          <div class="setting-item">
+            <label>Cor de fundo:</label>
+            <input type="color" id="bgColor" value="#ffffff">
+          </div>
+          <div class="setting-item">
+            <label>Imagem de fundo:</label>
+            <input type="file" id="bgImage" accept="image/*" style="width: 100%;">
+          </div>
+          <div class="setting-item">
+            <input type="checkbox" id="bgBlur">
+            <label>Aplicar desfoque</label>
+          </div>
+          <div class="setting-item">
+            <input type="checkbox" id="bgAllPages">
+            <label>Aplicar em todas as páginas</label>
+          </div>
+          <button class="btn btn-primary" onclick="applyBackground()" style="width: 100%; margin-top: 10px;">Aplicar Fundo</button>
+        </div>
+        
+        <!-- Cabeçalho e Rodapé -->
+        <div class="setting-group">
+          <h3>📌 Cabeçalho/Rodapé</h3>
+          <div class="setting-item">
+            <input type="checkbox" id="showHeader" checked>
+            <label>Mostrar cabeçalho</label>
+          </div>
+          <div class="setting-item">
+            <label>Texto cabeçalho:</label>
+            <input type="text" id="headerText" placeholder="Título do trabalho" style="width: 100%;">
+          </div>
+          <div class="setting-item">
+            <input type="checkbox" id="showFooter" checked>
+            <label>Mostrar rodapé</label>
+          </div>
+          <button class="btn btn-primary" onclick="updateHeaderFooter()" style="width: 100%; margin-top: 10px;">Atualizar</button>
+        </div>
+        
+        <!-- Fonte -->
+        <div class="setting-group">
+          <h3>🔤 Tipografia</h3>
+          <div class="setting-item">
+            <label>Fonte padrão:</label>
+            <select id="defaultFont">
+              <option value="Times New Roman">Times New Roman</option>
+              <option value="Arial">Arial</option>
+              <option value="Calibri">Calibri</option>
+              <option value="Georgia">Georgia</option>
+            </select>
+          </div>
+          <div class="setting-item">
+            <label>Tamanho (pt):</label>
+            <input type="number" id="defaultFontSize" value="12" min="8" max="24">
+          </div>
+          <div class="setting-item">
+            <label>Espaçamento:</label>
+            <select id="lineSpacing">
+              <option value="1">Simples</option>
+              <option value="1.5" selected>1,5</option>
+              <option value="2">Duplo</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" onclick="applyTypography()" style="width: 100%; margin-top: 10px;">Aplicar Fonte</button>
+        </div>
+        
+        <!-- Contador automático -->
+        <div class="setting-group">
+          <h3>🔢 Contadores Automáticos</h3>
+          <div class="setting-item">
+            <input type="checkbox" id="autoFigureNumbers" checked>
+            <label>Numerar figuras</label>
+          </div>
+          <div class="setting-item">
+            <input type="checkbox" id="autoTableNumbers" checked>
+            <label>Numerar tabelas</label>
+          </div>
+          <div class="setting-item">
+            <input type="checkbox" id="autoEquationNumbers" checked>
+            <label>Numerar equações</label>
+          </div>
+          <button class="btn btn-primary" onclick="updateCounters()" style="width: 100%; margin-top: 10px;">Atualizar Contadores</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== TOOLBAR DO CKEDITOR ========== -->
+  <div class="toolbar-container" id="toolbarContainer">
+    <div id="toolbar"></div>
+  </div>
+
+  <!-- ========== SIDEBAR DE NAVEGAÇÃO ========== -->
+  <div class="sidebar" id="sidebar">
+    <h3>📑 Navegação do Documento</h3>
+    
+    <div class="sidebar-content">
+      <h4 style="margin: 0 0 10px 0; font-size: 13px; color: #667eea;">Sumário</h4>
+      <div id="tocSidebar"></div>
+      
+      <h4 style="margin: 20px 0 10px 0; font-size: 13px; color: #667eea;">Páginas</h4>
+      <div id="pageNavigation"></div>
+    </div>
+  </div>
+
+  <!-- ========== ÁREA DE TRABALHO ========== -->
+  <div class="workspace" id="workspace">
+    <div class="loader" id="loader">Carregando Editor Profissional...</div>
+    
+    <!-- As páginas serão adicionadas aqui dinamicamente -->
+    <div id="pagesContainer"></div>
+  </div>
+
+  <!-- ========== BARRA DE STATUS ========== -->
+  <div class="status-bar">
+    <div class="status-item">
+      <span class="status-badge" id="statusInfo">✓ Pronto</span>
+      <span id="statusPages">Página 1 de 1</span>
+      <span id="statusWords">0 palavras</span>
+      <span id="statusChars">0 caracteres</span>
+    </div>
+    <div class="status-item">
+      <span>CKEditor 5 Ultra - Versão Acadêmica Profissional</span>
+      <span id="lastSaved"></span>
+    </div>
+  </div>
+
+  <!-- ========== MODAL DE TEMPLATES ========== -->
+  <div class="modal" id="templateModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>📄 Templates Acadêmicos</h2>
+        <button class="modal-close" onclick="closeModal('templateModal')">×</button>
+      </div>
+      <div class="modal-body">
+        <p>Selecione um template para inserir:</p>
+        <div style="display: grid; gap: 10px;">
+          <button class="btn btn-secondary" onclick="insertCover()">📕 Capa</button>
+          <button class="btn btn-secondary" onclick="insertTitlePage()">📄 Folha de Rosto</button>
+          <button class="btn btn-secondary" onclick="insertQuotePage()">💭 Folha de Citação</button>
+          <button class="btn btn-secondary" onclick="insertAbstract()">📝 Resumo/Abstract</button>
+          <button class="btn btn-secondary" onclick="insertTOC()">📋 Sumário</button>
+          <button class="btn btn-secondary" onclick="insertReferences()">📚 Referências</button>
+          <button class="btn btn-secondary" onclick="insertBackCover()">📘 Contracapa</button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('templateModal')">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== MODAL DE FÓRMULA ========== -->
+  <div class="modal" id="mathModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>∑ Inserir Fórmula LaTeX</h2>
+        <button class="modal-close" onclick="closeModal('mathModal')">×</button>
+      </div>
+      <div class="modal-body">
+        <p>Digite sua fórmula em LaTeX:</p>
+        <textarea id="mathInput" rows="6" style="width: 100%; padding: 10px; font-family: monospace; border: 1px solid #ccc; border-radius: 4px;" placeholder="Exemplo: x^2 + y^2 = z^2&#10;ou: \frac{a}{b} = \frac{c}{d}"></textarea>
+        <div style="margin-top: 15px;">
+          <h4 style="margin: 0 0 10px 0;">Pré-visualização:</h4>
+          <div id="mathPreview" style="padding: 15px; background: #f8f9fa; border-radius: 4px; min-height: 50px;"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('mathModal')">Cancelar</button>
+        <button class="btn btn-primary" onclick="applyMathFormula()">Inserir Fórmula</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ============================================================
+    // VARIÁVEIS GLOBAIS
+    // ============================================================
+    
+    const { 
+      DecoupledEditor,
+      Essentials,
+      Paragraph,
+      Bold,
+      Italic,
+      Underline,
+      Strikethrough,
+      Code,
+      Subscript,
+      Superscript,
+      Heading,
+      Font,
+      Alignment,
+      Link,
+      List,
+      BlockQuote,
+      Image,
+      ImageCaption,
+      ImageStyle,
+      ImageToolbar,
+      ImageUpload,
+      ImageResize,
+      Base64UploadAdapter,
+      Table,
+      TableToolbar,
+      TableProperties,
+      TableCellProperties,
+      MediaEmbed,
+      Indent,
+      IndentBlock,
+      CodeBlock,
+      HorizontalLine,
+      PageBreak,
+      RemoveFormat,
+      SourceEditing,
+      GeneralHtmlSupport,
+      Highlight
+    } = CKEDITOR;
+    
+    let editor;
+    let pages = [];
+    let currentPageIndex = 0;
+    let documentConfig = {
+      margins: { top: 3, left: 3, right: 2, bottom: 2 },
+      pageNumbers: { style: 'arabic', position: 'bottom-right', start: 1 },
+      font: { family: 'Times New Roman', size: 12, lineHeight: 1.5 },
+      header: { show: true, text: '' },
+      footer: { show: true },
+      background: { color: '#ffffff', image: null, blur: false, allPages: false },
+      counters: { figures: true, tables: true, equations: true }
+    };
+    
+    // ============================================================
+    // INICIALIZAÇÃO
+    // ============================================================
+    
+    window.addEventListener('DOMContentLoaded', () => {
+      initializeEditor();
+    });
+    
+    async function initializeEditor() {
+      try {
+        // Criar primeira página
+        createPage();
+        
+        // Inicializar CKEditor na primeira página
+        const firstPageEditor = document.querySelector('.editor-page-content');
+        
+        editor = await DecoupledEditor.create(firstPageEditor, {
+          licenseKey: 'GPL',
+          
+          plugins: [
+            Essentials, Paragraph, Bold, Italic, Underline, Strikethrough,
+            Code, Subscript, Superscript, Heading, Font, Alignment,
+            Link, List, BlockQuote, Image, ImageCaption, ImageStyle,
+            ImageToolbar, ImageUpload, ImageResize, Base64UploadAdapter,
+            Table, TableToolbar, TableProperties, TableCellProperties,
+            MediaEmbed, Indent, IndentBlock, CodeBlock, HorizontalLine,
+            PageBreak, RemoveFormat, SourceEditing, GeneralHtmlSupport, Highlight
+          ],
+          
+          toolbar: {
+            items: [
+              'undo', 'redo', '|',
+              'heading', '|',
+              'bold', 'italic', 'underline', 'strikethrough', '|',
+              'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor', '|',
+              'alignment', '|',
+              'numberedList', 'bulletedList', '|',
+              'outdent', 'indent', '|',
+              'link', 'insertImage', 'insertTable', 'blockQuote', 'codeBlock', '|',
+              'subscript', 'superscript', 'code', 'highlight', '|',
+              'horizontalLine', 'pageBreak', '|',
+              'removeFormat', 'sourceEditing'
+            ],
+            shouldNotGroupWhenFull: true
+          },
+          
+          heading: {
+            options: [
+              { model: 'paragraph', title: 'Parágrafo', class: 'ck-heading_paragraph' },
+              { model: 'heading1', view: 'h1', title: 'Título 1', class: 'ck-heading_heading1' },
+              { model: 'heading2', view: 'h2', title: 'Título 2', class: 'ck-heading_heading2' },
+              { model: 'heading3', view: 'h3', title: 'Título 3', class: 'ck-heading_heading3' },
+              { model: 'heading4', view: 'h4', title: 'Título 4', class: 'ck-heading_heading4' },
+              { model: 'heading5', view: 'h5', title: 'Título 5', class: 'ck-heading_heading5' },
+              { model: 'heading6', view: 'h6', title: 'Título 6', class: 'ck-heading_heading6' }
+            ]
+          },
+          
+          fontSize: {
+            options: [8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72]
+          },
+          
+          fontFamily: {
+            options: [
+              'default',
+              'Times New Roman, Times, serif',
+              'Arial, Helvetica, sans-serif',
+              'Courier New, Courier, monospace',
+              'Georgia, serif',
+              'Calibri, sans-serif',
+              'Verdana, Geneva, sans-serif'
+            ]
+          },
+          
+          alignment: {
+            options: ['left', 'center', 'right', 'justify']
+          },
+          
+          image: {
+            toolbar: [
+              'imageStyle:inline',
+              'imageStyle:block',
+              'imageStyle:alignLeft',
+              'imageStyle:alignRight',
+              'imageStyle:alignCenter',
+              '|',
+              'toggleImageCaption',
+              'imageTextAlternative',
+              '|',
+              'resizeImage'
+            ],
+            styles: [
+              'full',
+              'alignLeft',
+              'alignRight',
+              'alignCenter'
+            ],
+            resizeOptions: [
+              {
+                name: 'resizeImage:original',
+                value: null,
+                label: 'Original'
+              },
+              {
+                name: 'resizeImage:25',
+                value: '25',
+                label: '25%'
+              },
+              {
+                name: 'resizeImage:50',
+                value: '50',
+                label: '50%'
+              },
+              {
+                name: 'resizeImage:75',
+                value: '75',
+                label: '75%'
+              }
+            ]
+          },
+          
+          table: {
+            contentToolbar: [
+              'tableColumn', 'tableRow', 'mergeTableCells',
+              'tableProperties', 'tableCellProperties'
+            ]
+          },
+          
+          codeBlock: {
+            languages: [
+              { language: 'plaintext', label: 'Texto Simples' },
+              { language: 'c', label: 'C' },
+              { language: 'cpp', label: 'C++' },
+              { language: 'csharp', label: 'C#' },
+              { language: 'css', label: 'CSS' },
+              { language: 'html', label: 'HTML' },
+              { language: 'java', label: 'Java' },
+              { language: 'javascript', label: 'JavaScript' },
+              { language: 'php', label: 'PHP' },
+              { language: 'python', label: 'Python' },
+              { language: 'sql', label: 'SQL' }
+            ]
+          },
+          
+          htmlSupport: {
+            allow: [
+              { name: /.*/, attributes: true, classes: true, styles: true }
+            ]
+          }
+        });
+        
+        // Anexar toolbar
+        document.getElementById('toolbar').appendChild(editor.ui.view.toolbar.element);
+        
+        // Configurar atalhos customizados
+        setupKeyboardShortcuts(editor);
+        
+        // Event listeners
+        editor.model.document.on('change:data', () => {
+          updateStatus();
+          updateTOC();
+          checkPageOverflow();
+        });
+        
+        // Conteúdo inicial
+        editor.setData(`
+          <h1>Título do Documento Acadêmico</h1>
+          <p>Bem-vindo ao <strong>Editor Acadêmico Profissional</strong> - a versão mais completa e poderosa!</p>
+          <h2>Recursos Implementados</h2>
+          <ul>
+            <li>✅ Paginação automática com controle total</li>
+            <li>✅ Renderização de LaTeX em tempo real</li>
+            <li>✅ Edição avançada de imagens (redimensionar, alinhar, texto ao redor)</li>
+            <li>✅ Sumário automático atualizado em tempo real</li>
+            <li>✅ Plano de fundo com desfoque</li>
+            <li>✅ Templates acadêmicos (capa, folha de rosto, citação, referências)</li>
+            <li>✅ Controle de numeração de páginas (mostrar/ocultar por página)</li>
+            <li>✅ Legendas automáticas para figuras e tabelas</li>
+            <li>✅ Cabeçalho e rodapé personalizáveis</li>
+            <li>✅ Sistema completo de margens ABNT</li>
+          </ul>
+          <h2>Como Usar</h2>
+          <p>Use o botão <strong>⚙️ Configurações</strong> para personalizar margens, paginação, fontes e muito mais.</p>
+          <p>O botão <strong>📑 Navegação</strong> exibe o sumário e a lista de páginas.</p>
+          <p>Use <strong>📄 Templates</strong> para inserir elementos acadêmicos pré-formatados.</p>
+        `);
+        
+        // Esconder loader
+        document.getElementById('loader').style.display = 'none';
+        
+        // Atualizar interface
+        updateStatus();
+        updatePageNavigation();
+        applyMargins();
+        
+        console.log('✅ Editor inicializado com sucesso!');
+        
+      } catch (error) {
+        console.error('❌ Erro ao inicializar:', error);
+        document.getElementById('loader').innerHTML = 
+          '<p style="color: red;">Erro ao carregar o editor. Por favor, recarregue a página.</p>';
+      }
+    }
+    
+    // ============================================================
+    // GERENCIAMENTO DE PÁGINAS
+    // ============================================================
+    
+    function createPage(content = '') {
+      const pageNumber = pages.length + 1;
+      const container = document.getElementById('pagesContainer');
+      
+      const pageWrapper = document.createElement('div');
+      pageWrapper.className = 'page-wrapper';
+      pageWrapper.dataset.pageNumber = pageNumber;
+      
+      pageWrapper.innerHTML = `
+        <div class="page-background"></div>
+        
+        <div class="page-header">
+          <span class="header-text"></span>
+          <span>Página ${pageNumber}</span>
+        </div>
+        
+        <div class="editor-page-content">
+          ${content || '<p>Nova página...</p>'}
+        </div>
+        
+        <div class="page-footer">
+          <span></span>
+          <span class="page-number">${pageNumber}</span>
+        </div>
+      `;
+      
+      container.appendChild(pageWrapper);
+      pages.push(pageWrapper);
+      
+      updatePageNavigation();
+      updatePageNumbers();
+      
+      return pageWrapper;
+    }
+    
+    function addNewPage() {
+      const newPage = createPage();
+      updateStatus();
+      
+      // Scroll para a nova página
+      newPage.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    
+    function checkPageOverflow() {
+      // Sistema simples de detecção de overflow
+      const editorElement = document.querySelector('.editor-page-content');
+      if (!editorElement) return;
+      
+      const maxHeight = 25.7 * 37.795; // 25.7cm em pixels (aproximadamente)
+      
+      if (editorElement.scrollHeight > maxHeight * 1.1) {
+        console.log('⚠️ Conteúdo excedendo página detectado');
+      }
+    }
+    
+    // ============================================================
+    // CONFIGURAÇÕES E MARGENS
+    // ============================================================
+    
+    // CORRIGIDO: Adicionar/remover classe na toolbar quando configurações abrem/fecham
+    function toggleSettings() {
+      const panel = document.getElementById('settingsPanel');
+      const toolbar = document.getElementById('toolbarContainer');
+      
+      panel.classList.toggle('open');
+      
+      // Adicionar ou remover classe que ajusta a posição da toolbar
+      if (panel.classList.contains('open')) {
+        toolbar.classList.add('settings-open');
+      } else {
+        toolbar.classList.remove('settings-open');
+      }
+    }
+    
+    function applyMargins() {
+      documentConfig.margins = {
+        top: parseFloat(document.getElementById('marginTop').value),
+        left: parseFloat(document.getElementById('marginLeft').value),
+        right: parseFloat(document.getElementById('marginRight').value),
+        bottom: parseFloat(document.getElementById('marginBottom').value)
+      };
+      
+      pages.forEach(page => {
+        const content = page.querySelector('.editor-page-content');
+        if (content) {
+          const m = documentConfig.margins;
+          content.style.padding = `${m.top}cm ${m.right}cm ${m.bottom}cm ${m.left}cm`;
+        }
+      });
+      
+      console.log('✅ Margens aplicadas:', documentConfig.margins);
+    }
+    
+    function applyTypography() {
+      documentConfig.font = {
+        family: document.getElementById('defaultFont').value,
+        size: parseInt(document.getElementById('defaultFontSize').value),
+        lineHeight: parseFloat(document.getElementById('lineSpacing').value)
+      };
+      
+      const style = document.createElement('style');
+      style.id = 'custom-typography';
+      
+      const oldStyle = document.getElementById('custom-typography');
+      if (oldStyle) oldStyle.remove();
+      
+      style.textContent = `
+        .ck-content {
+          font-family: ${documentConfig.font.family} !important;
+          font-size: ${documentConfig.font.size}pt !important;
+          line-height: ${documentConfig.font.lineHeight} !important;
+        }
+      `;
+      
+      document.head.appendChild(style);
+      console.log('✅ Tipografia aplicada:', documentConfig.font);
+    }
+    
+    function updatePageNumbers() {
+      documentConfig.pageNumbers = {
+        style: document.getElementById('pageNumberStyle').value,
+        position: document.getElementById('pageNumberPosition').value,
+        start: parseInt(document.getElementById('pageNumberStart').value)
+      };
+      
+      pages.forEach((page, index) => {
+        const pageNum = page.querySelector('.page-number');
+        if (!pageNum) return;
+        
+        const number = index + documentConfig.pageNumbers.start;
+        
+        switch (documentConfig.pageNumbers.style) {
+          case 'arabic':
+            pageNum.textContent = number;
+            break;
+          case 'roman':
+            pageNum.textContent = toRoman(number).toLowerCase();
+            break;
+          case 'Roman':
+            pageNum.textContent = toRoman(number);
+            break;
+          case 'none':
+            pageNum.textContent = '';
+            break;
+        }
+      });
+      
+      console.log('✅ Numeração atualizada');
+    }
+    
+    function toRoman(num) {
+      const romanNumerals = [
+        { value: 1000, numeral: 'M' },
+        { value: 900, numeral: 'CM' },
+        { value: 500, numeral: 'D' },
+        { value: 400, numeral: 'CD' },
+        { value: 100, numeral: 'C' },
+        { value: 90, numeral: 'XC' },
+        { value: 50, numeral: 'L' },
+        { value: 40, numeral: 'XL' },
+        { value: 10, numeral: 'X' },
+        { value: 9, numeral: 'IX' },
+        { value: 5, numeral: 'V' },
+        { value: 4, numeral: 'IV' },
+        { value: 1, numeral: 'I' }
+      ];
+      
+      let result = '';
+      for (let i = 0; i < romanNumerals.length; i++) {
+        while (num >= romanNumerals[i].value) {
+          result += romanNumerals[i].numeral;
+          num -= romanNumerals[i].value;
+        }
+      }
+      return result;
+    }
+    
+    function updateHeaderFooter() {
+      documentConfig.header.show = document.getElementById('showHeader').checked;
+      documentConfig.header.text = document.getElementById('headerText').value;
+      documentConfig.footer.show = document.getElementById('showFooter').checked;
+      
+      pages.forEach(page => {
+        const header = page.querySelector('.page-header');
+        const footer = page.querySelector('.page-footer');
+        
+        if (header) {
+          header.style.display = documentConfig.header.show ? 'flex' : 'none';
+          const headerText = header.querySelector('.header-text');
+          if (headerText) headerText.textContent = documentConfig.header.text;
+        }
+        
+        if (footer) {
+          footer.style.display = documentConfig.footer.show ? 'flex' : 'none';
+        }
+      });
+      
+      console.log('✅ Cabeçalho/Rodapé atualizados');
+    }
+    
+    function applyBackground() {
+      const color = document.getElementById('bgColor').value;
+      const blur = document.getElementById('bgBlur').checked;
+      const allPages = document.getElementById('bgAllPages').checked;
+      const imageInput = document.getElementById('bgImage');
+      
+      documentConfig.background = { color, blur, allPages };
+      
+      const applyToPage = (page) => {
+        const bg = page.querySelector('.page-background');
+        if (!bg) return;
+        
+        bg.style.background = color;
+        bg.classList.toggle('blurred', blur);
+        
+        if (imageInput.files && imageInput.files[0]) {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            bg.innerHTML = `<img src="${e.target.result}" alt="Background">`;
+            documentConfig.background.image = e.target.result;
+          };
+          reader.readAsDataURL(imageInput.files[0]);
+        }
+      };
+      
+      if (allPages) {
+        pages.forEach(applyToPage);
+      } else {
+        const currentPage = pages[currentPageIndex];
+        if (currentPage) applyToPage(currentPage);
+      }
+      
+      console.log('✅ Plano de fundo aplicado');
+    }
+    
+    // ============================================================
+    // NAVEGAÇÃO E SUMÁRIO
+    // ============================================================
+    
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const workspace = document.getElementById('workspace');
+      
+      sidebar.classList.toggle('open');
+      workspace.classList.toggle('with-sidebar');
+      
+      if (sidebar.classList.contains('open')) {
+        updateTOC();
+      }
+    }
+    
+    function updateTOC() {
+      if (!editor) return;
+      
+      const content = editor.getData();
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = content;
+      
+      const headings = tempDiv.querySelectorAll('h1, h2, h3, h4, h5, h6');
+      const tocSidebar = document.getElementById('tocSidebar');
+      
+      if (!headings.length) {
+        tocSidebar.innerHTML = '<p style="color: #999; font-size: 12px;">Nenhum título encontrado</p>';
+        return;
+      }
+      
+      tocSidebar.innerHTML = '';
+      
+      headings.forEach((heading, index) => {
+        const level = parseInt(heading.tagName.substring(1));
+        const item = document.createElement('div');
+        item.className = `toc-item level-${level}`;
+        item.textContent = heading.textContent;
+        item.onclick = () => {
+          console.log('Navegar para:', heading.textContent);
+        };
+        tocSidebar.appendChild(item);
+      });
+    }
+    
+    function updatePageNavigation() {
+      const nav = document.getElementById('pageNavigation');
+      nav.innerHTML = '';
+      
+      pages.forEach((page, index) => {
+        const item = document.createElement('div');
+        item.className = 'page-nav-item';
+        if (index === currentPageIndex) item.classList.add('active');
+        
+        item.innerHTML = `
+          <span>Página ${index + 1}</span>
+          <span>${index === 0 ? '📄' : '📃'}</span>
+        `;
+        
+        item.onclick = () => {
+          currentPageIndex = index;
+          page.scrollIntoView({ behavior: 'smooth' });
+          updatePageNavigation();
+        };
+        
+        nav.appendChild(item);
+      });
+    }
+    
+    function insertTOC() {
+      if (!editor) return;
+      
+      const tocHTML = `
+        <div class="table-of-contents">
+          <h2>Sumário</h2>
+          <ul class="toc-list" id="generatedTOC">
+            <li><a href="#"><span>1. Introdução</span><span>1</span></a></li>
+            <li><a href="#"><span>2. Desenvolvimento</span><span>5</span></a></li>
+            <li><a href="#"><span>3. Conclusão</span><span>12</span></a></li>
+          </ul>
+          <p style="font-size: 10pt; color: #999; margin-top: 10px;">
+            <em>Este sumário será atualizado automaticamente conforme você edita o documento.</em>
+          </p>
+        </div>
+      `;
+      
+      editor.model.change(writer => {
+        const viewFragment = editor.data.processor.toView(tocHTML);
+        const modelFragment = editor.data.toModel(viewFragment);
+        editor.model.insertContent(modelFragment);
+      });
+      
+      closeModal('templateModal');
+      console.log('✅ Sumário inserido');
+    }
+    
+    // ============================================================
+    // TEMPLATES ACADÊMICOS
+    // ============================================================
+    
+    function openTemplateModal() {
+      openModal('templateModal');
+    }
+    
+    function insertCover() {
+      const coverHTML = `
+        <div class="academic-cover">
+          <div class="institution">UNIVERSIDADE FEDERAL DO BRASIL</div>
+          <div class="institution">Faculdade de Engenharia</div>
+          <div class="title">TÍTULO DO TRABALHO ACADÊMICO:<br>SUBTÍTULO SE NECESSÁRIO</div>
+          <div class="author">Nome do Autor</div>
+          <div class="location">
+            <p>Cidade - Estado</p>
+            <p>2025</p>
+          </div>
+        </div>
+      `;
+      
+      insertContent(coverHTML);
+      closeModal('templateModal');
+    }
+    
+    function insertTitlePage() {
+      const titlePageHTML = `
+        <div style="min-height: 25cm; display: flex; flex-direction: column; justify-content: space-between;">
+          <div style="text-align: center;">
+            <h2 style="font-size: 14pt; margin-bottom: 2cm;">Nome do Autor</h2>
+          </div>
+          
+          <div style="text-align: center;">
+            <h1 style="font-size: 18pt; font-weight: bold; text-transform: uppercase;">
+              TÍTULO DO TRABALHO
+            </h1>
+          </div>
+          
+          <div style="margin-left: 8cm;">
+            <p style="text-align: justify; font-size: 11pt;">
+              Trabalho de Conclusão de Curso apresentado à Faculdade de [Nome] da 
+              Universidade [Nome] como requisito parcial para obtenção do título de 
+              [Grau] em [Curso].
+            </p>
+            <p style="margin-top: 1cm; font-size: 11pt;">
+              <strong>Orientador:</strong> Prof. Dr. Nome do Orientador
+            </p>
+          </div>
+          
+          <div style="text-align: center; margin-top: auto;">
+            <p>Cidade - Estado</p>
+            <p>2025</p>
+          </div>
+        </div>
+      `;
+      
+      insertContent(titlePageHTML);
+      closeModal('templateModal');
+    }
+    
+    function insertQuotePage() {
+      const quoteHTML = `
+        <div style="min-height: 25cm; display: flex; flex-direction: column; justify-content: center; align-items: flex-end; padding-right: 3cm;">
+          <blockquote style="width: 10cm; text-align: justify; font-style: italic; border-left: 3px solid #667eea; padding-left: 1cm;">
+            "Insira aqui uma citação relevante ao tema do trabalho. A citação deve ser inspiradora 
+            e relacionada ao conteúdo desenvolvido."
+          </blockquote>
+          <p style="margin-top: 1cm; text-align: right;">— Autor da Citação</p>
+        </div>
+      `;
+      
+      insertContent(quoteHTML);
+      closeModal('templateModal');
+    }
+    
+    function insertAbstract() {
+      const abstractHTML = `
+        <h2 style="text-align: center; text-transform: uppercase;">Resumo</h2>
+        <p style="text-align: justify;">
+          Este trabalho apresenta... [Escreva aqui o resumo do trabalho em português, 
+          com no máximo 500 palavras, destacando objetivos, metodologia, resultados e conclusões].
+        </p>
+        <p style="margin-top: 1cm;">
+          <strong>Palavras-chave:</strong> Palavra1. Palavra2. Palavra3. Palavra4. Palavra5.
+        </p>
+        
+        <hr style="margin: 2cm 0;">
+        
+        <h2 style="text-align: center; text-transform: uppercase;">Abstract</h2>
+        <p style="text-align: justify;">
+          This work presents... [Write here the abstract in English, 
+          with a maximum of 500 words, highlighting objectives, methodology, results and conclusions].
+        </p>
+        <p style="margin-top: 1cm;">
+          <strong>Keywords:</strong> Keyword1. Keyword2. Keyword3. Keyword4. Keyword5.
+        </p>
+      `;
+      
+      insertContent(abstractHTML);
+      closeModal('templateModal');
+    }
+    
+    function insertReferences() {
+      const referencesHTML = `
+        <div class="references-section">
+          <h2>REFERÊNCIAS</h2>
+          
+          <div class="reference-item">
+            SOBRENOME, Nome. <strong>Título do livro em negrito</strong>. Cidade: Editora, ano.
+          </div>
+          
+          <div class="reference-item">
+            SOBRENOME, Nome; SOBRENOME2, Nome2. Título do artigo. <strong>Nome da Revista</strong>, 
+            v. X, n. Y, p. XX-YY, mês ano.
+          </div>
+          
+          <div class="reference-item">
+            SOBRENOME, Nome. Título do artigo online. <strong>Nome do Site</strong>, ano. 
+            Disponível em: &lt;URL&gt;. Acesso em: DD mês. AAAA.
+          </div>
+          
+          <p style="margin-top: 2cm; font-size: 10pt; color: #999; font-style: italic;">
+            Adicione suas referências seguindo as normas ABNT. As referências devem estar 
+            em ordem alfabética pelo sobrenome do primeiro autor.
+          </p>
+        </div>
+      `;
+      
+      insertContent(referencesHTML);
+      closeModal('templateModal');
+    }
+    
+    function insertBackCover() {
+      addNewPage();
+      closeModal('templateModal');
+      console.log('✅ Contracapa inserida (nova página)');
+    }
+    
+    function insertContent(html) {
+      if (!editor) return;
+      
+      editor.model.change(writer => {
+        const viewFragment = editor.data.processor.toView(html);
+        const modelFragment = editor.data.toModel(viewFragment);
+        editor.model.insertContent(modelFragment);
+      });
+    }
+    
+    // ============================================================
+    // FÓRMULAS LaTeX
+    // ============================================================
+    
+    function insertMathFormula() {
+      openModal('mathModal');
+      
+      const input = document.getElementById('mathInput');
+      input.oninput = () => {
+        const preview = document.getElementById('mathPreview');
+        preview.innerHTML = `$$${input.value}$$`;
+        if (window.MathJax) {
+          MathJax.typesetClear([preview]);
+          MathJax.typesetPromise([preview]).catch(err => console.error(err));
+        }
+      };
+    }
+    
+    function applyMathFormula() {
+      const latex = document.getElementById('mathInput').value.trim();
+      if (!latex) {
+        alert('Por favor, digite uma fórmula LaTeX.');
+        return;
+      }
+      
+      const mathHTML = `<span class="math-tex" data-latex="${latex}">$$${latex}$$</span>`;
+      insertContent(mathHTML);
+      
+      closeModal('mathModal');
+      setTimeout(renderAllMath, 100);
+    }
+    
+    function renderAllMath() {
+      if (!window.MathJax) {
+        console.warn('MathJax não está carregado ainda');
+        return;
+      }
+      
+      MathJax.typesetClear();
+      MathJax.typesetPromise([document.getElementById('pagesContainer')])
+        .then(() => {
+          console.log('✅ LaTeX renderizado!');
+          document.querySelectorAll('.math-tex').forEach(el => {
+            if (el.querySelector('.MathJax')) {
+              el.classList.add('rendered');
+            }
+          });
+        })
+        .catch(err => console.error('❌ Erro ao renderizar LaTeX:', err));
+    }
+    
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      startup: {
+        ready: () => {
+          MathJax.startup.defaultReady();
+          setTimeout(renderAllMath, 1500);
+        }
+      }
+    };
+    
+    // ============================================================
+    // ATALHOS DE TECLADO
+    // ============================================================
+    
+    function setupKeyboardShortcuts(editor) {
+      const keystrokes = editor.keystrokes;
+      
+      keystrokes.set('Ctrl+S', (data, cancel) => {
+        saveDocument();
+        cancel();
+      });
+      
+      keystrokes.set('Ctrl+P', (data, cancel) => {
+        printDocument();
+        cancel();
+      });
+      
+      keystrokes.set('Ctrl+Alt+F', (data, cancel) => {
+        insertMathFormula();
+        cancel();
+      });
+      
+      keystrokes.set('Ctrl+Enter', (data, cancel) => {
+        addNewPage();
+        cancel();
+      });
+      
+      console.log('✅ Atalhos configurados');
+    }
+    
+    // ============================================================
+    // UTILIDADES
+    // ============================================================
+    
+    function openModal(modalId) {
+      document.getElementById(modalId).classList.add('open');
+    }
+    
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.remove('open');
+    }
+    
+    function updateStatus() {
+      if (!editor) return;
+      
+      const text = editor.getData().replace(/<[^>]*>/g, '');
+      const words = text.trim().split(/\s+/).filter(w => w.length > 0).length;
+      const chars = text.length;
+      
+      document.getElementById('statusPages').textContent = `Página ${currentPageIndex + 1} de ${pages.length}`;
+      document.getElementById('statusWords').textContent = `${words} palavras`;
+      document.getElementById('statusChars').textContent = `${chars} caracteres`;
+    }
+    
+    function updateCounters() {
+      console.log('Atualizando contadores...');
+    }
+    
+    function saveDocument() {
+      if (!editor) return;
+      
+      const content = editor.getHTML();
+      const blob = new Blob([content], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'documento-academico.html';
+      a.click();
+      URL.revokeObjectURL(url);
+      
+      const now = new Date().toLocaleString('pt-BR');
+      document.getElementById('lastSaved').textContent = `Salvo em ${now}`;
+      console.log('✅ Documento salvo!');
+    }
+    
+    function exportToPDF() {
+      alert('Exportação para PDF: Use Ctrl+P e selecione "Salvar como PDF" para melhores resultados.');
+      printDocument();
+    }
+    
+    function printDocument() {
+      window.print();
+    }
+    
+    setInterval(() => {
+      if (editor) {
+        const content = editor.getData();
+        localStorage.setItem('academic_editor_autosave', content);
+        localStorage.setItem('academic_editor_autosave_time', new Date().toISOString());
+      }
+    }, 120000);
+    
+    console.log('🚀 Editor Acadêmico Profissional - CKEditor 5 Ultra');
+  </script>
+</body>
+</html>

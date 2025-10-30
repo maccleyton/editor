@@ -1,15 +1,23 @@
 /* ====== Utilidades / Estado ====== */
+// Função utilitária para selecionar elementos do DOM
 function $(s){ return document.querySelector(s); }
 var editor = $('#editor'), pages = $('#pages'), autoRender = $('#autoRender'), themeBtn = $('#themeBtn');
 var STORAGE_KEY = 'cosmos-md-doc-v2'; var THEME_KEY = 'cosmos-md-theme-v2';
+// Função debounce para limitar a frequência de execução
 function debounce(fn, w){ var t; w=w||300; return function(){ var a=arguments; clearTimeout(t); t=setTimeout(function(){ fn.apply(null,a); }, w); }; }
+// Atualiza a posição do cursor (linha e coluna)
 function setCaretInfo(){ var val=editor.value, pos=editor.selectionStart||0, before=val.slice(0,pos), lines=before.split('\n'); $('#cursorInfo').textContent='Lin '+lines.length+', Col '+(lines[lines.length-1].length+1); }
+// Atualiza o contador de caracteres
 function setCountInfo(){ $('#countInfo').textContent = editor.value.length + ' caracteres'; }
+// Escapa caracteres HTML especiais
 function escapeHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+// Escapa atributos HTML
 function escapeHtmlAttr(s){ return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+// Valida URLs seguras para links e imagens
 function safeUrl(u, allowData){ try{ var s=String(u).trim(); if(allowData && s.indexOf('data:')===0) return s; if(/^https?:\/\//i.test(s) || /^mailto:/i.test(s)) return s; }catch(e){} return '#'; }
 
 /* ====== Parser Markdown (com melhorias) ====== */
+// Converte Markdown para HTML com suporte a LaTeX, tabelas e blocos
 function mdToHtml(md){
   md = String(md).replace(/\r\n?/g,'\n');
 
@@ -60,44 +68,44 @@ function mdToHtml(md){
   var lines = md.split('\n'); var out=[], i=0;
 
   function flushPara(buf){ if(!buf.length) return; var text=buf.join(' ').trim(); if(text) out.push('<p>'+inline(text)+'</p>'); buf.length=0; }
-	function parseList(start) {
-	  let html = '';
-	  let stack = []; // para controlar níveis de indentação
-	  let j = start;
-
-	  while (j < lines.length) {
-		let line = lines[j];
-		let match = line.match(/^(\s*)([-+*]|\d+\.)\s+(.*)/);
-		if (!match) break;
-
-		let indent = match[1].length;
-		let type = /^\d+\./.test(match[2]) ? 'ol' : 'ul';
-		let content = inline(match[3]);
-
-		// Verifica se precisa abrir novo nível
-		while (stack.length && stack[stack.length - 1].indent > indent) {
-		  html += `</li></${stack.pop().type}>`;
-		}
-
-		if (!stack.length || stack[stack.length - 1].indent < indent) {
-		  html += `<${type}><li>`;
-		  stack.push({ indent, type });
-		} else {
-		  html += `</li><li>`;
-		}
-
-		html += content;
-		j++;
-	  }
-
-	  // Fecha todos os níveis abertos
-	  while (stack.length) {
-		html += `</li></${stack.pop().type}>`;
-	  }
-
-	  return { html, next: j };
-	}
-
+  function parseList(start) {
+    let html = '';
+    let stack = []; // para controlar níveis de indentação
+    let j = start;
+  
+    while (j < lines.length) {
+      let line = lines[j];
+      let match = line.match(/^(\s*)([-+*]|\d+\.)\s+(.*)/);
+      if (!match) break;
+  
+      let indent = match[1].length;
+      let type = /^\d+\./.test(match[2]) ? 'ol' : 'ul';
+      let content = inline(match[3]);
+  
+      // Verifica se precisa abrir novo nível
+      while (stack.length && stack[stack.length - 1].indent > indent) {
+        html += `</li></${stack.pop().type}>`;
+      }
+  
+      if (!stack.length || stack[stack.length - 1].indent < indent) {
+        html += `<${type}><li>`;
+        stack.push({ indent, type });
+      } else {
+        html += `</li><li>`;
+      }
+  
+      html += content;
+      j++;
+    }
+  
+    // Fecha todos os níveis abertos
+    while (stack.length) {
+      html += `</li></${stack.pop().type}>`;
+    }
+  
+    return { html, next: j };
+  }
+  
   while(i<lines.length){
     var l = lines[i];
     if(/^\s*$/.test(l)){ out.push(''); i++; continue; }
@@ -131,6 +139,7 @@ function mdToHtml(md){
 
   // Restaurar e processar blocos de código
   html = html.replace(/\u0000FENCE_(\d+)\u0000/g, function(m,idx){
+// Escapa caracteres HTML especiais
     var f=fences[Number(idx)]; var codeEsc=escapeHtml(f.code); var cls=f.lang ? 'language-'+escapeHtmlAttr(f.lang) : ''; 
     var extra=attrStr(f.attrs); 
     
@@ -174,17 +183,22 @@ function mdToHtml(md){
     return a;
   }
   function attrStr(attrs){
+// Escapa atributos HTML
     var s=''; if(attrs && attrs.id) s+=' id="'+escapeHtmlAttr(attrs.id)+'"';
+// Escapa atributos HTML
     if(attrs && attrs['class']) s+=' class="'+escapeHtmlAttr(attrs['class'])+'"'; return s;
   }
   function inline(t){
     t = String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+// Escapa atributos HTML
     t = t.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, function(m,alt,src){ var s=safeUrl(src,true); return '<img alt="'+escapeHtmlAttr(alt)+'" src="'+escapeHtmlAttr(s)+'" />'; });
+// Escapa caracteres HTML especiais
     t = t.replace(/\[([^\]]+)\]\(([^)]+)\)/g, function(m,txt,href){ var h=safeUrl(href,false); return '<a href="'+escapeHtmlAttr(h)+'" target="_blank" rel="noopener noreferrer">'+escapeHtml(txt)+'</a>'; });
     t = t.replace(/\*\*\*([^\*]+)\*\*\*/g, '<strong><em>$1</em></strong>').replace(/___([^_]+)___/g, '<strong><em>$1</em></strong>');
     t = t.replace(/\*\*([^\*]+)\*\*/g, '<strong>$1</strong>').replace(/__([^_]+)__/g, '<strong>$1</strong>');
     t = t.replace(/(^|[^*])\*([^*]+)\*(?!\*)/g, '$1<em>$2</em>').replace(/(^|[^_])_([^_]+)_(?!_)/g, '$1<em>$2</em>');
     t = t.replace(/~~([^~]+)~~/g, '<s>$1</s>');
+// Escapa caracteres HTML especiais
     t = t.replace(/`([^`]+)`/g, function(m,code){ return '<code class="inline-code">'+escapeHtml(code)+'</code>'; });
     t = t.replace(/ {2,}\n/g, '<br/>\n'); return t;
   }
@@ -196,6 +210,7 @@ function mdToHtml(md){
 }
 
 /* ====== Render + Paginação A4 (sem template strings) ====== */
+// Função debounce para limitar a frequência de execução
 var render = debounce(function(){
   try{
     localStorage.setItem(STORAGE_KEY, editor.value);
@@ -203,10 +218,12 @@ var render = debounce(function(){
     if (autoRender.checked && window.katex) {
       renderMathInElement(pages);
     }
+// Atualiza o contador de caracteres
     setCountInfo();
   }catch(e){ console.error('Erro no render:', e); }
 }, 300);
 
+// Pagina o conteúdo HTML em blocos simulando folhas A4
 function paginateToA4(html){
   pages.innerHTML='';
   var flow=document.createElement('div'); flow.className='content';
@@ -229,6 +246,7 @@ function paginateToA4(html){
   }
   flow.remove();
 }
+// Cria uma nova página A4
 function createPage(){ var wrap=document.createElement('div'); wrap.className='page';
   var inner=document.createElement('article'); inner.className='page-inner content'; wrap.appendChild(inner); return {wrap:wrap, inner:inner}; }
 
@@ -332,6 +350,7 @@ function renderMathInElement(element, options) {
 }
 
 /* ====== Inserções / Atalhos ====== */
+// Envolve a seleção com prefixo e sufixo (ex: negrito, itálico)
 function wrapSelection(prefix, suffix, placeholder){
   suffix = (typeof suffix==='string')? suffix : prefix; placeholder = placeholder||'';
   var el=editor, start=el.selectionStart, end=el.selectionEnd;
@@ -342,6 +361,7 @@ function wrapSelection(prefix, suffix, placeholder){
   var head=(before+pre+content).length; el.focus(); el.setSelectionRange(head, head); render();
 }
 
+// Insere bloco de código com três crases
 function insertFenceBlock(){
   var BT = '\x60\x60\x60'; // três crases sem usar crases no código
   var el=editor, start=el.selectionStart, end=el.selectionEnd, sel=el.value.slice(start,end);
@@ -353,6 +373,7 @@ function insertFenceBlock(){
   el.focus(); el.setSelectionRange(caretStart, caretEnd); render();
 }
 
+// Insere prefixo no início da linha (ex: título, lista)
 function insertLine(prefix, placeholder){
   placeholder=placeholder||''; var el=editor, start=el.selectionStart;
   var lineStart=el.value.lastIndexOf('\n', start-1)+1;
@@ -362,6 +383,7 @@ function insertLine(prefix, placeholder){
 }
 
 // Inserir bloco LaTeX
+// Insere bloco LaTeX padrão
 function insertLatexBlock() {
   var latexBlock = '$$\n\\frac{1}{2} + \\frac{1}{4} + \\frac{1}{8} + \\cdots = 1\n$$';
   var start=editor.selectionStart, end=editor.selectionEnd, before=editor.value.slice(0,start), after=editor.value.slice(end);
@@ -373,6 +395,7 @@ function insertLatexBlock() {
 }
 
 // Inserir tabela
+// Insere tabela Markdown com alinhamento
 function insertTable() {
   var table = '\n| Coluna A | Coluna B | Coluna C |\n|:---|:---:|---:|\n| A | B | C |\n| A2 | B2 | C2 |\n';
   var start=editor.selectionStart, end=editor.selectionEnd, before=editor.value.slice(0,start), after=editor.value.slice(end);
@@ -383,6 +406,7 @@ function insertTable() {
   render();
 }
 
+// Referência aos elementos principais da interface
 Array.prototype.forEach.call(document.querySelectorAll('button[data-action]'), function(btn){
   btn.addEventListener('click', function(){
     var a=btn.dataset.action;
@@ -407,6 +431,7 @@ Array.prototype.forEach.call(document.querySelectorAll('button[data-action]'), f
   });
 });
 
+// Atalhos de teclado para negrito, itálico e código
 editor.addEventListener('keydown', function(e){
   if(e.ctrlKey && e.key.toLowerCase()==='b'){ e.preventDefault(); wrapSelection('**','**','texto'); }
   else if(e.ctrlKey && e.key.toLowerCase()==='i'){ e.preventDefault(); wrapSelection('*','*','texto'); }
@@ -415,6 +440,7 @@ editor.addEventListener('keydown', function(e){
 
 /* Arrastar imagem -> data:URL */
 editor.addEventListener('dragover', function(e){ e.preventDefault(); });
+// Permite arrastar imagem para o editor e insere como data:URL
 editor.addEventListener('drop', function(e){
   e.preventDefault(); var files=Array.prototype.slice.call(e.dataTransfer.files||[]); var img=files.find(function(f){ return /^image\//.test(f.type); });
   if(!img) return;
@@ -433,9 +459,12 @@ function escapeForHtmlInsideScript(s){
   return String(s).replace(/<\/script>/gi,'<\\/script>');
 }
 
+// Exporta o conteúdo como PDF usando a impressão do navegador
 $('#exportPDF').addEventListener('click', function(){ window.print(); });
 
+// Exporta o conteúdo como HTML completo
 $('#exportHTML').addEventListener('click', function(){
+// Referência aos elementos principais da interface
   var css = document.querySelector('style') ? document.querySelector('style').textContent : '';
   var theme = document.body.className || '';
   var mjCfg = JSON.stringify(window.MathJax || {});
@@ -471,6 +500,7 @@ $('#exportHTML').addEventListener('click', function(){
   parts.push('<script>\n');
   parts.push('document.addEventListener("DOMContentLoaded", function(){ \n');
   parts.push('  if(window.katex) { \n');
+// Referência aos elementos principais da interface
   parts.push('    var elements = document.querySelectorAll(".katex, .latex-block, .latex-inline"); \n');
   parts.push('    elements.forEach(function(el) { \n');
   parts.push('      try { katex.render(el.textContent, el, { displayMode: el.classList.contains("latex-block") }); } catch(e) {} \n');
@@ -489,6 +519,7 @@ $('#exportHTML').addEventListener('click', function(){
   URL.revokeObjectURL(a.href);
 });
 
+// Exporta o conteúdo como arquivo Markdown (.md)
 $('#downloadMD').addEventListener('click', function(){
   var md = editor.value; if(!/\n$/.test(md)) md+='\n';
   var blob = new Blob([md], {type:'text/markdown;charset=utf-8'});
@@ -500,30 +531,41 @@ $('#downloadMD').addEventListener('click', function(){
   var saved=localStorage.getItem(STORAGE_KEY); if(saved!=null) editor.value=saved;
   var theme=localStorage.getItem(THEME_KEY)||'light';
   document.body.className=theme; themeBtn.textContent = theme==='light' ? '🌑' : '☀️';
+// Atualiza a posição do cursor (linha e coluna)
   render(); setCaretInfo(); setCountInfo();
 })();
 
+// Alterna entre tema claro e escuro
 themeBtn.addEventListener('click', function(){
   var isLight=document.body.classList.contains('light'); document.body.classList.toggle('light', !isLight);
   localStorage.setItem(THEME_KEY, isLight ? 'dark':'light'); themeBtn.textContent = isLight ? '☀️' : '🌑'; render();
 });
 
 /* Eventos editor */
+// Atualiza a posição do cursor (linha e coluna)
 editor.addEventListener('input', function(){ render(); setCaretInfo(); });
+// Atualiza a posição do cursor (linha e coluna)
 editor.addEventListener('click', setCaretInfo);
+// Atualiza a posição do cursor (linha e coluna)
 editor.addEventListener('keyup', setCaretInfo);
 
 /* ====== Modal LaTeX ====== */
 var latexModal=$('#latexModal'), latexBtn=$('#latexBtn'), latexInput=$('#latexInput'), latexInsert=$('#latexInsert'), latexCancel=$('#latexCancel'), latexPreview=$('#latexPreview'), latexPreviewToggle=$('#latexPreviewToggle');
+// Abre modal para edição de fórmulas LaTeX
 latexBtn.addEventListener('click', function(){
   var sel=editor.value.slice(editor.selectionStart, editor.selectionEnd);
+// Extrai fórmula LaTeX da seleção atual
   var ex=extractLatex(sel);
   latexInput.value=ex.tex||'';
+// Referência aos elementos principais da interface
   Array.prototype.forEach.call(document.querySelectorAll('input[name="latexKind"]'), function(r){ r.checked=(r.value===ex.kind); });
+// Atualiza a pré-visualização da fórmula LaTeX
   latexModal.classList.add('open'); updateLatexPreview();
 });
 
+// Insere fórmula LaTeX no editor
 latexInsert.addEventListener('click', function(){
+// Referência aos elementos principais da interface
   var kind=document.querySelector('input[name="latexKind"]:checked').value;
   var tex=(latexInput.value||'x^2').trim();
   var wrapped = (kind==='inline') ? ('$'+tex+'$') : ('$$\n'+tex+'\n$$');
@@ -532,12 +574,17 @@ latexInsert.addEventListener('click', function(){
   latexModal.classList.remove('open'); render();
 });
 
+// Fecha o modal de LaTeX sem inserir
 latexCancel.addEventListener('click', function(){ latexModal.classList.remove('open'); });
+// Atualiza a pré-visualização da fórmula LaTeX
 latexPreviewToggle.addEventListener('change', updateLatexPreview);
+// Atualiza a pré-visualização da fórmula LaTeX
 latexInput.addEventListener('input', debounce(updateLatexPreview, 200));
 
+// Atualiza a pré-visualização da fórmula LaTeX
 function updateLatexPreview(){
   latexPreview.innerHTML=''; if(!latexPreviewToggle.checked) return;
+// Referência aos elementos principais da interface
   var kind=document.querySelector('input[name="latexKind"]:checked').value; var tex=(latexInput.value||'').trim();
   if(!tex){ latexPreview.textContent='—'; return; }
   var container=document.createElement(kind==='inline'?'span':'div');
@@ -546,6 +593,7 @@ function updateLatexPreview(){
   if(window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise([latexPreview]);
 }
 
+// Extrai fórmula LaTeX da seleção atual
 function extractLatex(sel){
   var block=sel.match(/^\s*\${2}([\s\S]*)\${2}\s*$/); if(block) return {tex:block[1].trim(), kind:'block'};
   var inline=sel.match(/^\s*\$([^$]+)\$\s*$/); if(inline) return {tex:inline[1].trim(), kind:'inline'};

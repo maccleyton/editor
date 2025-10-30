@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markdown Editor - Copilot Fusion</title>
+    <link rel="stylesheet" href="./css/markdownEditor.css">
+</head>
+<body>
+    <div class="header">
+        <div class="logo">✨ Copilot Editor</div>
+        <div class="title">Markdown to PDF</div>
+        <div class="actions">
+            <button class="top-btn" onclick="exportPDF()">💾 PDF</button>
+            <button class="top-btn" onclick="exportHTML()">📄 HTML</button>
+            <button class="top-btn" onclick="toggleTheme()">🌙 Tema</button>
+        </div>
+    </div>
+
+    <div class="toolbar">
+        <div class="group">
+            <button class="icon-btn" onclick="wrap('**')" title="Bold">B</button>
+            <button class="icon-btn" onclick="wrap('*')" title="Italic">I</button>
+            <button class="icon-btn" onclick="wrap('`')" title="Code">⌘</button>
+        </div>
+        <div class="sep"></div>
+        <div class="group">
+            <button class="icon-btn" onclick="insertLine('# ')" title="H1">H1</button>
+            <button class="icon-btn" onclick="insertLine('## ')" title="H2">H2</button>
+            <button class="icon-btn" onclick="insertLine('### ')" title="H3">H3</button>
+        </div>
+        <div class="sep"></div>
+        <div class="group">
+            <button class="icon-btn" onclick="insertLine('- ')" title="List">•</button>
+            <button class="icon-btn" onclick="insertLine('1. ')" title="Numbered">1</button>
+            <button class="icon-btn" onclick="insertLine('> ')" title="Quote">❝</button>
+            <button class="icon-btn" onclick="insertTable()">📊</button>
+            <button class="icon-btn" onclick="insertCode()">{ }</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="editor-area">
+            <div class="editor-pane">
+                <div class="pane-title">📝 Editor Markdown</div>
+                <textarea id="editor" placeholder="Escreva seu markdown aqui..."></textarea>
+                <div class="statusbar">
+                    <div class="left">
+                        <span id="cursor">Lin 1, Col 1</span>
+                        <div class="sep"></div>
+                        <span id="count">0 caracteres</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="preview-pane">
+                <div class="pane-title">👁 Preview (A4)</div>
+                <div class="page-viewport">
+                    <div class="sheet" id="preview"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const editor = document.getElementById('editor');
+        const preview = document.getElementById('preview');
+        const cursorInfo = document.getElementById('cursor');
+        const countInfo = document.getElementById('count');
+        const STORAGE_KEY = 'md-editor-content';
+
+        function debounce(fn, delay) {
+            let timeout;
+            return function(...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => fn.apply(this, args), delay);
+            };
+        }
+
+        function updateCursor() {
+            const pos = editor.selectionStart;
+            const text = editor.value.substring(0, pos);
+            const lines = text.split('\n');
+            cursorInfo.textContent = `Lin ${lines.length}, Col ${lines[lines.length - 1].length + 1}`;
+        }
+
+        function updateCount() {
+            countInfo.textContent = `${editor.value.length} caracteres`;
+        }
+
+        function escapeHtml(text) {
+            return String(text)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        }
+
+        function mdToHtml(md) {
+            if (!md || !md.trim()) return '<p>Digite algo...</p>';
+
+            let html = md;
+
+            // Blocos de código
+            html = html.replace(/``````/gm, (m, lang, code) => {
+                return `<pre><code>${escapeHtml(code.trim())}</code></pre>`;
+            });
+
+            // Código inline
+            html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+
+            // Escapar < e >
+            html = html.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+            const lines = html.split('\n');
+            const output = [];
+            let i = 0;
+
+            while (i < lines.length) {
+                const line = lines[i].trim();
+
+                if (!line) { i++; continue; }
+
+                // Headings
+                const hMatch = line.match(/^(#{1,6})\s+(.+)$/);
+                if (hMatch) {
+                    output.push(`<h${hMatch[1].length}>${hMatch[2]}</h${hMatch[1].length}>`);
+                    i++;
+                    continue;
+                }
+
+                // Tabelas
+                if (line.startsWith('|') && i + 1 < lines.length && lines[i + 1].includes('---')) {
+                    const tableHtml = parseTable(lines, i);
+                    output.push(tableHtml.html);
+                    i = tableHtml.nextIdx;
+                    continue;
+                }
+
+                // Listas
+                if (line.match(/^[-*+]\s/)) {
+                    const items = [];
+                    while (i < lines.length && lines[i].trim().match(/^[-*+]\s/)) {
+                        items.push(`<li>${lines[i].trim().replace(/^[-*+]\s/, '')}</li>`);
+                        i++;
+                    }
+                    output.push(`<ul>${items.join('')}</ul>`);
+                    continue;
+                }
+
+                // Blockquote
+                if (line.startsWith('&gt; ')) {
+                    output.push(`<blockquote>${line.replace(/^&gt;\s*/, '')}</blockquote>`);
+                    i++;
+                    continue;
+                }
+
+                // HR
+                if (line.match(/^(---|___|\*\*\*)$/)) {
+                    output.push('<hr>');
+                    i++;
+                    continue;
+                }
+
+                // Parágrafo
+                output.push(`<p>${line}</p>`);
+                i++;
+            }
+
+            // Formatting
+            let result = output.join('\n');
+            result = result.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+            result = result.replace(/\*(.+?)\*/g, '<em>$1</em>');
+            result = result.replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2">$1</a>');
+
+            return result;
+        }
+
+        function parseTable(lines, startIdx) {
+            let idx = startIdx;
+            const headers = lines[idx++].split('|').filter(h => h.trim()).map(h => h.trim());
+            idx++; // Pular linha de separação
+            
+            let html = '<table><thead><tr>';
+            headers.forEach(h => html += `<th>${h}</th>`);
+            html += '</tr></thead><tbody>';
+            
+            while (idx < lines.length && lines[idx].includes('|')) {
+                const cells = lines[idx].split('|').filter(c => c.trim()).map(c => c.trim());
+                html += '<tr>';
+                cells.forEach(c => html += `<td>${c}</td>`);
+                html += '</tr>';
+                idx++;
+            }
+            
+            html += '</tbody></table>';
+            return { html, nextIdx: idx };
+        }
+
+        function render() {
+            preview.innerHTML = mdToHtml(editor.value);
+            updateCount();
+            localStorage.setItem(STORAGE_KEY, editor.value);
+        }
+
+        const renderDebounced = debounce(render, 300);
+
+        function wrap(d) {
+            const s = editor.selectionStart;
+            const e = editor.selectionEnd;
+            const sel = editor.value.substring(s, e);
+            const before = editor.value.substring(0, s);
+            const after = editor.value.substring(e);
+            editor.value = before + d + (sel || 'texto') + d + after;
+            editor.selectionStart = s + d.length;
+            editor.focus();
+            renderDebounced();
+        }
+
+        function insertLine(prefix) {
+            const pos = editor.selectionStart;
+            const before = editor.value.substring(0, pos);
+            const lastNL = before.lastIndexOf('\n');
+            const lineStart = lastNL === -1 ? 0 : lastNL + 1;
+            editor.value = editor.value.substring(0, lineStart) + prefix + editor.value.substring(lineStart);
+            editor.selectionStart = lineStart + prefix.length;
+            editor.focus();
+            renderDebounced();
+        }
+
+        function insertAtCursor(text) {
+            const pos = editor.selectionStart;
+            editor.value = editor.value.substring(0, pos) + text + editor.value.substring(pos);
+            editor.selectionStart = pos + text.length;
+            editor.focus();
+            renderDebounced();
+        }
+
+        function insertTable() {
+            insertAtCursor('\n| A | B | C |\n|---|---|---|\n| 1 | 2 | 3 |\n\n');
+        }
+
+        function insertCode() {
+            insertAtCursor('\n``````\n\n');
+        }
+
+        function exportPDF() {
+            window.print();
+        }
+
+        function exportHTML() {
+            const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Documento</title><style>${document.querySelector('style')?.textContent || ''}</style></head><body>${preview.innerHTML}</body></html>`;
+            const blob = new Blob([html], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'documento.html';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('light-mode');
+            localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
+        }
+
+        editor.addEventListener('input', () => { updateCursor(); renderDebounced(); });
+        editor.addEventListener('click', updateCursor);
+        editor.addEventListener('keyup', updateCursor);
+
+        window.addEventListener('load', () => {
+            editor.value = localStorage.getItem(STORAGE_KEY) || `# Bem-vindo!
+
+## Editor Markdown com Preview
+
+**Bold**, *itálico*, \`código inline\`
+
+### Exemplo de Tabela
+
+| Recurso | Status |
+|---------|--------|
+| LaTeX | ✅ |
+| Código | ✅ |
+
+\`\`\`python
+print("Funciona!")
+\`\`\`
+
+Bom trabalho! 🚀
+`;
+            
+            const theme = localStorage.getItem('theme');
+            if (theme === 'light') document.body.classList.add('light-mode');
+            
+            render();
+            updateCursor();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Copilot Editor Fusion - Ultimate Edition FIXED</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --bg-main: #0f172a;
+            --bg-panel: #1e293b;
+            --text: #e2e8f0;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --code-bg: #0b1020;
+            --success: #10b981;
+            --warning: #f59e0b;
+        }
+
+        html, body {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: var(--text);
+        }
+
+        .app {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background: var(--bg-main);
+            margin: 10px;
+            border-radius: 16px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            padding: 12px 16px;
+            background: var(--bg-panel);
+            border-bottom: 2px solid var(--border);
+            z-index: 100;
+        }
+
+        .brand {
+            font-size: 1.3rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-right: 12px;
+        }
+
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        button {
+            background: var(--bg-main);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 8px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+        }
+
+        button:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+            transform: translateY(-1px);
+        }
+
+        .divider {
+            width: 1px;
+            height: 24px;
+            background: var(--border);
+        }
+
+        .grow {
+            flex: 1;
+        }
+
+        .toggles {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .toggles label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        input[type="checkbox"] {
+            cursor: pointer;
+            width: 18px;
+            height: 18px;
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            gap: 12px;
+            padding: 12px;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        .pane {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .pane h3 {
+            margin: 0;
+            padding: 12px 16px;
+            background: var(--bg-main);
+            color: var(--primary);
+            font-size: 0.95rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            border-bottom: 2px solid var(--border);
+        }
+
+        #editor {
+            flex: 1;
+            resize: none;
+            padding: 16px;
+            border: 0;
+            outline: 0;
+            background: var(--bg-main);
+            color: var(--text);
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            tab-size: 2;
+        }
+
+        .status {
+            display: flex;
+            gap: 16px;
+            padding: 8px 16px;
+            background: var(--bg-main);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-weight: 500;
+            border-top: 1px solid var(--border);
+        }
+
+        .preview {
+            flex: 1;
+            overflow: auto;
+            padding: 16px;
+            background: var(--bg-main);
+        }
+
+        .a4-surface {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            align-items: center;
+            padding-bottom: 24px;
+        }
+
+        .page {
+            width: 210mm;
+            height: 297mm;
+            background: #ffffff;
+            color: #1f2937;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-inner {
+            padding: 20mm;
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        .content h1, .content h2, .content h3, .content h4, .content h5, .content h6 {
+            margin: 1.5em 0 0.8em;
+            line-height: 1.3;
+            font-weight: 700;
+            break-after: avoid;
+        }
+
+        .content h1:first-child, .content h2:first-child {
+            margin-top: 0;
+        }
+
+        .content h1 { 
+            font-size: 2.2rem; 
+            color: #667eea;
+            border-bottom: 4px solid #667eea;
+            padding-bottom: 12px;
+        }
+        
+        .content h2 { 
+            font-size: 1.8rem; 
+            color: #764ba2;
+            border-bottom: 3px solid #764ba2;
+            padding-bottom: 10px;
+        }
+        
+        .content h3 { 
+            font-size: 1.5rem; 
+            color: #667eea;
+        }
+        
+        .content h4 { 
+            font-size: 1.3rem;
+            color: #374151;
+        }
+        
+        .content p { 
+            margin: 1em 0; 
+            line-height: 1.8;
+            color: #374151;
+        }
+
+        .content code {
+            background: #e0e7ff;
+            color: #4338ca;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            font-weight: 600;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+
+        .content pre {
+            background: #0f172a;
+            color: #e2e8f0;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            margin: 2rem 0;
+            break-inside: avoid;
+        }
+
+        .content pre code {
+            background: transparent;
+            color: inherit;
+            padding: 0;
+            border-radius: 0;
+        }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+            break-inside: avoid;
+        }
+
+        .content table thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .content table th {
+            border: none;
+            padding: 16px;
+            text-align: left;
+            font-weight: 700;
+            font-size: 0.95em;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .content table td {
+            border: 1px solid #e5e7eb;
+            padding: 14px 16px;
+            text-align: left;
+            background: white;
+        }
+
+        .content table tbody tr:nth-child(even) td {
+            background-color: #f9fafb;
+        }
+
+        .content table tbody tr:hover td {
+            background-color: #e0e7ff;
+        }
+
+        .content blockquote {
+            margin: 1.5rem 0;
+            padding: 12px 20px;
+            border-left: 5px solid #667eea;
+            background: linear-gradient(to right, rgba(102, 126, 234, 0.1), transparent);
+            border-radius: 0 8px 8px 0;
+            font-style: italic;
+            color: #4b5563;
+        }
+
+        .content ul, .content ol {
+            padding-left: 2rem;
+            margin: 1rem 0;
+        }
+
+        .content li {
+            margin: 0.5rem 0;
+            line-height: 1.7;
+        }
+
+        .content hr {
+            border: 0;
+            height: 2px;
+            background: linear-gradient(to right, transparent, #667eea, transparent);
+            margin: 2.5rem 0;
+        }
+
+        .content a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .content a:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+
+        @media (max-width: 1400px) {
+            .page {
+                width: 180mm;
+                transform: scale(0.95);
+            }
+        }
+
+        @media (max-width: 1200px) {
+            main {
+                flex-direction: column;
+            }
+            
+            .pane {
+                min-height: 300px;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .page {
+                width: 160mm;
+                transform: scale(0.85);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .app {
+                margin: 5px;
+            }
+            
+            .page {
+                width: 95vw;
+                transform: scale(0.7);
+            }
+        }
+
+        @media print {
+            @page { size: A4; margin: 0; }
+            body { background: white; margin: 0; }
+            .app { margin: 0; box-shadow: none; }
+            header, .pane:first-child { display: none !important; }
+            main { padding: 0; }
+            .page { box-shadow: none; page-break-after: always; transform: none; }
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-main);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <header>
+            <div class="brand">✨ Copilot Fusion Ultimate</div>
+            <div class="toolbar">
+                <button onclick="wrap('**')">B</button>
+                <button onclick="wrap('*')">I</button>
+                <button onclick="wrap('`')">⌘</button>
+                <span class="divider"></span>
+                <button onclick="insertLine('# ')">H1</button>
+                <button onclick="insertLine('## ')">H2</button>
+                <button onclick="insertLine('### ')">H3</button>
+                <span class="divider"></span>
+                <button onclick="insertLine('- ')">• Lista</button>
+                <button onclick="insertLine('1. ')">1. Lista</button>
+                <span class="divider"></span>
+                <button onclick="insertLine('> ')">❝ Quote</button>
+                <button onclick="insertTable()">📊 Tabela</button>
+                <button onclick="insertLatex()">∑ LaTeX</button>
+                <button onclick="insertCode()">{ } Code</button>
+            </div>
+            <div class="grow"></div>
+            <div class="toggles">
+                <label>
+                    <input type="checkbox" id="autoRender" checked>
+                    Auto-render
+                </label>
+                <button onclick="window.print()">💾 PDF</button>
+                <button onclick="exportHTML()">📄 HTML</button>
+            </div>
+        </header>
+
+        <main>
+            <div class="pane">
+                <h3>📝 Editor Markdown</h3>
+                <textarea id="editor"></textarea>
+                <div class="status">
+                    <span id="cursorInfo">Lin 1, Col 1</span>
+                    <span id="countInfo">0 caracteres</span>
+                </div>
+            </div>
+
+            <div class="pane">
+                <h3>👁 Preview Paginado (A4)</h3>
+                <div class="preview">
+                    <div class="a4-surface" id="pages"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const editor = document.getElementById('editor');
+        const pages = document.getElementById('pages');
+        const cursorInfo = document.getElementById('cursorInfo');
+        const countInfo = document.getElementById('countInfo');
+        
+        const STORAGE_KEY = 'fusion-ultimate-v2-fixed';
+        
+        function debounce(fn, delay) {
+            let timeout;
+            return function(...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => fn.apply(this, args), delay);
+            };
+        }
+        
+        function updateCursor() {
+            const pos = editor.selectionStart;
+            const text = editor.value.substring(0, pos);
+            const lines = text.split('\n');
+            cursorInfo.textContent = `Lin ${lines.length}, Col ${lines[lines.length - 1].length + 1}`;
+        }
+        
+        function updateCount() {
+            countInfo.textContent = `${editor.value.length} caracteres`;
+        }
+        
+        function escapeHtml(text) {
+            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+        
+        function renderLatexInline(formula) {
+            try {
+                if (window.katex) {
+                    return katex.renderToString(formula, { displayMode: false, throwOnError: false });
+                }
+            } catch(e) {
+                return `$${formula}$`;
+            }
+        }
+        
+        function renderLatexDisplay(formula) {
+            try {
+                if (window.katex) {
+                    return `<div style="text-align: center; margin: 2rem 0;">${katex.renderToString(formula, { displayMode: true, throwOnError: false })}</div>`;
+                }
+            } catch(e) {
+                return `<div style="text-align: center; margin: 2rem 0;">$$${formula}$$</div>`;
+            }
+        }
+        
+        function parseInline(text) {
+            text = text.replace(/\$([^\$\n]+)\$/g, (match, formula) => renderLatexInline(formula.trim()));
+            text = text.replace(/`([^`]+)`/g, (match, code) => `<code>${escapeHtml(code)}</code>`);
+            text = text.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" style="max-width: 100%; border-radius: 8px;">');
+            text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
+            text = text.replace(/\*\*\*([^\*]+)\*\*\*/g, '<strong><em>$1</em></strong>');
+            text = text.replace(/\*\*([^\*]+)\*\*/g, '<strong>$1</strong>');
+            text = text.replace(/\*([^\*]+)\*/g, '<em>$1</em>');
+            return text;
+        }
+        
+        function mdToHtml(md) {
+            if (!md || md.trim() === '') return '<p>Digite algo no editor...</p>';
+            
+            let html = md;
+            
+            const codeBlocks = [];
+            html = html.replace(/``````/gm, (match, lang, code) => {
+                const id = `§CODE§${codeBlocks.length}§`;
+                const langClass = (lang && lang.trim()) || 'plaintext';
+                codeBlocks.push(`<pre><code class="language-${langClass}">${escapeHtml(code)}</code></pre>`);
+                return '\n' + id + '\n';
+            });
+            
+            const latexDisplays = [];
+            html = html.replace(/\$\$([\s\S]*?)\$\$/g, (match, formula) => {
+                const id = `§LATEX§${latexDisplays.length}§`;
+                latexDisplays.push(renderLatexDisplay(formula.trim()));
+                return '\n' + id + '\n';
+            });
+            
+            const lines = html.split('\n');
+            const output = [];
+            let i = 0;
+            
+            while (i < lines.length) {
+                const line = lines[i];
+                const trimmed = line.trim();
+                
+                if (!trimmed) {
+                    i++;
+                    continue;
+                }
+                
+                if (trimmed.startsWith('§CODE§') || trimmed.startsWith('§LATEX§')) {
+                    output.push(trimmed);
+                    i++;
+                    continue;
+                }
+                
+                if (trimmed.startsWith('|') && i + 1 < lines.length && lines[i + 1].includes('---')) {
+                    const tableResult = parseTable(lines, i);
+                    output.push(tableResult.html);
+                    i = tableResult.nextIdx;
+                    continue;
+                }
+                
+                const headerMatch = trimmed.match(/^(#{1,6})\s+(.+)$/);
+                if (headerMatch) {
+                    const level = headerMatch[1].length;
+                    const text = headerMatch[2];
+                    output.push(`<h${level}>${parseInline(text)}</h${level}>`);
+                    i++;
+                    continue;
+                }
+                
+                if (trimmed.match(/^[-*+]\s/)) {
+                    const items = [];
+                    while (i < lines.length && lines[i].trim().match(/^[-*+]\s/)) {
+                        const text = lines[i].trim().replace(/^[-*+]\s/, '');
+                        items.push(`<li>${parseInline(text)}</li>`);
+                        i++;
+                    }
+                    output.push(`<ul>${items.join('')}</ul>`);
+                    continue;
+                }
+                
+                if (trimmed.match(/^\d+\.\s/)) {
+                    const items = [];
+                    while (i < lines.length && lines[i].trim().match(/^\d+\.\s/)) {
+                        const text = lines[i].trim().replace(/^\d+\.\s/, '');
+                        items.push(`<li>${parseInline(text)}</li>`);
+                        i++;
+                    }
+                    output.push(`<ol>${items.join('')}</ol>`);
+                    continue;
+                }
+                
+                if (trimmed.startsWith('> ')) {
+                    const text = trimmed.replace(/^>\s*/, '');
+                    output.push(`<blockquote>${parseInline(text)}</blockquote>`);
+                    i++;
+                    continue;
+                }
+                
+                if (trimmed.match(/^(---|___|\*\*\*)$/)) {
+                    output.push('<hr>');
+                    i++;
+                    continue;
+                }
+                
+                output.push(`<p>${parseInline(trimmed)}</p>`);
+                i++;
+            }
+            
+            html = output.join('\n');
+            
+            latexDisplays.forEach((rendered, idx) => {
+                html = html.replace(`§LATEX§${idx}§`, rendered);
+            });
+            
+            codeBlocks.forEach((block, idx) => {
+                html = html.replace(`§CODE§${idx}§`, block);
+            });
+            
+            return html;
+        }
+        
+        function parseTable(lines, startIdx) {
+            let idx = startIdx;
+            const headerLine = lines[idx++];
+            const separatorLine = lines[idx++];
+            
+            const headers = headerLine.split('|').filter(h => h.trim()).map(h => h.trim());
+            const aligns = separatorLine.split('|').filter(a => a.trim()).map(a => {
+                a = a.trim();
+                if (a.startsWith(':') && a.endsWith(':')) return 'center';
+                if (a.endsWith(':')) return 'right';
+                return 'left';
+            });
+            
+            let html = '<table><thead><tr>';
+            headers.forEach((h, i) => {
+                html += `<th align="${aligns[i] || 'left'}">${parseInline(h)}</th>`;
+            });
+            html += '</tr></thead><tbody>';
+            
+            while (idx < lines.length && lines[idx].trim().startsWith('|')) {
+                const cells = lines[idx].split('|').filter(c => c.trim()).map(c => c.trim());
+                html += '<tr>';
+                cells.forEach((c, i) => {
+                    html += `<td align="${aligns[i] || 'left'}">${parseInline(c)}</td>`;
+                });
+                html += '</tr>';
+                idx++;
+            }
+            
+            html += '</tbody></table>';
+            return { html, nextIdx: idx };
+        }
+        
+        function createPage() {
+            const pageDiv = document.createElement('div');
+            pageDiv.className = 'page';
+            const inner = document.createElement('div');
+            inner.className = 'page-inner content';
+            pageDiv.appendChild(inner);
+            return { page: pageDiv, inner };
+        }
+        
+        function paginateContent(html) {
+            const tempDiv = document.createElement('div');
+            tempDiv.className = 'content';
+            tempDiv.style.cssText = `
+                visibility: hidden;
+                position: absolute;
+                width: 170mm;
+                left: -9999px;
+            `;
+            tempDiv.innerHTML = html;
+            document.body.appendChild(tempDiv);
+            
+            const elements = Array.from(tempDiv.children);
+            pages.innerHTML = '';
+            
+            if (elements.length === 0) {
+                tempDiv.remove();
+                return;
+            }
+            
+            let { page, inner } = createPage();
+            pages.appendChild(page);
+            
+            for (let i = 0; i < elements.length; i++) {
+                const el = elements[i];
+                const tagName = el.tagName;
+                
+                if ((tagName === 'H1' || tagName === 'H2') && inner.children.length > 0) {
+                    const nextEl = elements[i + 1];
+                    const isH1FollowedByH2 = tagName === 'H1' && nextEl && nextEl.tagName === 'H2';
+                    
+                    if (!isH1FollowedByH2) {
+                        ({ page, inner } = createPage());
+                        pages.appendChild(page);
+                    }
+                }
+                
+                const tempEl = el.cloneNode(true);
+                inner.appendChild(tempEl);
+                
+                void inner.offsetHeight;
+                
+                if (inner.scrollHeight > inner.clientHeight) {
+                    inner.removeChild(tempEl);
+                    ({ page, inner } = createPage());
+                    pages.appendChild(page);
+                    inner.appendChild(tempEl.cloneNode(true));
+                }
+            }
+            
+            const allPages = Array.from(pages.querySelectorAll('.page'));
+            allPages.forEach(p => {
+                const content = p.querySelector('.page-inner');
+                if (!content || content.children.length === 0) {
+                    p.remove();
+                }
+            });
+            
+            tempDiv.remove();
+        }
+        
+        const render = debounce(() => {
+            const html = mdToHtml(editor.value);
+            paginateContent(html);
+            updateCount();
+            localStorage.setItem(STORAGE_KEY, editor.value);
+        }, 200);
+        
+        function wrap(delimiter) {
+            const start = editor.selectionStart;
+            const end = editor.selectionEnd;
+            const selected = editor.value.substring(start, end);
+            const before = editor.value.substring(0, start);
+            const after = editor.value.substring(end);
+            
+            if (selected) {
+                editor.value = before + delimiter + selected + delimiter + after;
+                editor.selectionStart = start + delimiter.length;
+                editor.selectionEnd = end + delimiter.length;
+            } else {
+                editor.value = before + delimiter + 'texto' + delimiter + after;
+                editor.selectionStart = editor.selectionEnd = start + delimiter.length;
+            }
+            
+            editor.focus();
+            render();
+        }
+        
+        function insertLine(prefix) {
+            const pos = editor.selectionStart;
+            const before = editor.value.substring(0, pos);
+            const after = editor.value.substring(pos);
+            
+            const lastNewline = before.lastIndexOf('\n');
+            const lineStart = lastNewline === -1 ? 0 : lastNewline + 1;
+            
+            const beforeLine = editor.value.substring(0, lineStart);
+            const afterLine = editor.value.substring(lineStart);
+            
+            editor.value = beforeLine + prefix + afterLine;
+            editor.selectionStart = editor.selectionEnd = lineStart + prefix.length;
+            editor.focus();
+            render();
+        }
+        
+        function insertTable() {
+            const table = '\n| Coluna A | Coluna B | Coluna C |\n|:---|:---:|---:|\n| Esquerda | Centro | Direita |\n| A1 | B1 | C1 |\n\n';
+            insertAtCursor(table);
+        }
+        
+        function insertLatex() {
+            const latex = '\n$$\n\\frac{a^2 + b^2}{c} = x\n$$\n\n';
+            insertAtCursor(latex);
+        }
+        
+        function insertCode() {
+            const code = '\n``````\n\n';
+            insertAtCursor(code);
+        }
+        
+        function insertAtCursor(text) {
+            const pos = editor.selectionStart;
+            const before = editor.value.substring(0, pos);
+            const after = editor.value.substring(pos);
+            
+            editor.value = before + text + after;
+            editor.selectionStart = editor.selectionEnd = pos + text.length;
+            editor.focus();
+            render();
+        }
+        
+        function exportHTML() {
+            const html = `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Documento Exportado</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+</head>
+<body>${pages.innerHTML}</body>
+</html>`;
+            
+            const blob = new Blob([html], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'documento.html';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        editor.addEventListener('input', () => { updateCursor(); render(); });
+        editor.addEventListener('click', updateCursor);
+        editor.addEventListener('keyup', updateCursor);
+        editor.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'b') { e.preventDefault(); wrap('**'); }
+            else if (e.ctrlKey && e.key === 'i') { e.preventDefault(); wrap('*'); }
+        });
+        
+        window.addEventListener('load', () => {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                editor.value = saved;
+            } else {
+                editor.value = `# Guia Completo: LaTeX + Markdown
+
+## 🟢 Fundamentos
+
+**Texto em negrito**, *itálico* e \`código inline\`
+
+### Tabela Premium
+
+| Recurso | Comando | Status |
+|:--------|:-------:|-------:|
+| LaTeX | \`$$formula$$\` | ✅ |
+| Código | \`\`\`lang\`\`\` | ✅ |
+| Tabela | \`| col |\` | ✅ |
+
+### Código Python
+
+\`\`\`python
+def fibonacci(n):
+    if n <= 1:
+        return n
+    return fibonacci(n-1) + fibonacci(n-2)
+
+print(fibonacci(10))
+\`\`\`
+
+### Fórmulas LaTeX
+
+Inline: $E = mc^2$
+
+Display:
+
+$$
+\\frac{a^2 + b^2}{c^2} = 1
+$$
+
+$$
+x = \\frac{-b \\pm \\sqrt{b^2-4ac}}{2a}
+$$
+
+> **Dica**: Use Ctrl+B para negrito e Ctrl+I para itálico!
+
+---
+
+## 📚 Lista de Recursos
+
+- ✅ Markdown completo
+- ✅ LaTeX inline e display
+- ✅ Blocos de código com syntax highlighting
+- ✅ Tabelas com alinhamento
+- ✅ Paginação A4 automática
+- ✅ Responsivo (mobile, tablet, desktop)
+- ✅ Tema dark moderno
+- ✅ Exportação HTML/PDF
+`;
+            }
+            
+            render();
+            updateCursor();
+            updateCount();
+        });
+    </script>
+</body>
+</html>

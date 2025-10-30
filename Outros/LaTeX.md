@@ -1,8 +1,4 @@
-Perfeito, Cleyton! Vamos montar um **guia completão de LaTeX** em formato de bolso, seguindo a mesma lógica do guia de inglês para programação. A estrutura pode incluir:
-
----
-
-## 📘 **Guia de Bolso: LaTeX para Programadores e Estudantes**
+# 📘 **Guia de Bolso: LaTeX para Programadores e Estudantes**
 
 ### 🟢 **Fundamentos do LaTeX (1–3 meses)**
 

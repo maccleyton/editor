@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Copilot Editor Fusion - LaTeX + Markdown + A4</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    
+    <style>
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --bg: #0f172a;
+            --panel: #0b1229;
+            --text: #e2e8f0;
+            --muted: #94a3b8;
+            --border: #233164;
+            --accent: #60a5fa;
+            --button: #1e293b;
+            --shadow: rgba(0,0,0,.35);
+            --a4-bg: #0a0f1f;
+            --page-bg: #ffffff;
+            --code-bg: #0b1020;
+        }
+
+        .light {
+            --bg: #f8fafc;
+            --panel: #ffffff;
+            --text: #0f172a;
+            --muted: #475569;
+            --border: #e2e8f0;
+            --accent: #2563eb;
+            --button: #f1f5f9;
+            --shadow: rgba(0,0,0,.08);
+            --a4-bg: #eef2ff;
+            --page-bg: #ffffff;
+            --code-bg: #0f172a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        /* === ESTILOS VISUAIS DO CLAUDE === */
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--text);
+        }
+
+        .app {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(15px);
+            margin: 20px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        /* === CABEÇALHO MODERNO === */
+        header {
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            flex-wrap: wrap;
+            padding: 1rem 1.2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .brand {
+            font-size: 1.5rem;
+            font-weight: 900;
+            letter-spacing: 0.5px;
+            margin-right: 1rem;
+            background: linear-gradient(135deg, #fff 0%, #f0f0f0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* === TOOLBAR MODERNA === */
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .4rem;
+        }
+
+        button, .seg {
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: #667eea;
+            padding: .55rem .75rem;
+            border-radius: .75rem;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        button:hover {
+            background: white;
+            color: #667eea;
+            border-color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(255, 255, 255, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .seg {
+            display: inline-flex;
+            gap: .3rem;
+            align-items: center;
+        }
+
+        .grow {
+            flex: 1 1 auto;
+        }
+
+        .toggles {
+            display: flex;
+            gap: .6rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .toggles label {
+            color: rgba(255, 255, 255, 0.95);
+            font-size: .95rem;
+            font-weight: 600;
+        }
+
+        /* === MAIN CONTENT === */
+        main {
+            flex: 1 1 auto;
+            display: flex;
+            min-height: 0;
+            gap: 1rem;
+            padding: 1rem;
+            background: transparent;
+        }
+
+        /* === PAINÉIS COM GLASSMORPHISM === */
+        .pane {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(102, 126, 234, 0.2);
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+        }
+
+        .pane h3 {
+            margin: 0;
+            padding: .75rem 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        textarea {
+            flex: 1;
+            resize: none;
+            padding: 1.2rem;
+            border: 0;
+            outline: 0;
+            background: white;
+            color: #1a202c;
+            font: 14px/1.6 ui-monospace, 'Courier New', monospace;
+            tab-size: 2;
+        }
+
+        .status {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            justify-content: space-between;
+            padding: .5rem 1rem;
+            border-top: 2px solid rgba(102, 126, 234, 0.2);
+            background: linear-gradient(to bottom, transparent, rgba(102, 126, 234, 0.05));
+            color: #667eea;
+            font-size: .9rem;
+            font-weight: 600;
+        }
+
+        .preview {
+            flex: 1;
+            overflow: auto;
+            padding: 1.2rem;
+            background: #f8f9fa;
+        }
+
+        .content {
+            max-width: 58rem;
+            margin: 0 auto;
+        }
+
+        /* === TIPOGRAFIA === */
+        .content h1, .content h2, .content h3, .content h4, .content h5, .content h6 {
+            margin: 1.2em 0 .6em;
+            line-height: 1.3;
+            color: #1a202c;
+            font-weight: 700;
+        }
+
+        .content h1 { font-size: 2rem; color: #667eea; }
+        .content h2 { font-size: 1.7rem; color: #764ba2; }
+        .content h3 { font-size: 1.4rem; }
+        .content p { margin: .8em 0; line-height: 1.7; }
+
+        /* === CÓDIGO === */
+        .content code {
+            background: #e3f2fd;
+            color: #1565c0;
+            padding: .2rem .4rem;
+            border-radius: .4rem;
+            font-size: .9em;
+            font-weight: 600;
+        }
+
+        .content pre {
+            background: #1a202c;
+            color: #e2e8f0;
+            border: 2px solid #667eea;
+            padding: 1.2rem;
+            border-radius: .8rem;
+            overflow: auto;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+            margin: 1.5rem 0;
+        }
+
+        .content pre code {
+            background: transparent;
+            color: inherit;
+            padding: 0;
+        }
+
+        /* === TABELAS PREMIUM DO C3 === */
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .content table thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .content table th {
+            border: none;
+            padding: 16px 18px;
+            text-align: left;
+            font-weight: 700;
+            font-size: 0.95em;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .content table td {
+            border: 1px solid #e0e0e0;
+            padding: 14px 18px;
+            text-align: left;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            max-width: 350px;
+            background: white;
+        }
+
+        .content table tbody tr {
+            transition: all 0.2s ease;
+        }
+
+        .content table tbody tr:nth-child(even) td {
+            background-color: #f8f9fa;
+        }
+
+        .content table tbody tr:hover td {
+            background-color: #e3f2fd;
+            transform: scale(1.005);
+        }
+
+        /* Alinhamentos de tabela */
+        .content table th[align="center"], .content table td[align="center"] { text-align: center; }
+        .content table th[align="right"], .content table td[align="right"] { text-align: right; }
+        .content table th[align="left"], .content table td[align="left"] { text-align: left; }
+
+        /* === OUTROS ELEMENTOS === */
+        .content blockquote {
+            margin: 1rem 0;
+            padding: .8rem 1.2rem;
+            border-left: 5px solid #667eea;
+            background: linear-gradient(to right, rgba(102, 126, 234, 0.1), transparent);
+            border-radius: 0 .5rem .5rem 0;
+        }
+
+        .content ul, .content ol {
+            padding-left: 1.5rem;
+            margin: .8rem 0;
+        }
+
+        .content li {
+            margin: .4rem 0;
+        }
+
+        .content hr {
+            border: 0;
+            height: 2px;
+            background: linear-gradient(to right, transparent, #667eea, transparent);
+            margin: 2rem 0;
+        }
+
+        .content img {
+            max-width: 100%;
+            border-radius: .5rem;
+            border: 2px solid #e0e0e0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .content a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .content a:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+
+        /* === PÁGINAS A4 === */
+        .a4-surface {
+            background: #e8eaf6;
+            padding: 1.5rem;
+            border-radius: 1rem;
+        }
+
+        .pages {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .page {
+            width: 210mm;
+            height: 297mm;
+            background: white;
+            color: #111827;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+            border-radius: .5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-inner {
+            box-sizing: border-box;
+            padding: 18mm 18mm 25mm 18mm;
+            width: 100%;
+            height: calc(297mm - 18mm);
+            overflow: visible;
+        }
+
+        .page-inner .mjx-container {
+            color: #111827;
+        }
+
+        .page-inner h1, .page-inner h2, .page-inner table, .page-inner pre {
+            break-inside: avoid;
+            page-break-inside: avoid;
+        }
+
+        /* === PRINT === */
+        @media print {
+            @page { size: A4; margin: 0; }
+            body { background: white; margin: 0; }
+            .app { margin: 0; border-radius: 0; box-shadow: none; }
+            header, .pane:first-child { display: none !important; }
+            main { padding: 0; }
+            .preview { padding: 0; }
+            .a4-surface { padding: 0; background: white; }
+            .page { box-shadow: none; border-radius: 0; page-break-after: always; }
+            .page:last-child { page-break-after: auto; }
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <header>
+            <div class="brand">✨ Copilot Fusion Editor</div>
+            <div class="toolbar">
+                <button data-action="bold" title="Negrito (Ctrl+B)">B</button>
+                <button data-action="italic" title="Itálico (Ctrl+I)">I</button>
+                <button data-action="code" title="Código (Ctrl+`)">⌘</button>
+                <span style="width:1px;height:20px;background:rgba(255,255,255,0.3);"></span>
+                <button data-action="h1">H1</button>
+                <button data-action="h2">H2</button>
+                <button data-action="h3">H3</button>
+                <span style="width:1px;height:20px;background:rgba(255,255,255,0.3);"></span>
+                <button data-action="ul">• Lista</button>
+                <button data-action="ol">1. Lista</button>
+                <button data-action="task">☑ Task</button>
+                <span style="width:1px;height:20px;background:rgba(255,255,255,0.3);"></span>
+                <button data-action="quote">❝ Quote</button>
+                <button data-action="hr">—</button>
+                <button data-action="link">🔗 Link</button>
+                <button data-action="image">🖼 Img</button>
+                <span style="width:1px;height:20px;background:rgba(255,255,255,0.3);"></span>
+                <button data-action="fence">{ } Code</button>
+                <button data-action="table">📊 Tabela</button>
+                <button data-action="latex">∑ LaTeX</button>
+            </div>
+            <div class="grow"></div>
+            <div class="toggles">
+                <label><input type="checkbox" id="autoRender" checked> Auto-render</label>
+                <button id="exportPDF">💾 PDF</button>
+                <button id="exportHTML">📄 HTML</button>
+            </div>
+        </header>
+
+        <main>
+            <div class="pane left-pane">
+                <h3>📝 Editor Markdown</h3>
+                <textarea id="editor" placeholder="Digite seu Markdown aqui...
+
+# Título
+## Subtítulo
+
+**Negrito** e *itálico*
+
+- Lista
+- Itens
+
+| Coluna A | Coluna B |
+|:---|---:|
+| Esquerda | Direita |
+
+$$
+E = mc^2
+$$
+
+Código inline: `const x = 42;`"></textarea>
+                <div class="status">
+                    <span id="cursorInfo">Lin 1, Col 1</span>
+                    <span id="countInfo">0 caracteres</span>
+                </div>
+            </div>
+
+            <div class="pane">
+                <h3>👁 Preview Paginado (A4)</h3>
+                <div class="preview">
+                    <div class="a4-surface">
+                        <div class="pages" id="pages"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // === UTILIDADES ===
+        function $(s) { return document.querySelector(s); }
+        
+        const editor = $('#editor');
+        const pages = $('#pages');
+        const autoRender = $('#autoRender');
+        
+        const STORAGE_KEY = 'fusion-editor-v1';
+        
+        function debounce(fn, w) {
+            let t;
+            w = w || 300;
+            return function() {
+                const a = arguments;
+                clearTimeout(t);
+                t = setTimeout(() => fn.apply(null, a), w);
+            };
+        }
+        
+        function setCaretInfo() {
+            const val = editor.value;
+            const pos = editor.selectionStart || 0;
+            const before = val.slice(0, pos);
+            const lines = before.split('\n');
+            $('#cursorInfo').textContent = `Lin ${lines.length}, Col ${lines[lines.length-1].length + 1}`;
+        }
+        
+        function setCountInfo() {
+            $('#countInfo').textContent = editor.value.length + ' caracteres';
+        }
+        
+        function escapeHtml(s) {
+            return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+        
+        // === MARKDOWN PARSER ===
+        function mdToHtml(md) {
+            let html = '';
+            const lines = md.split('\n');
+            let i = 0;
+            const out = [];
+            
+            // Extrair blocos de código
+            const codeBlocks = [];
+            let codeId = 0;
+            md = md.replace(/``````/g, (m, lang, code) => {
+                const id = '@@CODE' + (codeId++) + '@@';
+                codeBlocks.push({ id, lang, code });
+                return id;
+            });
+            
+            // Extrair LaTeX display
+            const latexBlocks = [];
+            let latexId = 0;
+            md = md.replace(/\$\$([\s\S]*?)\$\$/g, (m, formula) => {
+                const id = '@@LATEX' + (latexId++) + '@@';
+                latexBlocks.push({ id, formula, display: true });
+                return id;
+            });
+            
+            // Extrair LaTeX inline
+            md = md.replace(/\$([^\$\n]+)\$/g, (m, formula) => {
+                const id = '@@LATEX' + (latexId++) + '@@';
+                latexBlocks.push({ id, formula, display: false });
+                return id;
+            });
+            
+            lines.forEach((line, idx) => {
+                // Cabeçalhos
+                if (/^#{1,6}\s/.test(line)) {
+                    const level = line.match(/^#+/)[0].length;
+                    const text = line.replace(/^#+\s*/, '');
+                    out.push(`<h${level}>${inline(text)}</h${level}>`);
+                }
+                // Tabelas
+                else if (/^\|/.test(line) && idx < lines.length - 1 && /^\|[-:\s|]+\|/.test(lines[idx + 1])) {
+                    const table = parseTable(lines, idx);
+                    out.push(table.html);
+                    // Skip lines que já foram processadas
+                    for (let j = idx + 1; j < table.endIdx; j++) {
+                        lines[j] = '';
+                    }
+                }
+                // Listas
+                else if (/^[-*+]\s/.test(line) || /^\d+\.\s/.test(line)) {
+                    // Será processado pelo parseList
+                }
+                // Quote
+                else if (/^>\s/.test(line)) {
+                    out.push(`<blockquote>${inline(line.replace(/^>\s*/, ''))}</blockquote>`);
+                }
+                // HR
+                else if (/^(---+|___+|\*\*\*+)$/.test(line.trim())) {
+                    out.push('<hr>');
+                }
+                // Parágrafo
+                else if (line.trim()) {
+                    out.push(`<p>${inline(line)}</p>`);
+                }
+            });
+            
+            html = out.join('\n');
+            
+            // Restaurar blocos de código
+            codeBlocks.forEach(block => {
+                const codeHtml = `<pre><code class="language-${block.lang}">${escapeHtml(block.code)}</code></pre>`;
+                html = html.replace(block.id, codeHtml);
+            });
+            
+            // Restaurar LaTeX
+            latexBlocks.forEach(block => {
+                let latexHtml;
+                try {
+                    if (window.katex) {
+                        latexHtml = katex.renderToString(block.formula, {
+                            displayMode: block.display,
+                            throwOnError: false
+                        });
+                    } else {
+                        latexHtml = block.display ? `$$${block.formula}$$` : `$${block.formula}$`;
+                    }
+                } catch(e) {
+                    latexHtml = block.display ? `$$${block.formula}$$` : `$${block.formula}$`;
+                }
+                html = html.replace(block.id, latexHtml);
+            });
+            
+            return html;
+        }
+        
+        function parseTable(lines, startIdx) {
+            let idx = startIdx;
+            const headerLine = lines[idx++];
+            const separatorLine = lines[idx++];
+            
+            const headers = headerLine.split('|').filter(h => h.trim()).map(h => h.trim());
+            const aligns = separatorLine.split('|').filter(a => a.trim()).map(a => {
+                a = a.trim();
+                if (a.startsWith(':') && a.endsWith(':')) return 'center';
+                if (a.endsWith(':')) return 'right';
+                return 'left';
+            });
+            
+            let tableHtml = '<table><thead><tr>';
+            headers.forEach((h, i) => {
+                tableHtml += `<th align="${aligns[i] || 'left'}">${inline(h)}</th>`;
+            });
+            tableHtml += '</tr></thead><tbody>';
+            
+            while (idx < lines.length && /^\|/.test(lines[idx])) {
+                const cells = lines[idx].split('|').filter(c => c.trim()).map(c => c.trim());
+                tableHtml += '<tr>';
+                cells.forEach((c, i) => {
+                    tableHtml += `<td align="${aligns[i] || 'left'}">${inline(c)}</td>`;
+                });
+                tableHtml += '</tr>';
+                idx++;
+            }
+            
+            tableHtml += '</tbody></table>';
+            
+            return { html: tableHtml, endIdx: idx };
+        }
+        
+        function inline(t) {
+            t = String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            
+            // Imagens
+            t = t.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (m, alt, src) => {
+                return `<img src="${src}" alt="${alt}">`;
+            });
+            
+            // Links
+            t = t.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (m, txt, href) => {
+                return `<a href="${href}">${txt}</a>`;
+            });
+            
+            // Bold+Italic
+            t = t.replace(/\*\*\*([^*]+)\*\*\*/g, '<strong><em>$1</em></strong>');
+            t = t.replace(/___([^_]+)___/g, '<strong><em>$1</em></strong>');
+            
+            // Bold
+            t = t.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+            t = t.replace(/__([^_]+)__/g, '<strong>$1</strong>');
+            
+            // Italic
+            t = t.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+            t = t.replace(/_([^_]+)_/g, '<em>$1</em>');
+            
+            // Code inline
+            t = t.replace(/`([^`]+)`/g, '<code>$1</code>');
+            
+            // Line break
+            t = t.replace(/  \n/g, '<br>');
+            
+            return t;
+        }
+        
+        // === RENDER + PAGINAÇÃO ===
+        const render = debounce(() => {
+            try {
+                localStorage.setItem(STORAGE_KEY, editor.value);
+                const html = mdToHtml(editor.value || '');
+                paginateToA4(html);
+                
+                if (autoRender.checked && window.katex) {
+                    setTimeout(() => {
+                        renderMathInElement(pages, {
+                            delimiters: [
+                                {left: "$$", right: "$$", display: true},
+                                {left: "$", right: "$", display: false}
+                            ]
+                        });
+                    }, 100);
+                }
+                
+                setCountInfo();
+            } catch(e) {
+                console.error('Erro no render:', e);
+            }
+        }, 300);
+        
+        function paginateToA4(html) {
+            pages.innerHTML = '';
+            
+            const flow = document.createElement('div');
+            flow.className = 'content';
+            flow.style.visibility = 'hidden';
+            flow.style.position = 'absolute';
+            flow.innerHTML = html;
+            document.body.appendChild(flow);
+            
+            let current = createPage();
+            pages.appendChild(current.wrap);
+            
+            const LIMIT = () => current.inner.clientHeight;
+            
+            while (flow.firstChild) {
+                const node = flow.firstChild;
+                
+                if (/^(H1|H2)$/.test(node.nodeName) && current.inner.childNodes.length) {
+                    current = createPage();
+                    pages.appendChild(current.wrap);
+                }
+                
+                current.inner.appendChild(node);
+                
+                if (current.inner.scrollHeight > LIMIT()) {
+                    current.inner.removeChild(node);
+                    current = createPage();
+                    pages.appendChild(current.wrap);
+                    current.inner.appendChild(node);
+                }
+            }
+            
+            flow.remove();
+        }
+        
+        function createPage() {
+            const wrap = document.createElement('div');
+            wrap.className = 'page';
+            const inner = document.createElement('article');
+            inner.className = 'page-inner content';
+            wrap.appendChild(inner);
+            return { wrap, inner };
+        }
+        
+        // === INSERÇÕES ===
+        function wrapSelection(prefix, suffix, placeholder) {
+            suffix = (typeof suffix === 'string') ? suffix : prefix;
+            placeholder = placeholder || '';
+            
+            const start = editor.selectionStart;
+            const end = editor.selectionEnd;
+            const sel = editor.value.slice(start, end);
+            const content = sel || placeholder;
+            const before = editor.value.slice(0, start);
+            const after = editor.value.slice(end);
+            
+            editor.value = before + prefix + content + suffix + after;
+            const head = (before + prefix + content).length;
+            editor.focus();
+            editor.setSelectionRange(head, head);
+            render();
+        }
+        
+        function insertFenceBlock() {
+            const BT = '```
+            const start = editor.selectionStart;
+            const end = editor.selectionEnd;
+            const sel = editor.value.slice(start, end);
+            const body = sel ? sel.replace(/\n?$/, '\n') : 'código aqui\n';
+            const block = BT + 'javascript\n' + body + BT + '\n';
+            const before = editor.value.slice(0, start);
+            const after = editor.value.slice(end);
+            
+            editor.value = before + block + after;
+            const caretPos = before.length + BT.length + 11;
+            editor.focus();
+            editor.setSelectionRange(caretPos, caretPos);
+            render();
+        }
+        
+        function insertLine(prefix, placeholder) {
+            placeholder = placeholder || '';
+            const start = editor.selectionStart;
+            const lineStart = editor.value.lastIndexOf('\n', start - 1) + 1;
+            const before = editor.value.slice(0, lineStart);
+            const after = editor.value.slice(lineStart);
+            
+            editor.value = before + prefix + placeholder + after;
+            editor.focus();
+            editor.setSelectionRange(lineStart + prefix.length, lineStart + prefix.length);
+            render();
+        }
+        
+        function insertLatexBlock() {
+            const latex = '$$\n\\\\frac{a^2 + b^2}{c^2} = 1\n$$\n';
+            const start = editor.selectionStart;
+            const before = editor.value.slice(0, start);
+            const after = editor.value.slice(start);
+            
+            editor.value = before + latex + after;
+            editor.focus();
+            editor.setSelectionRange(before.length + 3, before.length + latex.length - 4);
+            render();
+        }
+        
+        function insertTable() {
+            const table = '\n| Coluna A | Coluna B | Coluna C |\n|:---|:---:|---:|\n| Esquerda | Centro | Direita |\n| A1 | B1 | C1 |\n';
+            const start = editor.selectionStart;
+            const before = editor.value.slice(0, start);
+            const after = editor.value.slice(start);
+            
+            editor.value = before + table + after;
+            editor.focus();
+            render();
+        }
+        
+        // === BOTÕES ===
+        document.querySelectorAll('button[data-action]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const action = btn.dataset.action;
+                switch(action) {
+                    case 'bold': wrapSelection('**', '**', 'texto'); break;
+                    case 'italic': wrapSelection('*', '*', 'texto'); break;
+                    case 'code': wrapSelection('`', '`', 'codigo'); break;
+                    case 'h1': insertLine('# '); break;
+                    case 'h2': insertLine('## '); break;
+                    case 'h3': insertLine('### '); break;
+                    case 'ul': insertLine('- '); break;
+                    case 'ol': insertLine('1. '); break;
+                    case 'task': insertLine('- [ ] '); break;
+                    case 'quote': insertLine('> '); break;
+                    case 'hr': insertLine('\n---\n'); break;
+                    case 'link': wrapSelection('[', '](url)', 'texto'); break;
+                    case 'image': wrapSelection('', 'alt'); break;
+                    case 'fence': insertFenceBlock(); break;
+                    case 'table': insertTable(); break;
+                    case 'latex': insertLatexBlock(); break;
+                }
+            });
+        });
+        
+        // === ATALHOS ===
+        editor.addEventListener('keydown', e => {
+            if (e.ctrlKey && e.key.toLowerCase() === 'b') {
+                e.preventDefault();
+                wrapSelection('**', '**', 'texto');
+            } else if (e.ctrlKey && e.key.toLowerCase() === 'i') {
+                e.preventDefault();
+                wrapSelection('*', '*', 'texto');
+            } else if (e.ctrlKey && e.key === '`') {
+                e.preventDefault();
+                wrapSelection('`', '`', 'codigo');
+            }
+        });
+        
+        // === EXPORTAÇÕES ===
+        $('#exportPDF').addEventListener('click', () => window.print());
+        
+        $('#exportHTML').addEventListener('click', () => {
+            const html = `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Documento Exportado</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <style>${document.querySelector('style').textContent}</style>
+</head>
+<body>
+    <div class="content">${pages.innerHTML}</div>
+</body>
+</html>`;
+            
+            const blob = new Blob([html], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'documento.html';
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+        
+        // === EVENTOS ===
+        editor.addEventListener('input', () => {
+            setCaretInfo();
+            render();
+        });
+        
+        editor.addEventListener('click', setCaretInfo);
+        editor.addEventListener('keyup', setCaretInfo);
+        
+        autoRender.addEventListener('change', render);
+        
+        // === DRAG & DROP IMAGEM ===
+        editor.addEventListener('dragover', e => e.preventDefault());
+        editor.addEventListener('drop', e => {
+            e.preventDefault();
+            const files = Array.from(e.dataTransfer.files || []);
+            const img = files.find(f => /^image\//.test(f.type));
+            
+            if (!img) return;
+            
+            const fr = new FileReader();
+            fr.onload = () => {
+                const dataUrl = fr.result;
+                const name = (img.name || 'imagem').replace(/\.[^.]+$/, '');
+                const start = editor.selectionStart;
+                const before = editor.value.slice(0, start);
+                const after = editor.value.slice(start);
+                
+                editor.value = before + `` + after;
+                editor.focus();
+                render();
+            };
+            fr.readAsDataURL(img);
+        });
+        
+        // === INICIALIZAÇÃO ===
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+            editor.value = saved;
+        }
+        
+        render();
+        setCaretInfo();
+    </script>
+</body>
+</html>

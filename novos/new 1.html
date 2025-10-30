@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Visualizador Markdown A4</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #ccc;
+    }
+    .page {
+      width: 21cm;
+      height: 29.7cm;
+      margin: 1cm auto;
+      background: white;
+      padding: 2cm;
+      box-sizing: border-box;
+      page-break-after: always;
+      overflow: hidden;
+    }
+    h1, h2 {
+      page-break-before: always;
+    }
+    pre {
+      background: #f4f4f4;
+      padding: 1em;
+      overflow-x: auto;
+    }
+    code {
+      background: #eee;
+      padding: 0.2em 0.4em;
+      border-radius: 4px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1em 0;
+    }
+    th, td {
+      border: 1px solid #999;
+      padding: 0.5em;
+      text-align: left;
+    }
+    .latex {
+      font-family: 'Times New Roman', serif;
+      background: #f9f9f9;
+      padding: 0.5em;
+      margin: 1em 0;
+      border-left: 4px solid #0077cc;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="page">
+    <h1>Introdução</h1>
+    <p>Este é um visualizador de Markdown com suporte a elementos avançados.</p>
+
+    <h2>Exemplo de Tabela</h2>
+    <table>
+      <tr><th>Nome</th><th>Idade</th></tr>
+      <tr><td>Ana</td><td>23</td></tr>
+      <tr><td>João</td><td>31</td></tr>
+    </table>
+
+    <h2>Exemplo de Código</h2>
+    <pre><code>function soma(a, b) {
+  return a + b;
+}</code></pre>
+
+    <h2>Exemplo de LaTeX Inline</h2>
+    <p>A fórmula da energia é <code>E = mc^2</code>.</p>
+
+    <h2>Exemplo de LaTeX em Bloco</h2>
+    <div class="latex">
+      $$\int_{a}^{b} f(x)\,dx = F(b) - F(a)$$
+    </div>
+  </div>
+
+  <div class="page">
+    <h1>Nova Página</h1>
+    <p>Conteúdo adicional que começa em uma nova página.</p>
+  </div>
+
+</body>
+</html>

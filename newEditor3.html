@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Copilot Editor Fusion - Ultimate Edition</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    
+    <style>
+        /* ===== RESET GLOBAL ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* ===== VARIÁVEIS DE CORES ===== */
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --bg-main: #0f172a;
+            --bg-panel: #1e293b;
+            --text: #e2e8f0;
+            --text-muted: #94a3b8;
+            --border: #334155;
+        }
+
+        /* ===== ELEMENTOS RAIZ ===== */
+        html, body {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: var(--text);
+        }
+
+        /* ===== CONTAINER PRINCIPAL ===== */
+        .app {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background: var(--bg-main);
+            margin: 10px;
+            border-radius: 16px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+        }
+
+        /* ===== HEADER ===== */
+        header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            padding: 12px 16px;
+            background: var(--bg-panel);
+            border-bottom: 2px solid var(--border);
+            z-index: 100;
+        }
+
+        .brand {
+            font-size: 1.3rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-right: 12px;
+        }
+
+        /* ===== TOOLBAR ===== */
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        button {
+            background: var(--bg-main);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 8px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+        }
+
+        button:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+            transform: translateY(-1px);
+        }
+
+        .divider {
+            width: 1px;
+            height: 24px;
+            background: var(--border);
+        }
+
+        .grow {
+            flex: 1;
+        }
+
+        /* ===== TOGGLES ===== */
+        .toggles {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .toggles label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        input[type="checkbox"] {
+            cursor: pointer;
+            width: 18px;
+            height: 18px;
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        main {
+            flex: 1;
+            display: flex;
+            gap: 12px;
+            padding: 12px;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        .pane {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .pane h3 {
+            margin: 0;
+            padding: 12px 16px;
+            background: var(--bg-main);
+            color: var(--primary);
+            font-size: 0.95rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            border-bottom: 2px solid var(--border);
+        }
+
+        /* ===== EDITOR TEXTAREA ===== */
+        #editor {
+            flex: 1;
+            resize: none;
+            padding: 16px;
+            border: 0;
+            outline: 0;
+            background: var(--bg-main);
+            color: var(--text);
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            tab-size: 2;
+        }
+
+        .status {
+            display: flex;
+            gap: 16px;
+            padding: 8px 16px;
+            background: var(--bg-main);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-weight: 500;
+            border-top: 1px solid var(--border);
+        }
+
+        /* ===== PREVIEW ===== */
+        .preview {
+            flex: 1;
+            overflow: auto;
+            padding: 16px;
+            background: var(--bg-main);
+        }
+
+        .a4-surface {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            align-items: center;
+            padding-bottom: 24px;
+        }
+
+        /* ===== PÁGINAS A4 ===== */
+        .page {
+            width: 210mm;
+            height: 297mm;
+            background: #ffffff;
+            color: #1f2937;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .page-inner {
+            padding: 20mm;
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        /* ===== CONTEÚDO - HEADINGS ===== */
+        .content h1,
+        .content h2,
+        .content h3,
+        .content h4,
+        .content h5,
+        .content h6 {
+            margin: 1.5em 0 0.8em;
+            line-height: 1.3;
+            font-weight: 700;
+            break-after: avoid;
+        }
+
+        .content h1:first-child,
+        .content h2:first-child {
+            margin-top: 0;
+        }
+
+        .content h1 {
+            font-size: 2.2rem;
+            color: #667eea;
+            border-bottom: 4px solid #667eea;
+            padding-bottom: 12px;
+        }
+
+        .content h2 {
+            font-size: 1.8rem;
+            color: #764ba2;
+            border-bottom: 3px solid #764ba2;
+            padding-bottom: 10px;
+        }
+
+        .content h3 {
+            font-size: 1.5rem;
+            color: #667eea;
+        }
+
+        .content h4 {
+            font-size: 1.3rem;
+            color: #374151;
+        }
+
+        .content h5 {
+            font-size: 1.1rem;
+        }
+
+        .content h6 {
+            font-size: 1rem;
+        }
+
+        /* ===== CONTEÚDO - PARÁGRAFO ===== */
+        .content p {
+            margin: 1em 0;
+            line-height: 1.8;
+            color: #374151;
+        }
+
+        /* ===== CONTEÚDO - CÓDIGO ===== */
+        .content code {
+            background: #e0e7ff;
+            color: #4338ca;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            font-weight: 600;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+
+        .content pre {
+            background: #0f172a;
+            color: #e2e8f0;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            margin: 2rem 0;
+            break-inside: avoid;
+        }
+
+        .content pre code {
+            background: transparent;
+            color: inherit;
+            padding: 0;
+        }
+
+        /* ===== CONTEÚDO - TABELAS ===== */
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+            break-inside: avoid;
+        }
+
+        .content table thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .content table th {
+            padding: 16px;
+            text-align: left;
+            font-weight: 700;
+            font-size: 0.95em;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            white-space: normal;
+            word-wrap: break-word;
+            word-break: break-word;
+        }
+
+        .content table td {
+            border: 1px solid #e5e7eb;
+            padding: 14px 16px;
+            background: white;
+            white-space: normal;
+            word-wrap: break-word;
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .content table tbody tr:nth-child(even) td {
+            background-color: #f9fafb;
+        }
+
+        .content table tbody tr:hover td {
+            background-color: #e0e7ff;
+        }
+
+        /* ===== CONTEÚDO - BLOCKQUOTE ===== */
+        .content blockquote {
+            margin: 1.5rem 0;
+            padding: 12px 20px;
+            border-left: 5px solid #667eea;
+            background: linear-gradient(to right, rgba(102, 126, 234, 0.1), transparent);
+            border-radius: 0 8px 8px 0;
+            font-style: italic;
+            color: #4b5563;
+        }
+
+        /* ===== CONTEÚDO - LISTAS ===== */
+        .content ul,
+        .content ol {
+            padding-left: 2rem;
+            margin: 1rem 0;
+        }
+
+        .content li {
+            margin: 0.5rem 0;
+            line-height: 1.7;
+        }
+
+        /* ===== CONTEÚDO - HR ===== */
+        .content hr {
+            border: 0;
+            height: 2px;
+            background: linear-gradient(to right, transparent, #667eea, transparent);
+            margin: 2.5rem 0;
+        }
+
+        /* ===== CONTEÚDO - LINKS ===== */
+        .content a {
+            color: #667eea;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .content a:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+
+        /* ===== CONTEÚDO - IMAGENS ===== */
+        .content img {
+            max-width: 100%;
+            border-radius: 8px;
+            border: 2px solid #e5e7eb;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        /* ===== CONTEÚDO - KATEX ===== */
+        .content .katex {
+            font-size: 1.1em;
+        }
+
+        .content .katex-display {
+            margin: 1.5rem 0;
+        }
+
+        /* ===== RESPONSIVIDADE ===== */
+        @media (max-width: 1400px) {
+            .page {
+                width: 180mm;
+                transform: scale(0.95);
+            }
+        }
+
+        @media (max-width: 1200px) {
+            main {
+                flex-direction: column;
+            }
+
+            .pane {
+                min-height: 300px;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .page {
+                width: 160mm;
+                transform: scale(0.85);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .app {
+                margin: 5px;
+            }
+
+            .page {
+                width: 95vw;
+                transform: scale(0.7);
+            }
+        }
+
+        /* ===== PRINT ===== */
+        @media print {
+            @page {
+                size: A4;
+                margin: 0;
+            }
+
+            body {
+                background: white;
+                margin: 0;
+            }
+
+            .app {
+                margin: 0;
+                box-shadow: none;
+            }
+
+            header, .pane:first-child {
+                display: none !important;
+            }
+
+            main {
+                padding: 0;
+            }
+
+            .preview {
+                padding: 0;
+                background: white;
+            }
+
+            .page {
+                box-shadow: none;
+                page-break-after: always;
+            }
+        }
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-main);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <!-- HEADER -->
+        <header>
+            <div class="brand">✨ Copilot Fusion Ultimate</div>
+            <div class="toolbar">
+                <button onclick="wrap('**')">B</button>
+                <button onclick="wrap('*')">I</button>
+                <button onclick="wrap('`')">⌘</button>
+                <span class="divider"></span>
+                <button onclick="insertLine('# ')">H1</button>
+                <button onclick="insertLine('## ')">H2</button>
+                <button onclick="insertLine('### ')">H3</button>
+                <span class="divider"></span>
+                <button onclick="insertLine('- ')">• Lista</button>
+                <button onclick="insertLine('1. ')">1. Lista</button>
+                <span class="divider"></span>
+                <button onclick="insertLine('> ')">❝ Quote</button>
+                <button onclick="insertTable()">📊 Tabela</button>
+                <button onclick="insertLatex()">∑ LaTeX</button>
+                <button onclick="insertCode()">{ } Code</button>
+            </div>
+            <div class="grow"></div>
+            <div class="toggles">
+                <label>
+                    <input type="checkbox" id="autoRender" checked>
+                    Auto-render
+                </label>
+                <button onclick="window.print()">💾 PDF</button>
+                <button onclick="exportHTML()">📄 HTML</button>
+            </div>
+        </header>
+
+        <!-- MAIN CONTENT -->
+        <main>
+            <!-- EDITOR PANE -->
+            <div class="pane">
+                <h3>📝 Editor Markdown</h3>
+                <textarea id="editor"></textarea>
+                <div class="status">
+                    <span id="cursorInfo">Lin 1, Col 1</span>
+                    <span id="countInfo">0 caracteres</span>
+                </div>
+            </div>
+
+            <!-- PREVIEW PANE -->
+            <div class="pane">
+                <h3>👁 Preview Paginado (A4)</h3>
+                <div class="preview">
+                    <div class="a4-surface" id="pages"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        /* ===== SELETORES E CONSTANTES ===== */
+        const editor = document.getElementById('editor');
+        const pages = document.getElementById('pages');
+        const cursorInfo = document.getElementById('cursorInfo');
+        const countInfo = document.getElementById('countInfo');
+        const STORAGE_KEY = 'fusion-ultimate-final-v1';
+
+        /* ===== FUNÇÕES UTILITÁRIAS ===== */
+        
+        /**
+         * Debounce - aguarda X ms antes de executar função
+         */
+        function debounce(fn, delay) {
+            let timeout;
+            return function(...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => fn.apply(this, args), delay);
+            };
+        }
+
+        /**
+         * Atualiza informações do cursor
+         */
+        function updateCursor() {
+            const pos = editor.selectionStart;
+            const text = editor.value.substring(0, pos);
+            const lines = text.split('\n');
+            cursorInfo.textContent = `Lin ${lines.length}, Col ${lines[lines.length - 1].length + 1}`;
+        }
+
+        /**
+         * Atualiza contagem de caracteres
+         */
+        function updateCount() {
+            countInfo.textContent = `${editor.value.length} caracteres`;
+        }
+
+        /**
+         * Escapa caracteres HTML
+         */
+        function escapeHtml(text) {
+            return String(text)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        }
+
+        /* ===== FUNÇÕES LATEX ===== */
+
+        /**
+         * Renderiza LaTeX inline
+         */
+        function renderLatexInline(formula) {
+            try {
+                if (window.katex) {
+                    return katex.renderToString(formula, {
+                        displayMode: false,
+                        throwOnError: false
+                    });
+                }
+            } catch(e) {
+                console.error('LaTeX inline error:', e);
+            }
+            return `$${formula}$`;
+        }
+
+        /**
+         * Renderiza LaTeX display
+         */
+        function renderLatexDisplay(formula) {
+            try {
+                if (window.katex) {
+                    return `<div class="katex-display">${katex.renderToString(formula, {
+                        displayMode: true,
+                        throwOnError: false
+                    })}</div>`;
+                }
+            } catch(e) {
+                console.error('LaTeX display error:', e);
+            }
+            return `<div class="katex-display">$$${formula}$$</div>`;
+        }
+
+        /* ===== FUNÇÕES DE PARSING ===== */
+
+        /**
+         * Parse inline simples (bold, italic, links)
+         */
+        function parseInlineSimple(text) {
+            // Imagens
+            text = text.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, 
+                '<img src="$2" alt="$1" style="max-width:100%;border-radius:8px;">');
+            
+            // Links
+            text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
+            
+            // Bold
+            text = text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+            
+            // Italic
+            text = text.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+            
+            return text;
+        }
+
+        /**
+         * Converte Markdown para HTML
+         */
+        function mdToHtml(md) {
+            if (!md || !md.trim()) return '<p>Digite algo...</p>';
+            
+            let html = md;
+            
+            // 1. Proteger blocos de código
+            const codeBlocks = [];
+            html = html.replace(/``````/gm, (m, code) => {
+                const id = `§CODE${codeBlocks.length}§`;
+                codeBlocks.push(`<pre><code>${escapeHtml(code.trim())}</code></pre>`);
+                return '\n' + id + '\n';
+            });
+            
+            // 2. Proteger código inline
+            const inlineCodes = [];
+            html = html.replace(/`([^`]+)`/g, (m, code) => {
+                const id = `§INLINE${inlineCodes.length}§`;
+                inlineCodes.push(`<code>${escapeHtml(code)}</code>`);
+                return `§INLINEKEY${id}§`;
+            });
+            
+            // 3. Proteger LaTeX display
+            const latexDisplays = [];
+            html = html.replace(/\$\$([\s\S]*?)\$\$/g, (m, formula) => {
+                const id = `§LATEX${latexDisplays.length}§`;
+                latexDisplays.push(renderLatexDisplay(formula.trim()));
+                return '\n' + id + '\n';
+            });
+            
+            // 4. Proteger LaTeX inline
+            const latexInlines = [];
+            html = html.replace(/\$([^\$\n]+)\$/g, (m, formula) => {
+                const id = `§LATEXINLINE${latexInlines.length}§`;
+                latexInlines.push(renderLatexInline(formula.trim()));
+                return `§LATEXKEY${id}§`;
+            });
+            
+            // 5. Escapar < e >
+            html = html.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            
+            // 6. Processar markdown linha por linha
+            const lines = html.split('\n');
+            const output = [];
+            let i = 0;
+            
+            while (i < lines.length) {
+                const trimmed = lines[i].trim();
+                
+                if (!trimmed) {
+                    i++;
+                    continue;
+                }
+                
+                // Preservar placeholders
+                if (trimmed.startsWith('§CODE') || trimmed.startsWith('§LATEX')) {
+                    output.push(trimmed);
+                    i++;
+                    continue;
+                }
+                
+                // Tabelas
+                if (trimmed.startsWith('|') && i + 1 < lines.length && lines[i + 1].includes('---')) {
+                    const tableResult = parseTable(lines, i);
+                    output.push(tableResult.html);
+                    i = tableResult.nextIdx;
+                    continue;
+                }
+                
+                // Headings
+                const hMatch = trimmed.match(/^(#{1,6})\s+(.+)$/);
+                if (hMatch) {
+                    const level = hMatch[1].length;
+                    const text = hMatch[2];
+                    output.push(`<h${level}>${parseInlineSimple(text)}</h${level}>`);
+                    i++;
+                    continue;
+                }
+                
+                // Listas não ordenadas
+                if (trimmed.match(/^[-*+]\s/)) {
+                    const items = [];
+                    while (i < lines.length && lines[i].trim().match(/^[-*+]\s/)) {
+                        const text = lines[i].trim().replace(/^[-*+]\s/, '');
+                        items.push(`<li>${parseInlineSimple(text)}</li>`);
+                        i++;
+                    }
+                    output.push(`<ul>${items.join('')}</ul>`);
+                    continue;
+                }
+                
+                // Listas ordenadas
+                if (trimmed.match(/^\d+\.\s/)) {
+                    const items = [];
+                    while (i < lines.length && lines[i].trim().match(/^\d+\.\s/)) {
+                        const text = lines[i].trim().replace(/^\d+\.\s/, '');
+                        items.push(`<li>${parseInlineSimple(text)}</li>`);
+                        i++;
+                    }
+                    output.push(`<ol>${items.join('')}</ol>`);
+                    continue;
+                }
+                
+                // Blockquotes
+                if (trimmed.startsWith('&gt; ')) {
+                    const text = trimmed.replace(/^&gt;\s*/, '');
+                    output.push(`<blockquote>${parseInlineSimple(text)}</blockquote>`);
+                    i++;
+                    continue;
+                }
+                
+                // Horizontal rule
+                if (trimmed.match(/^(---|___|\*\*\*)$/)) {
+                    output.push('<hr>');
+                    i++;
+                    continue;
+                }
+                
+                // Parágrafo
+                output.push(`<p>${parseInlineSimple(trimmed)}</p>`);
+                i++;
+            }
+            
+            html = output.join('\n');
+            
+            // 7. Restaurar conteúdo protegido
+            latexDisplays.forEach((r, idx) => html = html.replace(`§LATEX${idx}§`, r));
+            latexInlines.forEach((r, idx) => html = html.replace(`§LATEXKEY§LATEXINLINE${idx}§§`, r));
+            inlineCodes.forEach((c, idx) => html = html.replace(`§INLINEKEY§INLINE${idx}§§`, c));
+            codeBlocks.forEach((b, idx) => html = html.replace(`§CODE${idx}§`, b));
+            
+            return html;
+        }
+
+        /**
+         * Parse de tabelas Markdown
+         */
+        function parseTable(lines, startIdx) {
+            let idx = startIdx;
+            const headers = lines[idx++].split('|').filter(h => h.trim()).map(h => h.trim());
+            const aligns = lines[idx++].split('|').filter(a => a.trim()).map(a => {
+                a = a.trim();
+                if (a.startsWith(':') && a.endsWith(':')) return 'center';
+                if (a.endsWith(':')) return 'right';
+                return 'left';
+            });
+            
+            let html = '<table><thead><tr>';
+            headers.forEach((h, i) => {
+                html += `<th align="${aligns[i] || 'left'}" style="white-space: normal;">${parseInlineSimple(h)}</th>`;
+            });
+            html += '</tr></thead><tbody>';
+            
+            while (idx < lines.length && lines[idx].trim().startsWith('|')) {
+                const cells = lines[idx].split('|').filter(c => c.trim()).map(c => c.trim());
+                html += '<tr>';
+                cells.forEach((c, i) => {
+                    html += `<td align="${aligns[i] || 'left'}" style="white-space: normal;">${parseInlineSimple(c)}</td>`;
+                });
+                html += '</tr>';
+                idx++;
+            }
+            
+            html += '</tbody></table>';
+            return { html, nextIdx: idx };
+        }
+
+        /* ===== FUNÇÕES DE PAGINAÇÃO ===== */
+
+        /**
+         * Cria uma nova página A4
+         */
+        function createPage() {
+            const page = document.createElement('div');
+            page.className = 'page';
+            const inner = document.createElement('div');
+            inner.className = 'page-inner content';
+            page.appendChild(inner);
+            return { page, inner };
+        }
+
+        /**
+         * Pagina conteúdo em páginas A4
+         */
+        function paginateContent(html) {
+            const temp = document.createElement('div');
+            temp.className = 'content';
+            temp.style.cssText = 'visibility:hidden;position:absolute;width:170mm;left:-9999px';
+            temp.innerHTML = html;
+            document.body.appendChild(temp);
+            
+            const elements = Array.from(temp.children);
+            pages.innerHTML = '';
+            
+            if (!elements.length) {
+                temp.remove();
+                return;
+            }
+            
+            let { page, inner } = createPage();
+            pages.appendChild(page);
+            
+            for (let i = 0; i < elements.length; i++) {
+                const el = elements[i];
+                const tag = el.tagName;
+                
+                // H1/H2 iniciam nova página
+                if ((tag === 'H1' || tag === 'H2') && inner.children.length > 0) {
+                    const next = elements[i + 1];
+                    if (!(tag === 'H1' && next && next.tagName === 'H2')) {
+                        ({ page, inner } = createPage());
+                        pages.appendChild(page);
+                    }
+                }
+                
+                const clone = el.cloneNode(true);
+                inner.appendChild(clone);
+                void inner.offsetHeight;
+                
+                // Verificar overflow
+                if (inner.scrollHeight > inner.clientHeight) {
+                    inner.removeChild(clone);
+                    ({ page, inner } = createPage());
+                    pages.appendChild(page);
+                    inner.appendChild(clone.cloneNode(true));
+                }
+            }
+            
+            // Limpar páginas vazias
+            pages.querySelectorAll('.page').forEach(p => {
+                const content = p.querySelector('.page-inner');
+                if (!content || !content.children.length) {
+                    p.remove();
+                }
+            });
+            
+            temp.remove();
+        }
+
+        /* ===== FUNÇÕES DE EDIÇÃO ===== */
+
+        /**
+         * Renderização com debounce
+         */
+        const render = debounce(() => {
+            paginateContent(mdToHtml(editor.value));
+            updateCount();
+            localStorage.setItem(STORAGE_KEY, editor.value);
+        }, 200);
+
+        /**
+         * Envolve texto com delimitador
+         */
+        function wrap(delimiter) {
+            const start = editor.selectionStart;
+            const end = editor.selectionEnd;
+            const selected = editor.value.substring(start, end);
+            const before = editor.value.substring(0, start);
+            const after = editor.value.substring(end);
+            
+            editor.value = before + delimiter + (selected || 'texto') + delimiter + after;
+            editor.selectionStart = editor.selectionEnd = start + delimiter.length + (selected ? selected.length : 0);
+            editor.focus();
+            render();
+        }
+
+        /**
+         * Insere prefixo no início da linha
+         */
+        function insertLine(prefix) {
+            const pos = editor.selectionStart;
+            const before = editor.value.substring(0, pos);
+            const lastNL = before.lastIndexOf('\n');
+            const lineStart = lastNL === -1 ? 0 : lastNL + 1;
+            
+            editor.value = editor.value.substring(0, lineStart) + prefix + editor.value.substring(lineStart);
+            editor.selectionStart = editor.selectionEnd = lineStart + prefix.length;
+            editor.focus();
+            render();
+        }
+
+        /**
+         * Insere texto no cursor
+         */
+        function insertAtCursor(text) {
+            const pos = editor.selectionStart;
+            editor.value = editor.value.substring(0, pos) + text + editor.value.substring(pos);
+            editor.selectionStart = editor.selectionEnd = pos + text.length;
+            editor.focus();
+            render();
+        }
+
+        // Atalhos de inserção
+        function insertTable() {
+            insertAtCursor('\n| A | B | C |\n|:---|:---:|---:|\n| 1 | 2 | 3 |\n\n');
+        }
+
+        function insertLatex() {
+            insertAtCursor('\n$$\n\\frac{a^2+b^2}{c}=x\n$$\n\n');
+        }
+
+        function insertCode() {
+            insertAtCursor('\n``````\n\n');
+        }
+
+        /**
+         * Exporta para HTML
+         */
+        function exportHTML() {
+            const html = `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Documento Exportado</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+</head>
+<body style="padding:20px;font-family:Arial">
+    ${pages.innerHTML}
+</body>
+</html>`;
+            
+            const blob = new Blob([html], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'documento.html';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        /* ===== EVENT LISTENERS ===== */
+        
+        editor.addEventListener('input', () => {
+            updateCursor();
+            render();
+        });
+        
+        editor.addEventListener('click', updateCursor);
+        editor.addEventListener('keyup', updateCursor);
+        
+        editor.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'b') {
+                e.preventDefault();
+                wrap('**');
+            } else if (e.ctrlKey && e.key === 'i') {
+                e.preventDefault();
+                wrap('*');
+            }
+        });
+
+        /* ===== INICIALIZAÇÃO ===== */
+        
+        window.addEventListener('load', () => {
+            editor.value = localStorage.getItem(STORAGE_KEY) || `# Teste Completo
+
+## Tabela com LaTeX
+
+| Operação | Fórmula | Resultado |
+|----------|---------|-----------|
+| Adição | $a + b$ | $2 + 3 = 5$ |
+| Subtração | $a - b$ | $10 - 4 = 6$ |
+| Multiplicação | $a \\times b$ | $2 \\times 3 = 6$ |
+| Divisão | $\\frac{a}{b}$ | $\\frac{8}{2} = 4$ |
+
+## LaTeX Display
+
+$$
+\\frac{-b \\pm \\sqrt{b^2-4ac}}{2a}
+$$
+
+$$
+\\int_a^b x \\, dx
+$$
+
+Tudo 100% funcional! ✨
+`;
+            render();
+            updateCursor();
+            updateCount();
+        });
+    </script>
+</body>
+</html>

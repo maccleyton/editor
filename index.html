@@ -1,566 +1,478 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Editor Markdown</title>
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-	<script type="text/javascript">
-		window.MathJax = {
-		  tex: {
-			inlineMath: [['$', '$'], ['\\(', '\\)']],
-			displayMath: [['$$', '$$'], ['\\[', '\\]']]
-		  }
-		};
-	</script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <style>
-        :root {
-            --primary: #2b5b84;
-            --secondary: #6cbe45;
-            --dark: #1e1e2f;
-            --darker: #151523;
-            --light: #2a2a3e;
-            --text: #ffffff;
-            --accent: #ff6b00;
-        }
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, var(--dark) 0%, var(--darker) 100%);
-            color: var(--text);
-            min-height: 100vh;
-            padding: 20px;
-        }
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: var(--light);
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
-        }
-        .header {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--light) 100%);
-            padding: 25px;
-            text-align: center;
-            border-bottom: 3px solid var(--secondary);
-			position: relative;
-            overflow: hidden;
-        }
-        .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            background: linear-gradient(45deg, var(--secondary), #8dee6a);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-		.editor-icon {
-            position: absolute;
-            top: 20px;
-            right: 30px;
-            font-size: 4em;
-            opacity: 0.3;
-        }
-        .editor-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-			height: 75vh;
-			min-height: 400px;
-        }
-        @media (max-width: 968px) {
-            .editor-container {
-                grid-template-columns: 1fr;
-				height: auto;
-				min-height: 300px;
-            }
-        }
-        .editor-panel, .preview-panel {
-            padding: 0;
-            position: relative;
-			height: 100%;
-			min-height: 200px;
-			display: flex;
-			flex-direction: column;
-            overflow: hidden;
-        }
-        .panel-header {
-            background: var(--darker);
-            padding: 15px 20px;
-            border-bottom: 1px solid var(--primary);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-shrink: 0;
-        }
-        .panel-title {
-            font-weight: bold;
-            color: var(--secondary);
-        }
-        #markdownEditor {
-            width: 100%;
-			flex: 1 1 auto;
-			min-height: 0;
-            background: var(--darker);
-            border: none;
-            padding: 20px;
-            color: var(--text);
-            font-family: 'Fira Code', 'Courier New', monospace;
-            font-size: 14px;
-            line-height: 1.6;
-            resize: none;
-            outline: none;
-			overflow-y: auto;
-            overflow-x: hidden;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            word-break: normal;
-            tab-size: 4;
-        }
-        #markdownPreview {
-			flex: 1 1 auto;
-			min-height: 0;
-            padding: 20px;
-            background: var(--darker);
-            overflow-y: auto;
-            overflow-x: hidden;
-            line-height: 1.7;
-            max-width: 100%;
-            word-wrap: break-word;
-            word-break: normal;
-            overflow-wrap: break-word;
-        }
-        /* Estilização do Markdown Preview */
-        #markdownPreview h1, 
-        #markdownPreview h2, 
-        #markdownPreview h3,
-        #markdownPreview h4,
-        #markdownPreview h5,
-        #markdownPreview h6 {
-            color: var(--secondary);
-            margin: 20px 0 10px 0;
-            border-bottom: 2px solid var(--primary);
-            padding-bottom: 5px;
-            word-wrap: break-word;
-            overflow-wrap: break-word;
-            max-width: 100%;
-            word-break: normal;
-        }
-        #markdownPreview h1 { font-size: 2em; }
-        #markdownPreview h2 { font-size: 1.6em; }
-        #markdownPreview h3 { font-size: 1.3em; }
-        #markdownPreview p {
-            margin: 10px 0;
-            word-wrap: break-word;
-            overflow-wrap: break-word;
-            max-width: 100%;
-            word-break: normal;
-        }
-        #markdownPreview code {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-family: 'Fira Code', monospace;
-            color: #ff6b6b;
-            word-wrap: break-word;
-            white-space: pre-wrap;
-            max-width: 100%;
-            word-break: normal;
-        }
-        #markdownPreview pre {
-            background: #151523;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
-            border-left: 4px solid var(--accent);
-            word-wrap: break-word;
-            max-width: 100%;
-            overflow-x: hidden;
-            white-space: pre-wrap;
-            word-break: normal;
-        }
-        #markdownPreview pre code {
-            background: none;
-            padding: 0;
-            color: inherit;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            word-break: normal;
-            overflow-x: hidden;
-        }
-        #markdownPreview blockquote {
-            border-left: 4px solid var(--primary);
-            padding-left: 15px;
-            margin: 15px 0;
-            color: #cccccc;
-            background: rgba(43, 91, 132, 0.1);
-            padding: 10px 15px;
-            border-radius: 0 8px 8px 0;
-            word-wrap: break-word;
-            overflow-wrap: break-word;
-            max-width: 100%;
-            word-break: normal;
-        }
-        #markdownPreview table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 15px 0;
-            max-width: 100%;
-            word-wrap: break-word;
-            word-break: normal;
-        }
-        #markdownPreview th, 
-        #markdownPreview td {
-            padding: 10px;
-            border: 1px solid var(--primary);
-            text-align: left;
-            word-wrap: break-word;
-            max-width: 100%;
-            word-break: normal;
-        }
-        #markdownPreview th {
-            background: var(--primary);
-            color: white;
-        }
-        #markdownPreview ul, 
-        #markdownPreview ol {
-            margin: 10px 0 10px 20px;
-            max-width: 100%;
-        }
-        #markdownPreview li {
-            margin: 5px 0;
-            word-wrap: break-word;
-            overflow-wrap: break-word;
-            max-width: 100%;
-            word-break: normal;
-        }
-        .toolbar {
-            display: flex;
-            gap: 8px;
-            padding: 15px;
-            background: var(--darker);
-            border-bottom: 1px solid var(--primary);
-            flex-wrap: wrap;
-        }
-        .toolbar-btn {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 12px;
-            transition: all 0.3s ease;
-        }
-        .toolbar-btn:hover {
-            background: var(--secondary);
-            transform: translateY(-1px);
-        }
-        .file-controls {
-            display: flex;
-            gap: 10px;
-            padding: 15px;
-            background: var(--darker);
-            border-top: 1px solid var(--primary);
-            justify-content: center;
-        }
-        .file-btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
-        .btn-save {
-            background: var(--secondary);
-            color: white;
-        }
-        .btn-save:hover {
-            background: #7dce5a;
-        }
-        .btn-load {
-            background: var(--primary);
-            color: white;
-        }
-        .btn-load:hover {
-            background: #3a7bbf;
-        }
-        .btn-new {
-            background: var(--accent);
-            color: white;
-        }
-        .btn-new:hover {
-            background: #ff8c42;
-        }
-        .status-bar {
-            background: var(--darker);
-            padding: 8px 15px;
-            text-align: center;
-            font-size: 12px;
-            color: #cccccc;
-            border-top: 1px solid var(--primary);
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEXUS EDITOR — Repositório Universal</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>
+  window.MathJax = {
+    tex: { inlineMath:[['$','$'],['\\(','\\)']], displayMath:[['$$','$$'],['\\[','\\]']], processEscapes:true },
+    options: { skipHtmlTags:['script','noscript','style','textarea','pre'] },
+    startup: { typeset:false }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+<link rel="stylesheet" href="./style.css">
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-			<div class="editor-icon">📝</div>
-            <h1>EDITOR MARKDOWN</h1>
-            <p>Editor científico com suporte a LaTeX, código e exportação</p>
-        </div>
 
-        <div class="toolbar">
-            <button class="toolbar-btn" onclick="insertText('**', '**')">Negrito</button>
-            <button class="toolbar-btn" onclick="insertText('*', '*')">Itálico</button>
-            <button class="toolbar-btn" onclick="insertText('# ', '')">Título 1</button>
-            <button class="toolbar-btn" onclick="insertText('## ', '')">Título 2</button>
-            <button class="toolbar-btn" onclick="insertText('### ', '')">Título 3</button>
-            <button class="toolbar-btn" onclick="insertText('`', '`')">Código</button>
-            <button class="toolbar-btn" onclick="insertText('```\n', '\n```')">Bloco de Código</button>
-            <button class="toolbar-btn" onclick="insertText('- ', '')">Lista</button>
-            <button class="toolbar-btn" onclick="insertText('1. ', '')">Lista Num.</button>
-            <button class="toolbar-btn" onclick="insertText('> ', '')">Citação</button>
-            <button class="toolbar-btn" onclick="insertText('[', '](url)')">Link</button>
-            <button class="toolbar-btn" onclick="insertText('![', '](imagem.jpg)')">Imagem</button>
-            <button class="toolbar-btn" onclick="insertText('$$', '$$')">LaTeX Bloco</button>
-            <button class="toolbar-btn" onclick="insertText('$', '$')">LaTeX Inline</button>
-            <button class="toolbar-btn" onclick="insertText('---\n', '')">Linha</button>
-            <button class="toolbar-btn" onclick="loadMarkdownFile()">Abrir</button>
-			<button class="toolbar-btn" onclick="saveMarkdown()">Salvar</button>
-        </div>
-		
-        <div class="editor-container">
-            <div class="editor-panel">
-                <div class="panel-header">
-                    <span class="panel-title">📄 EDITOR MARKDOWN</span>
-                    <span id="charCount">0 caracteres</span>
-                </div>
-                <textarea id="markdownEditor" placeholder="Digite seu conteúdo Markdown aqui...
+<div class="bracket-corner tl"></div>
+<div class="bracket-corner tr"></div>
+<div class="bracket-corner bl"></div>
+<div class="bracket-corner br"></div>
 
-# Exemplo de Título
-**Texto em negrito** e *itálico*
+<div id="loading-overlay">
+  <div class="loading-glyph">🜂</div>
+  <div class="loading-text">Inicializando Nexus Editor...</div>
+</div>
+
+<!-- ══ HEADER ══ -->
+<header id="app-header">
+  <div class="header-logo">
+    <span class="logo-glyph">🜂</span>
+    <div>
+      <div class="logo-text">NEXUS EDITOR</div>
+      <div class="logo-sub">Repositório Universal</div>
+    </div>
+  </div>
+  <div class="header-sep"></div>
+  <span class="header-tag">dataCore v1.0</span>
+  <span class="header-tag">Route: Sagittarius</span>
+  <div class="header-sep"></div>
+  <div class="panel-toggles">
+    <button class="ptog-btn active" id="tog-toc"     onclick="togglePanel('toc')"    ><span class="ptog-dot"></span>TOC</button>
+    <button class="ptog-btn active" id="tog-editor"  onclick="togglePanel('editor')" ><span class="ptog-dot"></span>FORGE</button>
+    <button class="ptog-btn active" id="tog-preview" onclick="togglePanel('preview')"><span class="ptog-dot"></span>A4</button>
+  </div>
+  <div class="header-sep"></div>
+  <button class="hdr-btn" onclick="loadMarkdownFile()" title="Abrir arquivo .md">⬆ ABRIR</button>
+  <button class="hdr-btn" onclick="saveMarkdown()"     title="Baixar como .md">⬇ SALVAR</button>
+  <button class="hdr-btn" onclick="openFsLoad()"       title="Carregar do Firestore">☁ CARREGAR</button>
+  <button class="hdr-btn amber" onclick="openSettings()">⚙ CONFIG</button>
+  <div class="header-spacer"></div>
+  <div id="header-status"><span class="status-dot"></span><span>SISTEMA OPERACIONAL</span></div>
+  <div class="header-sep"></div>
+  <button class="btn-save-main" onclick="openSaveModal()"><span>⬡</span><span>COMMIT FIRESTORE</span></button>
+</header>
+
+<!-- ══ TABS ══ -->
+<div id="tabs-row"><!-- rendered by JS --></div>
+
+<!-- ══ TOOLBAR ══ -->
+<div id="toolbar">
+  <!-- Títulos -->
+  <button class="tb-btn" onclick="ins('h1')" title="Título H1"><img alt="H1" src="./assets/format_h1.svg"/></button>
+  <button class="tb-btn" onclick="ins('h2')" title="Título H2"><img alt="H2" src="./assets/format_h2.svg"/></button>
+  <button class="tb-btn" onclick="ins('h3')" title="Título H3"><img alt="H3" src="./assets/format_h3.svg"/></button>
+  <button class="tb-btn" onclick="ins('h4')" title="Título H4"><img alt="H4" src="./assets/format_h4.svg"/></button>
+  <button class="tb-btn" onclick="ins('h5')" title="Título H5"><img alt="H5" src="./assets/format_h5.svg"/></button>
+  <button class="tb-btn" onclick="ins('h6')" title="Título H6"><img alt="H6" src="./assets/format_h6.svg"/></button>
+  <div class="tb-sep"></div>
+
+  <!-- Formatação inline -->
+  <button class="tb-btn" onclick="ins('bold')"      title="Negrito (Ctrl+B)"><img alt="Bold" src="./assets/format_bold.svg"/></button>
+  <button class="tb-btn" onclick="ins('italic')"    title="Itálico (Ctrl+I)"><img alt="Italic" src="./assets/format_italic.svg"/></button>
+  <button class="tb-btn" onclick="ins('underline')" title="Sublinhado"><img alt="Underline" src="./assets/format_underlined.svg"/></button>
+  <button class="tb-btn" onclick="ins('strike')"    title="Tachado"><img alt="Strike" src="./assets/format_strikethrough.svg"/></button>
+  <button class="tb-btn" onclick="ins('highlight')" title="Realce / Marcador"><img alt="Highlight" src="./assets/format_ink_highlighter.svg"/></button>
+  <div class="tb-sep"></div>
+
+  <!-- Sobrescrito / Subscrito / Quebra -->
+  <button class="tb-btn" onclick="ins('sup')"       title="Sobrescrito (superscript)"><img alt="Superscript" src="./assets/format_superscript.svg"/></button>
+  <button class="tb-btn" onclick="ins('sub')"       title="Subscrito (subscript)"><img alt="Subscript" src="./assets/format_subscript.svg"/></button>
+  <button class="tb-btn" onclick="ins('br')"        title="Quebra de linha forçada"><img alt="Break" src="./assets/format_drag_handle.svg"/></button>
+  <div class="tb-sep"></div>
+
+  <!-- Código -->
+  <button class="tb-btn" onclick="ins('code-inline')" title="Código Inline"><img alt="Code" src="./assets/format_code.svg"/></button>
+  <button class="tb-btn" onclick="ins('code-block')"  title="Bloco de Código"><img alt="Code Block" src="./assets/format_code_block.svg"/></button>
+  <div class="tb-sep"></div>
+
+  <!-- LaTeX -->
+  <button class="tb-btn" onclick="ins('latex-inline')" title="LaTeX Inline"><img alt="LaTeX" src="./assets/format_function.svg"/></button>
+  <button class="tb-btn" onclick="ins('latex-block')"  title="LaTeX em Bloco"><img alt="LaTeX Block" src="./assets/format_square_root.svg"/></button>
+  <div class="tb-sep"></div>
+
+  <!-- Estrutura -->
+  <button class="tb-btn" onclick="ins('link')"       title="Link"><img alt="Link" src="./assets/format_link.svg"/></button>
+  <button class="tb-btn" onclick="ins('image')"      title="Imagem"><img alt="Image" src="./assets/format_image.svg"/></button>
+  <button class="tb-btn" onclick="ins('table')"      title="Tabela"><img alt="Table" src="./assets/format_table.svg"/></button>
+  <button class="tb-btn" onclick="ins('blockquote')" title="Citação"><img alt="Quote" src="./assets/format_quote.svg"/></button>
+  <button class="tb-btn" onclick="ins('hr')"         title="Separador horizontal"><img alt="Horizontal Rule" src="./assets/format_horizontal_rule.svg"/></button>
+  <div class="tb-sep"></div>
+
+  <!-- Listas -->
+  <button class="tb-btn" onclick="ins('list-ul')"   title="Lista com marcadores"><img alt="List Bulleted" src="./assets/format_list_bulleted.svg"/></button>
+  <button class="tb-btn" onclick="ins('list-ol')"   title="Lista numerada"><img alt="List Numbered" src="./assets/format_list_numbered.svg"/></button>
+  <button class="tb-btn" onclick="ins('checkbox')"  title="Lista de tarefas (checkbox)"><img alt="Checklist" src="./assets/format_checklist.svg"/></button>
+  <button class="tb-btn" onclick="ins('deflist')"   title="Lista de definição"><img alt="List Definition" src="./assets/format_list_definition.svg"/></button>
+  <div class="tb-sep"></div>
+
+  <!-- Ações -->
+  <button class="tb-btn green" onclick="forceRenderMath()" title="Renderizar LaTeX agora"><img alt="Render" src="./assets/format_latex.svg"/></button>
+  <div class="tb-sep"></div>
+  <button class="tb-btn amber" onclick="toggleSymbolPanel()" title="Banco de Símbolos"><img alt="Symbols" src="./assets/format_special_character.svg"/></button>
+</div>
+
+<!-- ══ MAIN LAYOUT ══ -->
+<div id="main-layout">
+
+  <!-- TOC -->
+  <aside id="toc-panel" class="panel" style="flex:0 0 220px;">
+    <div class="panel-collapsed-label">TOC — ÍNDICE</div>
+    <div class="panel-hdr">
+      <div><div class="panel-label">Índice</div><div class="panel-sub-title">Table of Contents</div></div>
+      <button class="btn-collapse" onclick="togglePanel('toc')">◀</button>
+    </div>
+    <div id="toc-content"><div class="toc-empty">// Nenhum cabeçalho<br>// detectado.</div></div>
+    <div id="toc-footer">
+      <div class="stat-row"><span class="stat-lbl">Palavras</span><span class="stat-val" id="stat-words">0</span></div>
+      <div class="stat-row"><span class="stat-lbl">Chars</span>  <span class="stat-val" id="stat-chars">0</span></div>
+      <div class="stat-row"><span class="stat-lbl">Linhas</span> <span class="stat-val" id="stat-lines">0</span></div>
+    </div>
+  </aside>
+  <div class="resize-handle" data-left="toc-panel" data-right="editor-panel"></div>
+
+  <!-- EDITOR -->
+  <section id="editor-panel" class="panel" style="flex:1 1 0;">
+    <div class="panel-collapsed-label">FORGE — EDITOR</div>
+    <div class="editor-hdr">
+      <span class="editor-module-tag">⬡ MÓDULO FORGE — ENTRADA ATIVA</span>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <button class="tb-btn" onclick="toggleSearch()" title="Buscar / Substituir (Ctrl+F)" style="font-size:10px;padding:2px 7px;">🔍</button>
+        <span class="editor-fname" id="editor-fname">corpus.md</span>
+      </div>
+    </div>
+    <!-- Search / Replace Bar -->
+    <div id="search-bar">
+      <div class="sb-row">
+        <input class="sb-input" id="sb-find" placeholder="Buscar..." oninput="sbSearch()" onkeydown="sbKeyNav(event)">
+        <span class="sb-count" id="sb-count"></span>
+        <button class="sb-btn" onclick="sbPrev()" title="Anterior">↑</button>
+        <button class="sb-btn" onclick="sbNext()" title="Próximo">↓</button>
+        <button class="sb-btn" onclick="toggleSearch()" title="Fechar">✕</button>
+      </div>
+      <div class="sb-row">
+        <input class="sb-input" id="sb-replace" placeholder="Substituir por...">
+        <button class="sb-btn cyan" onclick="sbReplaceOne()">Substituir</button>
+        <button class="sb-btn cyan" onclick="sbReplaceAll()">Substituir Todos</button>
+      </div>
+      <div class="sb-options">
+        <label class="sb-chk"><input type="checkbox" id="sb-case"><span>Aa Case</span></label>
+        <label class="sb-chk"><input type="checkbox" id="sb-regex"><span>.*Regex</span></label>
+        <label class="sb-chk"><input type="checkbox" id="sb-whole"><span>\\b Palavra</span></label>
+      </div>
+    </div>
+    <textarea id="md-editor" spellcheck="false" autocomplete="off"
+      placeholder="// Inicialize o corpus...
+// LaTeX renderiza ao sair do editor (blur) ou via ∑ RENDER
+
+# Título do Axioma
+
+## Definição
+Insira conteúdo aqui.
+
+## Equações
+Inline: $E = mc^2$
+
+Bloco:
+$$\int_{-\infty}^{\infty} e^{-x^2} dx = \sqrt{\pi}$$
 
 ## Código
-def quantum_state():
-return "Superposição quântica"
+\`\`\`python
+def nexus(x):
+    return x ** 2
+\`\`\`"></textarea>
+    <div id="math-indicator">
+      <span class="math-ind-dot"></span>
+      <span id="math-ind-text">LaTeX: aguardando edição</span>
+    </div>
+  </section>
+  <div class="resize-handle" data-left="editor-panel" data-right="preview-panel"></div>
 
-Matemática
+  <!-- PREVIEW -->
+  <section id="preview-panel" class="panel" style="flex:1 1 0;">
+    <div class="panel-collapsed-label">PREVIEW</div>
+    <div class="preview-hdr">
+      <span class="preview-module-tag">◈ PREVIEW</span>
+      <!-- Mode toggle -->
+      <div class="preview-mode-toggle">
+        <button class="pmode-btn active" id="pmode-html" onclick="setPreviewMode('html')" title="Modo HTML — renderização livre">⬛ HTML</button>
+        <button class="pmode-btn"        id="pmode-a4"   onclick="setPreviewMode('a4')"   title="Modo A4 — simulação de impressão">📄 A4</button>
+      </div>
+      <!-- Zoom controls — só visíveis no modo A4 -->
+      <div class="zoom-controls" id="zoom-controls-wrap" style="display:none;">
+        <span class="zoom-label">ZOOM</span>
+        <button class="zoom-btn" onclick="changeZoom(-0.05)">−</button>
+        <span class="zoom-val" id="zoom-val">90%</span>
+        <button class="zoom-btn" onclick="changeZoom(+0.05)">+</button>
+        <button class="zoom-btn zoom-reset" onclick="resetZoom()">FIT</button>
+      </div>
+      <button class="btn-print" onclick="window.print()">⎙ IMPRIMIR</button>
+    </div>
+    <div id="preview-scroll">
+      <div id="a4-sheet"><div id="preview-content"></div></div>
+    </div>
+  </section>
 
-Equação de Schrödinger:
-i\hbar\frac{\partial}{\partial t}\Psi = \hat{H}\Psi
+</div>
 
-Listas
+<!-- ══ SYMBOL PANEL ══ -->
+<div id="symbol-panel">
+  <div class="sym-panel-hdr">
+    <div><div class="sym-panel-title">⟨ BANCO DE SÍMBOLOS ⟩</div><div class="sym-panel-sub">Física · Matemática · Química · Computação</div></div>
+    <button class="btn-sym-close" onclick="toggleSymbolPanel()">✕</button>
+  </div>
+  <div id="color-tools">
+    <div class="ct-tabs">
+      <button class="ct-tab active" data-ct="font"   onclick="selectColorTab('font')">Fonte</button>
+      <button class="ct-tab"        data-ct="bg"     onclick="selectColorTab('bg')">Fundo</button>
+      <button class="ct-tab"        data-ct="border" onclick="selectColorTab('border')">Borda</button>
+      <button class="ct-tab"        data-ct="fill"   onclick="selectColorTab('fill')">Contorno</button>
+    </div>
+    <div class="ct-row">
+      <span class="ct-label">Cores</span>
+      <div class="ct-swatches" id="ct-swatches"></div>
+      <div class="ct-custom">
+        <input type="color" id="ct-custom-color" value="#00d4ff" oninput="onCustomColor(this.value)">
+      </div>
+    </div>
+    <div class="ct-prev-strip">
+      <div class="ct-prev-box" id="ct-preview-box">Aₓ · Ω · Σ · ∫</div>
+      <button class="btn-apply-color" onclick="applyColorToSelection()">APLICAR</button>
+      <button class="btn-clear-color" onclick="clearColorFromSelection()">LIMPAR</button>
+    </div>
+  </div>
+  <div class="sym-search-row">
+    <input type="text" class="sym-search" id="sym-search" placeholder="buscar símbolo... ex: integral, alpha..." oninput="filterSymbols(this.value)">
+  </div>
+  <div class="sym-cats" id="sym-cats"></div>
+  <div id="sym-grid-wrap"></div>
+</div>
 
-· Item 1
-· Item 2
-· Item 3
-
-Citação científica interessante..."></textarea>
-            </div>
-            <div class="preview-panel">
-                <div class="panel-header">
-                    <span class="panel-title">👁️ PREVIEW EM TEMPO REAL</span>
-                </div>
-                <div id="markdownPreview"></div>
-            </div>
+<!-- ══ MODAL SAVE ══ -->
+<div id="modal-overlay">
+  <div id="modal-box">
+    <div class="modal-hdr">
+      <div><div class="modal-eyebrow">Sagittarius Router · dataCore</div><div class="modal-title">COMMIT DE DOCUMENTO</div></div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field-group">
+        <label class="field-label" for="input-title">Título <span class="req">*</span></label>
+        <input type="text" id="input-title" class="field-input" placeholder="Ex: Axioma da Relatividade Geral..." maxlength="120">
+      </div>
+      <div class="field-group">
+        <label class="field-label" for="input-status">Status <span class="req">*</span></label>
+        <div class="select-wrap">
+          <select id="input-status" class="field-select" onchange="updateStatusBadge()">
+            <option value="">— Selecione o status —</option>
+            <option value="Em construção">Em construção</option>
+            <option value="Conjectura">Conjectura</option>
+            <option value="Erro">Erro</option>
+          </select>
+          <span class="select-arrow">▾</span>
         </div>
+        <div id="status-badge-prev" class="status-badge-prev"><span>◆</span><span id="badge-text"></span></div>
+      </div>
+    </div>
+    <div class="modal-ftr">
+      <button class="btn-cancel" onclick="closeModal()">CANCELAR</button>
+      <button class="btn-confirm" id="btn-confirm-save" onclick="commitToFirestore()"><span>⬡</span><span>GRAVAR NO FIRESTORE</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SETTINGS MODAL ══ -->
+<div id="settings-overlay">
+  <div class="settings-panel">
+    <div class="settings-header">
+      <div class="settings-title">CONFIGURAÇÕES DO EDITOR</div>
+      <button class="close-settings" onclick="closeSettings()">✕</button>
     </div>
 
-    <script>
-        const editor = document.getElementById('markdownEditor');
-        const preview = document.getElementById('markdownPreview');
-        const charCount = document.getElementById('charCount');
+    <div class="settings-section">
+      <div class="section-title">Tema Geral</div>
+      <div class="setting-row">
+        <div class="setting-label">Tema do Editor</div>
+        <div class="theme-buttons">
+          <button class="theme-btn active" onclick="setTheme('dark',event)">Dark</button>
+          <button class="theme-btn" onclick="setTheme('light',event)">Light</button>
+        </div>
+      </div>
+    </div>
 
-		// ✅ SOLUÇÃO CORRETA - Cole isso no seu código original
+    <div class="settings-section">
+      <div class="section-title">Cores dos Títulos (Preview)</div>
+      <!-- H1-H6 rows generated by JS -->
+      <div id="heading-settings"></div>
+    </div>
 
-		function updatePreview() {
-			let markdownText = editor.value;
-			
-			// ✅ PROCESSAR LINHA POR LINHA PARA PROTEGER PIPES EM CÓDIGO INLINE
-			const lines = markdownText.split('\n');
-			const processedLines = lines.map(line => {
-				// Detectar se é uma linha de tabela (contém | fora de backticks)
-				// Contar pipes fora de código
-				let inCode = false;
-				let pipeCount = 0;
-				
-				for (let i = 0; i < line.length; i++) {
-					if (line[i] === '`') {
-						inCode = !inCode;
-					} else if (line[i] === '|' && !inCode) {
-						pipeCount++;
-					}
-				}
-				
-				// Se tem pelo menos 1 pipe fora de código, é provável que seja tabela
-				if (pipeCount > 0) {
-					// Proteger pipes dentro de código usando barra invertida
-					let result = '';
-					let inBacktick = false;
-					
-					for (let i = 0; i < line.length; i++) {
-						if (line[i] === '`') {
-							inBacktick = !inBacktick;
-							result += line[i];
-						} else if (line[i] === '|' && inBacktick) {
-							// Usar barra invertida para escapar pipe dentro de código
-							result += '\\|';
-						} else {
-							result += line[i];
-						}
-					}
-					
-					return result;
-				}
-				
-				return line;
-			});
-			
-			markdownText = processedLines.join('\n');
-			
-			// Configuração do marked para melhor renderização
-			marked.setOptions({
-				breaks: true,
-				gfm: true
-			});
-			
-			preview.innerHTML = marked.parse(markdownText);
-			charCount.textContent = `${editor.value.length} caracteres`;
+    <div class="settings-section">
+      <div class="section-title">Código Inline</div>
+      <div class="setting-row"><div class="setting-label">Cor do Texto</div><input type="color" class="color-input" id="codeInlineColor" value="#e10f0f"></div>
+      <div class="setting-row"><div class="setting-label">Cor de Fundo</div><input type="color" class="color-input" id="codeInlineBg" value="#141414"></div>
+    </div>
 
-			// Atualiza o preview do MathJax para renderização das fórmulas LaTeX
-			if (window.MathJax) {
-				setTimeout(() => {
-					MathJax.typesetPromise([preview]).catch((err) => console.error(err.message));
-				}, 0);
-			}
+    <div class="settings-section">
+      <div class="section-title">LaTeX Inline</div>
+      <div class="setting-row"><div class="setting-label">Cor do Texto</div><input type="color" class="color-input" id="latexInlineColor" value="#283cff"></div>
+      <div class="setting-row"><div class="setting-label">Cor de Fundo</div>
+        <div class="s-row-flex"><input type="color" class="color-input" id="latexInlineBg" value="#000000"><input type="checkbox" id="latexInlineBgTransparent" checked><span class="s-chk-label">Transparente</span></div>
+      </div>
+    </div>
 
-			// Atualiza o highlight.js para realçar código no preview
-			preview.querySelectorAll('pre code').forEach((block) => {
-				hljs.highlightBlock(block);
-			});
-		}
-        editor.addEventListener('input', updatePreview);
+    <div class="settings-section">
+      <div class="section-title">Bloco de Citação</div>
+      <div class="setting-row"><div class="setting-label">Cor do Texto</div><input type="color" class="color-input" id="quoteColor" value="#00ff05"></div>
+      <div class="setting-row"><div class="setting-label">Cor de Fundo</div><input type="color" class="color-input" id="quoteBg" value="#0a281e"></div>
+      <div class="setting-row"><div class="setting-label">Cor da Borda</div><input type="color" class="color-input" id="quoteBorder" value="#00ff0f"></div>
+    </div>
 
-        window.onload = () => {
-            updatePreview();
-        };
+    <div class="settings-section">
+      <div class="section-title">Bloco de LaTeX</div>
+      <div class="setting-row"><div class="setting-label">Cor do Texto</div><input type="color" class="color-input" id="latexBlockColor" value="#283cff"></div>
+      <div class="setting-row"><div class="setting-label">Cor de Fundo</div><input type="color" class="color-input" id="latexBlockBg" value="#141414"></div>
+      <div class="setting-row"><div class="setting-label">Cor da Borda</div><input type="color" class="color-input" id="latexBlockBorder" value="#283cff"></div>
+    </div>
 
-        // Função para indentação com Tab
-        function handleTabKey(e) {
-            if (e.key === 'Tab') {
-                e.preventDefault();
-                
-                const start = editor.selectionStart;
-                const end = editor.selectionEnd;
-                const text = editor.value;
-                
-                // Se há texto selecionado, indentar/dedentar múltiplas linhas
-                if (start !== end) {
-                    const before = text.substring(0, start);
-                    const selected = text.substring(start, end);
-                    const after = text.substring(end);
-                    
-                    // Verificar se é Shift+Tab (dedentar)
-                    if (e.shiftKey) {
-                        // Remover indentação (2 espaços ou tab)
-                        const dedented = selected.replace(/^( {2}|\t)/gm, '');
-                        editor.value = before + dedented + after;
-                        editor.setSelectionRange(start, start + dedented.length);
-                    } else {
-                        // Adicionar indentação (2 espaços)
-                        const indented = selected.replace(/^/gm, '  ');
-                        editor.value = before + indented + after;
-                        editor.setSelectionRange(start, start + indented.length);
-                    }
-                } else {
-                    // Apenas inserir 2 espaços na posição atual
-                    const spaces = '  ';
-                    editor.value = text.substring(0, start) + spaces + text.substring(end);
-                    editor.setSelectionRange(start + spaces.length, start + spaces.length);
-                }
-                
-                updatePreview();
-            }
-        }
+    <div class="settings-section">
+      <div class="section-title">Bloco de Código</div>
+      <div class="setting-row"><div class="setting-label">Cor de Fundo</div><input type="color" class="color-input" id="codeBlockBg" value="#141414"></div>
+      <div class="setting-row"><div class="setting-label">Cor da Borda</div><input type="color" class="color-input" id="codeBlockBorder" value="#00ff0f"></div>
+    </div>
 
-        // Adicionar evento de teclado para o Tab
-        editor.addEventListener('keydown', handleTabKey);
+    <div class="settings-section">
+      <div class="section-title">Tabela / HR</div>
+      <div class="setting-row"><div class="setting-label">Cabeçalho da Tabela</div><input type="color" class="color-input" id="tableHeaderBg" value="#007d32"></div>
+      <div class="setting-row"><div class="setting-label">Cor do HR</div><input type="color" class="color-input" id="hrColor" value="#ffffff"></div>
+      <div class="setting-row"><div class="setting-label">Espessura HR (px)</div><input type="number" class="setting-input" id="hrThickness" value="1" min="1" max="10"></div>
+      <div class="setting-row"><div class="setting-label">Estilo HR</div>
+        <select class="setting-input" id="hrStyle">
+          <option value="solid">Sólida</option><option value="dashed">Tracejada</option><option value="dotted">Pontilhada</option>
+        </select>
+      </div>
+    </div>
 
-        function insertText(prefix, suffix) {
-            const start = editor.selectionStart;
-            const end = editor.selectionEnd;
-            const text = editor.value;
+    <div class="settings-section">
+      <div class="section-title">Tipografia</div>
+      <div class="setting-row"><div class="setting-label">Família da Fonte (Preview)</div>
+        <select class="setting-input" id="fontFamily">
+          <option value="Georgia, serif">Georgia</option>
+          <option value="'Times New Roman', serif">Times New Roman</option>
+          <option value="'Segoe UI', sans-serif">Segoe UI</option>
+          <option value="Arial, sans-serif">Arial</option>
+          <option value="Verdana, sans-serif">Verdana</option>
+          <option value="Calibri, sans-serif">Calibri</option>
+          <option value="'Courier New', monospace">Courier New</option>
+        </select>
+      </div>
+      <div id="font-size-settings"></div>
+      <div class="setting-row"><div class="setting-label">Cor do Parágrafo</div>
+        <div class="s-row-flex">
+          <input type="color" class="color-input" id="pColor" value="#ffffff">
+          <span class="s-chk-label">Cor dos parágrafos e texto geral</span>
+        </div>
+      </div>
+      <div class="setting-row"><div class="setting-label">Cor dos Links</div>
+        <div class="s-row-flex">
+          <input type="color" class="color-input" id="linkColor" value="#004bff">
+          <span class="s-chk-label">Hyperlinks no preview</span>
+        </div>
+      </div>
+    </div>
 
-            const before = text.substring(0, start);
-            const selected = text.substring(start, end);
-            const after = text.substring(end);
+    <div class="settings-section">
+      <div class="section-title">Espaçamento e Layout</div>
+      <div class="setting-row"><div class="setting-label">Espaço horizontal (letter-spacing)</div><input type="number" class="setting-input" id="spacingHorizontal" value="0" min="-5" max="10" step="0.1"></div>
+      <div class="setting-row"><div class="setting-label">Espaço vertical (line-height)</div><input type="number" class="setting-input" id="spacingVertical" value="1.7" min="1" max="3" step="0.1"></div>
+      <div class="setting-row"><div class="setting-label">Espaço entre palavras</div><input type="number" class="setting-input" id="wordSpacing" value="0" min="-5" max="20" step="1"></div>
+      <div class="setting-row"><div class="setting-label">Margens internas (px)</div><input type="number" class="setting-input" id="margins" value="20" min="0" max="100" step="5"></div>
+      <div class="setting-row"><div class="setting-label">Alinhamento do Texto</div>
+        <select class="setting-input" id="textAlign">
+          <option value="left">Esquerda</option><option value="right">Direita</option>
+          <option value="center">Centro</option><option value="justify">Justificado</option>
+        </select>
+      </div>
+    </div>
 
-            let newText;
-            if (selected.length > 0) {
-                newText = before + prefix + selected + suffix + after;
-            } else {
-                newText = before + prefix + suffix + after;
-            }
+    <div class="settings-footer">
+      <button class="btn-settings-reset" onclick="resetSettings()">RESTAURAR PADRÃO</button>
+      <button class="btn-settings-apply" onclick="applySettings()">APLICAR CONFIGURAÇÕES</button>
+    </div>
+  </div>
+</div>
 
-            editor.value = newText;
+<!-- ══ STATUS BAR ══ -->
+<div id="status-bar">
+  <div class="sb-left">
+    <span class="sb-stat"><span id="sb-words">0</span> palavras</span>
+    <span class="sb-stat"><span id="sb-chars">0</span> chars</span>
+    <span class="sb-stat"><span id="sb-lines">0</span> linhas</span>
+    <span id="read-time">~0 min</span>
+    <span id="cursor-pos">Ln <span id="cur-ln">1</span>, Col <span id="cur-col">1</span></span>
+    <span class="sb-stat">Tab: <span id="sb-tab">Documento 1</span></span>
+  </div>
+  <div class="sb-right">
+    <div id="autosave-dot"><span class="as-dot"></span><span id="as-text">auto-save ativo</span></div>
+    <span class="sb-stat">NEXUS EDITOR · Markdown + LaTeX + Firebase</span>
+    <div id="fb-status"><div class="fb-dot" id="fb-dot"></div><span id="fb-status-text">Firebase: init...</span></div>
+  </div>
+</div>
 
-            // Coloca o cursor entre prefixo e sufixo, se o sufixo existir
-            const cursorPos = selected.length > 0 ? end + prefix.length + suffix.length : start + prefix.length;
-            editor.setSelectionRange(cursorPos, cursorPos);
+<!-- ══ FIRESTORE LOAD MODAL ══ -->
+<div id="fs-load-overlay">
+  <div id="fs-load-box">
+    <div class="fs-load-hdr">
+      <div>
+        <div class="fs-load-eyebrow">dataCore · Sagittarius</div>
+        <div class="fs-load-title">CARREGAR DOCUMENTO</div>
+      </div>
+      <button class="modal-close" onclick="closeFsLoad()">✕</button>
+    </div>
+    <div class="fs-load-search">
+      <input type="text" id="fs-search-input" placeholder="Filtrar documentos..." oninput="filterFsDocs(this.value)">
+    </div>
+    <div id="fs-doc-list"><div class="fs-empty">// Conectando ao Firestore...</div></div>
+    <div class="fs-load-ftr">
+      <button class="btn-cancel" onclick="closeFsLoad()">CANCELAR</button>
+      <button class="btn-confirm" id="btn-load-confirm" onclick="confirmFsLoad()" disabled><span>☁</span><span>ABRIR DOCUMENTO</span></button>
+    </div>
+  </div>
+</div>
 
-            editor.focus();
-            updatePreview();
-        }
-		
-		function saveMarkdown() {
-			const text = editor.value;
-			const blob = new Blob([text], {type: 'text/markdown'});
-			const url = URL.createObjectURL(blob);
-			const a = document.createElement('a');
-			a.href = url;
-			a.download = 'editor.md';
-			document.body.appendChild(a);
-			a.click();
-			document.body.removeChild(a);
-			URL.revokeObjectURL(url);
-		}
+<!-- ══ DIFF MODAL ══ -->
+<div id="diff-overlay" style="position:fixed;inset:0;background:rgba(4,6,8,.88);z-index:5300;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px);">
+  <div style="width:680px;max-height:82vh;background:var(--bg-panel);border:1px solid var(--border-bright);display:flex;flex-direction:column;position:relative;">
+    <div style="padding:12px 16px;border-bottom:1px solid var(--border-dim);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+      <div>
+        <div style="font-family:var(--font-mono);font-size:8px;letter-spacing:3px;color:var(--cyan-mid);text-transform:uppercase;margin-bottom:3px;">Comparação de Versões</div>
+        <div style="font-family:var(--font-ui);font-weight:700;font-size:15px;letter-spacing:2px;color:var(--text-primary);">DIFF — LOCAL vs FIRESTORE</div>
+      </div>
+      <button class="modal-close" onclick="closeDiff()">✕</button>
+    </div>
+    <div style="padding:8px 14px;border-bottom:1px solid var(--border-dim);flex-shrink:0;display:flex;gap:16px;">
+      <span style="font-family:var(--font-mono);font-size:9px;display:flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;background:rgba(61,255,160,.3);border-left:3px solid var(--green-ok);display:inline-block;"></span>Adicionado</span>
+      <span style="font-family:var(--font-mono);font-size:9px;display:flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;background:rgba(255,85,85,.3);border-left:3px solid var(--red-alert);display:inline-block;"></span>Removido</span>
+      <span style="font-family:var(--font-mono);font-size:9px;display:flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;background:rgba(56,200,240,.2);border-left:3px solid var(--cyan-base);display:inline-block;"></span>Modificado</span>
+    </div>
+    <div id="diff-content" style="flex:1;overflow-y:auto;padding:10px 16px;font-family:var(--font-mono);font-size:12px;line-height:1.7;"></div>
+    <div style="padding:10px 16px;border-top:1px solid var(--border-dim);display:flex;justify-content:flex-end;gap:8px;flex-shrink:0;">
+      <button class="btn-cancel" onclick="closeDiff()">FECHAR</button>
+      <button class="btn-confirm" onclick="applyFirestoreVersion()"><span>↓</span><span>USAR VERSÃO FIRESTORE</span></button>
+    </div>
+  </div>
+</div>
 
-        function loadMarkdownFile() {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = '.md,.markdown,.txt';
-            
-            input.onchange = e => {
-                const file = e.target.files[0];
-                if (!file) return;
-                
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    editor.value = e.target.result;
-                    updatePreview();
-                    
-                    // Mostra mensagem de sucesso
-                    setTimeout(() => {
-                        alert(`Arquivo "${file.name}" carregado com sucesso!`);
-                    }, 100);
-                };
-                reader.onerror = function() {
-                    alert('Erro ao carregar o arquivo.');
-                };
-                reader.readAsText(file);
-            };
-            
-            input.click();
-        }
-    </script>
+<div id="toast"><span class="t-icon" id="toast-icon">◆</span><span id="toast-msg"></span></div>
+
+<script src="./script.js"></script>
 </body>
 </html>

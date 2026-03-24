@@ -2,10 +2,6 @@
    NEXUS EDITOR v3 — FULL ENGINE
    ═══════════════════════════════════════════════════ */
 
-// import app from './firebase.js'; // Ajuste o caminho conforme sua estrutura de pastas
-
-// console.log("Firebase inicializado no Nexus Editor!", app.name);
-
 // ══ FIREBASE CONFIG ══
 const FIREBASE_CONFIG = {
   apiKey:            "SUA_API_KEY",

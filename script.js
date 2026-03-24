@@ -2,9 +2,9 @@
    NEXUS EDITOR v3 — FULL ENGINE
    ═══════════════════════════════════════════════════ */
 
-import app from './firebase.js'; // Ajuste o caminho conforme sua estrutura de pastas
+// import app from './firebase.js'; // Ajuste o caminho conforme sua estrutura de pastas
 
-console.log("Firebase inicializado no Nexus Editor!", app.name);
+// console.log("Firebase inicializado no Nexus Editor!", app.name);
 
 // ══ FIREBASE CONFIG ══
 const FIREBASE_CONFIG = {
@@ -15,6 +15,7 @@ const FIREBASE_CONFIG = {
   messagingSenderId: "SEU_SENDER_ID",
   appId:             "SEU_APP_ID"
 };
+
 let db = null;
 function initFirebase(){
   try{

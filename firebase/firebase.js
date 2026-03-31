@@ -5,7 +5,7 @@ import { initializeApp } from "firebase/app";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-    apiKey: "",
+    apiKey: "AIzaSyA9CAztrSnIQ3RiYyyB94b6k_twEqsOxLY",
     authDomain: "nexus-editor.firebaseapp.com",
     projectId: "nexus-editor",
     storageBucket: "nexus-editor.firebasestorage.app",
@@ -15,3 +15,5 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
+
+export const db = getFirestore(app);
